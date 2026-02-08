@@ -1,0 +1,38 @@
+{
+  "$schema": "https://railway.app/json-schema/v0.47.0.json",
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "startCommand": "node src/api/server.js",
+    "restartPolicyType": "on_failure",
+    "restartPolicyMaxRetries": 5
+  },
+  "env": {
+    "NODE_ENV": {
+      "description": "Node.js environment",
+      "value": "production"
+    },
+    "PORT": {
+      "description": "Server port",
+      "value": "$PORT",
+      "value_type": "RANDOM_PORT"
+    },
+    "JWT_SECRET": {
+      "description": "Secret key for JWT tokens (generate a random string)",
+      "value": ""
+    },
+    "ANTHROPIC_API_KEY": {
+      "description": "Anthropic API key (get from https://console.anthropic.com)",
+      "value": ""
+    },
+    "TELEGRAM_BOT_TOKEN": {
+      "description": "Telegram bot token (optional, get from BotFather)",
+      "value": ""
+    },
+    "DB_PATH": {
+      "description": "Database path for SQLite",
+      "value": "/app/data/agent-saas.db"
+    }
+  }
+}

@@ -69,6 +69,44 @@ agent-saas/
 - **Semaine 2** : Agent core + mémoire + onboarding
 - **Semaine 3** : Actions + Stripe + Beta test
 
+## 🚀 Déploiement
+
+### Railway
+
+L'app est prête pour le déploiement sur [Railway](https://railway.app) :
+
+```bash
+# Option 1 : Déployer depuis le dashboard Railway
+# (Voir DEPLOYMENT.md pour les détails)
+
+# Option 2 : CLI
+railway login
+railway init
+railway variables set ANTHROPIC_API_KEY=sk-ant-...
+railway variables set JWT_SECRET=your-secret
+railway up
+```
+
+📖 **Voir [DEPLOYMENT.md](./DEPLOYMENT.md) pour les instructions complètes.**
+
+## Installation locale
+
+```bash
+# Install dependencies
+npm install
+
+# Initialize database
+npm run db:init
+
+# Start dev server
+npm run dev
+
+# Production server
+npm start
+```
+
+L'app écoute sur `http://localhost:3000`.
+
 ---
 
 *Projet démarré le 8 février 2026*
