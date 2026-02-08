@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentions Légales - Ton Agent IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 0, 150, 0.05) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Grain overlay */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.7;
+        }
+
+        nav .logo {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 32px;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero section */
+        .hero {
+            min-height: 35vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .hero .sub {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Content */
+        .legal-content {
+            padding: 60px 20px;
+        }
+
+        .legal-content h2 {
+            font-size: 1.8rem;
+            margin-top: 48px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(120, 0, 255, 0.3);
+            padding-bottom: 16px;
+        }
+
+        .legal-content h2:first-of-type {
+            margin-top: 0;
+        }
+
+        .legal-content h3 {
+            font-size: 1.2rem;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: rgba(120, 0, 255, 0.8);
+        }
+
+        .legal-content p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 16px;
+        }
+
+        .legal-content ul {
+            list-style: none;
+            margin: 16px 0 16px 0;
+            color: rgba(255,255,255,0.7);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .legal-content ul li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .legal-content ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: rgba(120, 0, 255, 0.6);
+        }
+
+        .legal-content a {
+            color: rgba(120, 0, 255, 0.8);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .legal-content a:hover {
+            opacity: 0.6;
+        }
+
+        .highlight {
+            background: rgba(120, 0, 255, 0.1);
+            padding: 24px;
+            border-left: 3px solid rgba(120, 0, 255, 0.5);
+            border-radius: 8px;
+            margin: 24px 0;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Footer */
+        footer {
+            padding: 48px 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        footer a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        footer a:hover {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            nav ul {
+                gap: 16px;
+                font-size: 14px;
+            }
+            .legal-content h2 {
+                font-size: 1.4rem;
+            }
+            .legal-content h3 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="grain"></div>
+
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">⚡ Ton Agent</a>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/about.html">À propos</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/legal.html">Légal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Mentions Légales & CGU</h1>
+        <p class="sub">Transparence et clarté : comment on fonctionne.</p>
+    </section>
+
+    <section class="legal-content">
+        <div class="container">
+            <h2>Mentions Légales</h2>
+
+            <h3>Éditeur du site</h3>
+            <p>
+                Le présent site est édité par :<br>
+                <strong>Ton Agent IA SAS</strong><br>
+                123 Avenue de l'Intelligence Artificielle<br>
+                75008 Paris, France<br>
+                SIRET : 123 456 789 00012<br>
+                Email : <a href="mailto:legal@tonagent.ai">legal@tonagent.ai</a>
+            </p>
+
+            <h3>Directeur de Publication</h3>
+            <p>
+                <strong>Marie Dubois</strong> — Présidente Directrice Générale
+            </p>
+
+            <h3>Hébergement</h3>
+            <p>
+                Le site est hébergé par :<br>
+                Vercel Inc.<br>
+                440 N Barranca Ave<br>
+                Sunnyvale, CA 94087, USA
+            </p>
+
+            <h3>Données personnelles</h3>
+            <p>
+                Nous accordons une importance particulière à la protection de vos données personnelles.
+                Consultez notre <a href="/privacy.html">politique de confidentialité</a> pour connaître
+                comment nous collectons, utilisons et protégeons vos données.
+            </p>
+
+            <h2>Conditions Générales d'Utilisation</h2>
+
+            <h3>1. Objet</h3>
+            <p>
+                Les présentes Conditions Générales d'Utilisation (CGU) s'appliquent à l'utilisation
+                du service "Ton Agent IA" (ci-après "le Service") proposé par Ton Agent IA SAS.
+            </p>
+
+            <h3>2. Accès au Service</h3>
+            <p>
+                L'accès au Service est réservé aux personnes physiques âgées d'au moins 18 ans ou
+                disposant de l'autorisation parentale. En acceptant ces CGU, vous certifiez être
+                en droit d'utiliser le Service.
+            </p>
+
+            <h3>3. Compte Utilisateur</h3>
+            <ul>
+                <li>Vous êtes responsable de la confidentialité de vos identifiants</li>
+                <li>Vous acceptez d'être responsable de toute activité effectuée via votre compte</li>
+                <li>Vous vous engagez à nous notifier rapidement de tout accès non autorisé</li>
+                <li>Un compte ne peut pas être utilisé à des fins commerciales sans accord écrit</li>
+            </ul>
+
+            <h3>4. Utilisation Acceptable</h3>
+            <p>
+                Vous vous engagez à ne pas :
+            </p>
+            <ul>
+                <li>Utiliser le Service à des fins illégales ou non autorisées</li>
+                <li>Harceler, menacer, ou intimider d'autres utilisateurs</li>
+                <li>Contourner les mesures de sécurité du Service</li>
+                <li>Transmettre des virus, malwares ou code malveillant</li>
+                <li>Scraper ou accéder non autorisé au contenu</li>
+                <li>Utiliser le Service pour entrainer d'autres modèles d'IA sans permission</li>
+            </ul>
+
+            <h3>5. Propriété Intellectuelle</h3>
+            <p>
+                Tout le contenu du Service (code, texte, logos, design) reste la propriété
+                exclusive de Ton Agent IA SAS. Vous obtenez une licence limitée et non-exclusive
+                pour utiliser le Service selon ces conditions.
+            </p>
+            <p>
+                Les contenus générés par le Service sont votre propriété, sauf disposition
+                contraire prévue dans le contrat d'abonnement.
+            </p>
+
+            <h3>6. Responsabilité</h3>
+            <div class="highlight">
+                <strong>Clause de limitation :</strong><br>
+                Ton Agent IA SAS ne peut être tenu responsable des dégâts directs, indirects,
+                accessoires ou consécutifs résultant de l'utilisation du Service. En particulier :
+                <ul style="margin-top: 12px;">
+                    <li>Perte de données ou de profits</li>
+                    <li>Interruption de service</li>
+                    <li>Erreurs ou imprécisions dans les réponses de l'agent</li>
+                </ul>
+            </div>
+
+            <h3>7. Confidentialité et Sécurité des Données</h3>
+            <ul>
+                <li>Tes données te appartiennent à 100%</li>
+                <li>Nous ne les revendons jamais</li>
+                <li>Nous ne les utilisons pas pour entrainer d'autres modèles</li>
+                <li>Tu peux demander leur suppression complète à tout moment</li>
+                <li>Nous utilisons le chiffrement de bout en bout pour la transmission</li>
+            </ul>
+
+            <h3>8. Modifications du Service</h3>
+            <p>
+                Nous nous réservons le droit de modifier ou d'interrompre le Service à tout moment.
+                Les modifications matérielles te seront communiquées par email 30 jours à l'avance.
+            </p>
+
+            <h3>9. Résiliation</h3>
+            <p>
+                Ton Agent IA SAS peut résilier ton compte à tout moment si tu violes ces CGU.
+                Tu peux résilier ton abonnement à tout moment sans frais cachés.
+            </p>
+
+            <h3>10. Droit Applicable</h3>
+            <p>
+                Ces CGU sont régies par le droit français. Tout litige sera soumis à la juridiction
+                exclusive des tribunaux de Paris.
+            </p>
+
+            <h3>11. Contact pour les Questions Légales</h3>
+            <p>
+                Pour toute question concernant ces mentions légales ou les CGU :<br>
+                Email : <a href="mailto:legal@tonagent.ai">legal@tonagent.ai</a>
+            </p>
+
+            <div class="highlight" style="margin-top: 48px;">
+                <strong>Dernière mise à jour :</strong> Février 2026<br>
+                En accédant au Service, tu acceptes l'intégralité de ces conditions.
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Ton Agent IA — <a href="/legal.html">Mentions légales</a> • <a href="/about.html">À propos</a> • <a href="/contact.html">Contact</a></p>
+        </div>
+    </footer>
+</body>
+</html>

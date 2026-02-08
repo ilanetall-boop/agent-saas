@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À propos - Ton Agent IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 0, 150, 0.05) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Grain overlay */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.7;
+        }
+
+        nav .logo {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 32px;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero section */
+        .hero {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .hero .sub {
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.5);
+            max-width: 600px;
+        }
+
+        /* Content sections */
+        section {
+            padding: 80px 20px;
+        }
+
+        section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        /* Mission */
+        .mission {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 48px;
+            border-radius: 24px;
+        }
+
+        .mission h3 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            color: rgba(120, 0, 255, 0.8);
+        }
+
+        .mission p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Values */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .value-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 32px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .value-card:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-4px);
+        }
+
+        .value-card .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .value-card h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .value-card p {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Team */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .team-member {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 32px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .team-member:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .team-member .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7000ff, #00c8ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 20px;
+        }
+
+        .team-member h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .team-member .role {
+            color: rgba(120, 0, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .team-member p {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            padding: 48px 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        footer a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        footer a:hover {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            section h2 {
+                font-size: 1.8rem;
+            }
+            nav ul {
+                gap: 16px;
+                font-size: 14px;
+            }
+            .mission {
+                padding: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="grain"></div>
+
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">⚡ Ton Agent</a>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/about.html">À propos</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/legal.html">Légal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>À propos de nous</h1>
+        <p class="sub">Notre mission : révolutionner la façon dont tu travailles avec l'IA.</p>
+    </section>
+
+    <section id="mission">
+        <div class="container">
+            <h2>Notre Mission</h2>
+            <div class="mission">
+                <h3>Democratiser l'IA pour tout le monde</h3>
+                <p>
+                    Nous croyons que chaque personne devrait avoir accès à un assistant IA personnel puissant,
+                    simple d'utilisation et entièrement privé. Sans code compliqué, sans configs d'enfer.
+                    Juste toi, ton agent, et tes ambitions. Dès 2026, ça devient possible.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="values">
+        <div class="container">
+            <h2>Nos Valeurs</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="icon">🔐</div>
+                    <h3>Confidentialité</h3>
+                    <p>Tes données t'appartiennent. Zéro tracking, zéro vente d'infos. Isolation totale.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon">🚀</div>
+                    <h3>Simplicité</h3>
+                    <p>Pas de jargon, pas de configuration complexe. Tu décris, on exécute. Voilà.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon">⚡</div>
+                    <h3>Action</h3>
+                    <p>Pas de promesses vides. Ton agent crée, code, automatise. Du concret.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon">🌍</div>
+                    <h3>Accessibilité</h3>
+                    <p>Pour tous. Peu importe ton budget, ton expérience technique ou ta location.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon">💡</div>
+                    <h3>Innovation</h3>
+                    <p>On s'améliore chaque jour. Nouvelles features, meilleure compréhension, plus puissant.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon">🤝</div>
+                    <h3>Transparence</h3>
+                    <p>On te dit ce qu'on fait, comment on le fait, et pourquoi. Pas de cachettes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="team">
+        <div class="container">
+            <h2>L'Équipe</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="avatar">🧠</div>
+                    <h3>Alex Renault</h3>
+                    <div class="role">Co-fondateur & CTO</div>
+                    <p>Ancien ingénieur ML chez Google. Spécialiste IA et systèmes autonomes. Rêve d'agents qui pensent vraiment.</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">💼</div>
+                    <h3>Marie Dubois</h3>
+                    <div class="role">Co-fondatrice & CEO</div>
+                    <p>Startupeur en série. Visionnaire du futur. A mis 3 ans à convaincre Alex que c'était LA bonne idée.</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">🎨</div>
+                    <h3>Sam Lefevre</h3>
+                    <div class="role">Head of Product</div>
+                    <p>Design thinking + User obsession. Rend les choses compliquées super simples. Fan de dark mode.</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">🔧</div>
+                    <h3>Thomas Wu</h3>
+                    <div class="role">Lead Engineer</div>
+                    <p>Peut faire tourner du code sur n'importe quoi. Expert backend et infra. Fanboy de performance.</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">📱</div>
+                    <h3>Lisa Schmidt</h3>
+                    <div class="role">Integrations Lead</div>
+                    <p>Spécialiste des APIs et intégrations. Fait parler ton agent avec tous les outils que tu aimes.</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">💬</div>
+                    <h3>Carlos Silva</h3>
+                    <div class="role">Community Manager</div>
+                    <p>La voix de nos users. S'assure qu'on écoute, qu'on répond, et qu'on fait ce qu'il faut.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Ton Agent IA — <a href="/legal.html">Mentions légales</a> • <a href="/contact.html">Contact</a></p>
+        </div>
+    </footer>
+</body>
+</html>

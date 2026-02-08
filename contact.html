@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Ton Agent IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 0, 150, 0.05) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Grain overlay */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.7;
+        }
+
+        nav .logo {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 32px;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero section */
+        .hero {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .hero .sub {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Contact section */
+        section {
+            padding: 60px 20px;
+        }
+
+        /* Contact info */
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto 80px;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 32px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .info-card:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .info-card .icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .info-card h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .info-card a, .info-card p {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .info-card a:hover {
+            opacity: 0.8;
+        }
+
+        /* Form */
+        .contact-form-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 48px;
+            border-radius: 24px;
+        }
+
+        .contact-form-wrapper h2 {
+            font-size: 2rem;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px 18px;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: rgba(120, 0, 255, 0.5);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 20px rgba(120, 0, 255, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #7000ff, #00c8ff);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(120, 0, 255, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .form-message {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .form-message.success {
+            background: rgba(0, 200, 100, 0.1);
+            color: rgba(0, 200, 100, 0.8);
+            border: 1px solid rgba(0, 200, 100, 0.2);
+            display: block;
+        }
+
+        .form-message.error {
+            background: rgba(255, 50, 50, 0.1);
+            color: rgba(255, 150, 150, 0.8);
+            border: 1px solid rgba(255, 50, 50, 0.2);
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            padding: 48px 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        footer a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        footer a:hover {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            nav ul {
+                gap: 16px;
+                font-size: 14px;
+            }
+            .contact-form-wrapper {
+                padding: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="grain"></div>
+
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">⚡ Ton Agent</a>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/about.html">À propos</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/legal.html">Légal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>On t'écoute</h1>
+        <p class="sub">Des questions, un bug, une idée ? Contacte-nous directement.</p>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="contact-info">
+                <div class="info-card">
+                    <div class="icon">📧</div>
+                    <h3>Email</h3>
+                    <a href="mailto:hello@tonagent.ai">hello@tonagent.ai</a>
+                </div>
+                <div class="info-card">
+                    <div class="icon">💬</div>
+                    <h3>Support</h3>
+                    <a href="https://t.me/tonagent_support" target="_blank">Telegram Bot Support</a>
+                </div>
+                <div class="info-card">
+                    <div class="icon">🚀</div>
+                    <h3>Suggestions</h3>
+                    <p>Envoie tes idées de features</p>
+                </div>
+            </div>
+
+            <div class="contact-form-wrapper">
+                <h2>Envoie-nous un message</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Nom</label>
+                        <input type="text" id="name" name="name" placeholder="Ton nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="ton@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Sujet</label>
+                        <input type="text" id="subject" name="subject" placeholder="Pourquoi tu nous contactes ?" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Ton message en détail..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Envoyer le message</button>
+                    <div id="formMessage" class="form-message"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Ton Agent IA — <a href="/legal.html">Mentions légales</a> • <a href="/about.html">À propos</a></p>
+        </div>
+    </footer>
+
+    <script>
+        const form = document.getElementById('contactForm');
+        const messageDiv = document.getElementById('formMessage');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toISOString()
+            };
+
+            // Simulate form submission
+            messageDiv.textContent = '📤 Envoi en cours...';
+            messageDiv.className = 'form-message success';
+            messageDiv.style.display = 'block';
+
+            // In a real implementation, you would send this to a backend
+            // For now, we simulate success after a delay
+            setTimeout(() => {
+                messageDiv.textContent = '✅ Message envoyé ! On te répond rapidement.';
+                messageDiv.className = 'form-message success';
+                form.reset();
+            }, 1500);
+
+            // Log the data (in production, send to your backend)
+            console.log('Form submitted:', formData);
+        });
+    </script>
+</body>
+</html>
