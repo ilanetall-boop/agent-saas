@@ -19,6 +19,7 @@ app.use((req, res, next) => {
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/agent', require('./routes/agents'));
+app.use('/api/telegram', require('./routes/telegram'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -52,12 +53,26 @@ async function start() {
    API:      http://localhost:${config.port}/api
    
    Endpoints:
+   Auth:
    - POST /api/auth/register
    - POST /api/auth/login
    - GET  /api/auth/me
+   
+   Agent:
    - GET  /api/agent/me
    - POST /api/agent/chat
    - POST /api/agent/memory
+   
+   Telegram:
+   - POST /api/telegram/link
+   - GET  /api/telegram/status
+   - GET  /api/telegram/info
+   - POST /api/telegram/send
+   - POST /api/telegram/init
+   - POST /api/telegram/disconnect
+   - POST /api/telegram/webhook/:agentId
+   
+   Health:
    - GET  /api/health
 `);
         });
