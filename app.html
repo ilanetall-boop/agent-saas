@@ -329,6 +329,117 @@
         }
 
         .hidden { display: none !important; }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-body ol {
+            margin: 0;
+            padding-left: 20px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .modal-body li {
+            margin: 8px 0;
+        }
+
+        .modal-body code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #88ff88;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            justify-content: flex-end;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #7000ff, #00c8ff);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.8;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 <body>
@@ -386,6 +497,7 @@
             </h1>
             <div style="display:flex;align-items:center;gap:16px;">
                 <span class="user-info" id="userInfo"></span>
+                <button class="logout" onclick="openTelegramModal()">📱 Telegram</button>
                 <button class="logout" onclick="logout()">Déconnexion</button>
             </div>
         </div>
@@ -409,6 +521,39 @@
             <div class="usage-bar">
                 <span id="usageText">0 / 50 messages ce mois</span>
                 <div class="bar"><div class="bar-fill" id="usageBar" style="width: 0%"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Telegram Modal -->
+    <div class="modal" id="telegramModal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📱 Connecter Telegram</h2>
+                <button class="modal-close" onclick="closeTelegramModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Pour utiliser ton agent sur Telegram:</p>
+                <ol>
+                    <li><strong>Va sur Telegram</strong> et cherche <code>@BotFather</code></li>
+                    <li>Envoie <code>/newbot</code> et suis les instructions</li>
+                    <li>Tu recevras un <strong>token</strong> (ex: <code>123456:ABC-xxx</code>)</li>
+                    <li>Copie-le ici et clique "Connecter"</li>
+                </ol>
+                <div style="margin:16px 0;">
+                    <input 
+                        type="text" 
+                        id="telegramToken" 
+                        placeholder="Colle le token ici..." 
+                        style="width:100%;padding:12px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;font-family:monospace;"
+                    />
+                </div>
+                <div id="telegramError" style="color:#ff4444;margin:8px 0;display:none;"></div>
+                <div id="telegramSuccess" style="color:#44ff44;margin:8px 0;display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeTelegramModal()">Annuler</button>
+                <button class="btn-primary" onclick="linkTelegramBot()">🔗 Connecter</button>
             </div>
         </div>
     </div>
@@ -670,6 +815,72 @@
             sendBtn.disabled = false;
             input.focus();
         }
+
+        // Telegram Modal Functions
+        function openTelegramModal() {
+            document.getElementById('telegramModal').style.display = 'flex';
+            document.getElementById('telegramToken').focus();
+        }
+
+        function closeTelegramModal() {
+            document.getElementById('telegramModal').style.display = 'none';
+            document.getElementById('telegramToken').value = '';
+            document.getElementById('telegramError').style.display = 'none';
+            document.getElementById('telegramSuccess').style.display = 'none';
+        }
+
+        async function linkTelegramBot() {
+            const tokenInput = document.getElementById('telegramToken');
+            const botToken = tokenInput.value.trim();
+            const errorEl = document.getElementById('telegramError');
+            const successEl = document.getElementById('telegramSuccess');
+
+            // Clear messages
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+
+            if (!botToken) {
+                errorEl.textContent = 'Veuillez entrer le token du bot';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/telegram/init`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ botToken })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    successEl.textContent = '✅ Bot connecté! Va envoyer un message à ton bot sur Telegram.';
+                    successEl.style.display = 'block';
+                    tokenInput.value = '';
+                    setTimeout(() => {
+                        closeTelegramModal();
+                    }, 2000);
+                } else {
+                    errorEl.textContent = `Erreur: ${data.error || 'Impossible de connecter le bot'}`;
+                    errorEl.style.display = 'block';
+                }
+            } catch (e) {
+                errorEl.textContent = `Erreur réseau: ${e.message}`;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.getElementById('telegramModal').style.display !== 'none') {
+                e.preventDefault();
+                linkTelegramBot();
+            }
+        });
     </script>
 </body>
 </html>
