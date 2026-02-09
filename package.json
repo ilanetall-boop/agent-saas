@@ -17,6 +17,7 @@
     "dotenv": "^16.4.1",
     "node-telegram-bot-api": "^0.64.0",
     "@anthropic-ai/sdk": "^0.74.0",
-    "nanoid": "^5.0.5"
+    "nanoid": "^5.0.5",
+    "@sentry/node": "^7.88.0"
   }
 }

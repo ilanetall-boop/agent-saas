@@ -12,6 +12,9 @@ module.exports = {
     // Telegram
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN, // Master bot for onboarding
     
+    // Sentry (optional, for error tracking)
+    sentryDsn: process.env.SENTRY_DSN,
+    
     // Plans
     plans: {
         free: { messagesLimit: 50, features: ['search', 'reminders'] },

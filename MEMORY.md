@@ -40,7 +40,7 @@ AI assistant (named "Alex") that:
 - Anthropic model call in `/api/agent/chat` route
 - Onboarding prompts change based on step (0-4)
 
-## Test Results (2026-02-09 05:45)
+## Test Results (2026-02-09 05:55)
 ✅ Health check
 ✅ Register + Login
 ✅ Token auth works (Bearer header)
@@ -48,6 +48,9 @@ AI assistant (named "Alex") that:
 ✅ Duplicate email rejection
 ✅ Wrong password rejection
 ✅ Invalid token → 401
+✅ **Message Limit Enforcement** — Message 50 accepted, 51 rejected with 429
+✅ **Load Test** — 5 concurrent users × 3 messages each, no crashes
+✅ Error messages now show HTTP status + real error (not generic "connexion au serveur")
 
 ⚠️ BUGS FOUND:
 - [ ] Silent errors in try-catch (no proper logging)

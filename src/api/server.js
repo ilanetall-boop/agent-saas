@@ -1,14 +1,32 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const Sentry = require('@sentry/node');
 const config = require('./config');
 const { initDb } = require('./db/db');
+
+// Initialize Sentry for error tracking (if SENTRY_DSN is set)
+if (config.sentryDsn) {
+    Sentry.init({
+        dsn: config.sentryDsn,
+        environment: process.env.NODE_ENV || 'production',
+        tracesSampleRate: 0.1,
+    });
+    console.log('✅ Sentry initialized');
+} else {
+    console.log('⚠️ Sentry DSN not set - error tracking disabled');
+}
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Sentry error tracking middleware
+if (config.sentryDsn) {
+    app.use(Sentry.Handlers.requestHandler());
+}
 
 // Request logging
 app.use((req, res, next) => {
@@ -34,9 +52,20 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../index.html'));
 });
 
+// Sentry error tracking middleware (must be after all other middleware/routes)
+if (config.sentryDsn) {
+    app.use(Sentry.Handlers.errorHandler());
+}
+
 // Error handler
 app.use((err, req, res, next) => {
     console.error('Error:', err);
+    
+    // Report to Sentry if enabled
+    if (config.sentryDsn) {
+        Sentry.captureException(err);
+    }
+    
     res.status(500).json({ error: 'Erreur serveur' });
 });
 
