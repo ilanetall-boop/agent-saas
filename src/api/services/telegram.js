@@ -69,6 +69,13 @@ async function handleMessage(msg, agentId, bot) {
         const chatId = msg.chat.id;
         const userId = msg.from.id;
         const userName = msg.from.first_name || 'Ami';
+        
+        // Store chatId if not already stored
+        const agent = db.getAgentByUserId(agentId);
+        if (agent && !agent.telegram_chat_id) {
+            db.updateAgentTelegram(agent.id, agent.telegram_bot_token, chatId);
+            console.log(`[TELEGRAM] Captured chatId ${chatId} for agent ${agentId}`);
+        }
 
         // Handle commands
         if (msg.text && msg.text.startsWith('/')) {
@@ -123,8 +130,7 @@ async function handleMessage(msg, agentId, bot) {
         // Get conversation history (last 10 messages)
         const history = db.getRecentMessages(conversation.id, 10).reverse();
 
-        // Get agent and memory
-        const agent = db.getAgentByUserId(agentId);
+        // Get memory (agent already fetched above)
         const memories = db.getAllMemories(agentId);
         const memoryMap = {};
         memories.forEach(m => { memoryMap[m.key] = m.value; });

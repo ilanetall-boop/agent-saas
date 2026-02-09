@@ -40,6 +40,45 @@ router.post('/webhook/:agentId', async (req, res) => {
 });
 
 /**
+ * POST /api/telegram/init
+ * Initialize Telegram bot (no chatId required)
+ * Bot starts polling, chatId captured from first user message
+ * Body: { botToken }
+ */
+router.post('/init', authMiddleware, async (req, res) => {
+    try {
+        const { botToken } = req.body;
+
+        if (!botToken) {
+            return res.status(400).json({ error: 'botToken requis' });
+        }
+
+        const agent = db.getAgentByUserId(req.user.id);
+        if (!agent) {
+            return res.status(404).json({ error: 'Agent non trouvé' });
+        }
+
+        // Initialize bot (polling mode)
+        const result = await initBot({ agentId: req.user.id, botToken });
+
+        if (!result.success) {
+            return res.status(500).json({ error: result.error });
+        }
+
+        db.updateAgentTelegram(agent.id, botToken, null);
+
+        res.json({
+            success: true,
+            message: '✅ Bot démarré! Envoie un message à ton bot sur Telegram.',
+            agent: { id: agent.id, name: agent.name, telegramConnected: true }
+        });
+    } catch (error) {
+        console.error('Init Telegram error:', error);
+        res.status(500).json({ error: 'Erreur lors du démarrage du bot Telegram' });
+    }
+});
+
+/**
  * POST /api/telegram/link
  * Link user's agent to Telegram
  * Body: { botToken, chatId, webhookUrl? }
