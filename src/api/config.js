@@ -7,7 +7,7 @@ module.exports = {
     
     // Anthropic
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-    defaultModel: 'claude-3-haiku-20240307',
+    defaultModel: 'claude-3-5-haiku-20241022',
     
     // Telegram
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN, // Master bot for onboarding
