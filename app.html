@@ -451,7 +451,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     agent = data.agent;
-                    document.getElementById('agentName').textContent = agent.name;
+                    document.getElementById('agentName').textContent = agent.name || 'Alex';
                 }
             } catch (e) {
                 console.error('Load agent failed:', e);
@@ -476,7 +476,7 @@
             
             // Welcome message if first time
             if (!agent.onboardingComplete) {
-                addMessage('assistant', 'Salut ! Je suis ton agent IA personnel. Je peux t\'aider à coder, automatiser des tâches, réfléchir à des idées... Dis-moi ce dont tu as besoin !');
+                addMessage('assistant', 'Hey ! Moi c\'est Alex, ton nouvel assistant. Et toi, c\'est quoi ton petit nom ?');
             }
         }
 

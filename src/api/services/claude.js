@@ -7,17 +7,12 @@ const anthropic = new Anthropic({
 
 /**
  * Generate a response from Claude
- * @param {Object} options
- * @param {string} options.systemPrompt - System instructions
- * @param {Array} options.messages - Conversation history [{role, content}]
- * @param {Object} options.memory - Agent's memory about user
- * @param {string} options.model - Model to use
  */
 async function generateResponse({ systemPrompt, messages, memory = {}, model = config.defaultModel }) {
     // Build context from memory
     let memoryContext = '';
     if (Object.keys(memory).length > 0) {
-        memoryContext = '\n\nCe que tu sais sur l\'utilisateur:\n';
+        memoryContext = '\n\nCe que tu sais sur cette personne:\n';
         for (const [key, value] of Object.entries(memory)) {
             memoryContext += `- ${key}: ${value}\n`;
         }
@@ -28,7 +23,7 @@ async function generateResponse({ systemPrompt, messages, memory = {}, model = c
     try {
         const response = await anthropic.messages.create({
             model,
-            max_tokens: 1024,
+            max_tokens: 500, // Limité pour des réponses courtes
             system: fullSystemPrompt,
             messages: messages.map(m => ({
                 role: m.role === 'user' ? 'user' : 'assistant',
@@ -51,53 +46,64 @@ async function generateResponse({ systemPrompt, messages, memory = {}, model = c
 }
 
 /**
- * Default system prompt for agents
+ * Default system prompt - friendly & concise
  */
 function getDefaultSystemPrompt(agentName, userName) {
-    return `Tu es ${agentName || 'un assistant IA personnel'}. Tu appartiens à ${userName || 'ton utilisateur'}.
+    const name = agentName || 'Alex';
+    const user = userName || null;
+    
+    let prompt = `Tu es ${name}, un assistant IA personnel sympa et efficace.
 
-Tu es là pour l'aider dans tout ce qu'il veut :
-- Répondre à ses questions
-- L'aider à réfléchir
-- Automatiser des tâches
-- Écrire du contenu
-- Et bien plus
+RÈGLES IMPORTANTES:
+- Réponses COURTES (2-3 phrases max sauf si on te demande plus)
+- Ton chaleureux, comme un pote qui aide
+- Tutoiement toujours
+- Pas de listes à rallonge
+- Pas de "Je suis désolé" ou "En tant qu'IA"
+- Direct et concret
 
-Ton style :
-- Direct et efficace
-- Pas de blabla inutile
-- Tu proposes des solutions concrètes
-- Tu demandes des précisions si nécessaire
-- Tu utilises le français naturellement
+`;
 
-Si on te demande quelque chose que tu ne peux pas faire maintenant, dis-le honnêtement et propose une alternative.`;
+    if (!user) {
+        prompt += `C'est la PREMIÈRE conversation. Commence par te présenter brièvement et demande son prénom. Sois accueillant mais pas trop long.`;
+    } else {
+        prompt += `Tu parles avec ${user}. Sois naturel et utile.`;
+    }
+
+    return prompt;
 }
 
 /**
- * Onboarding conversation prompts
+ * Onboarding system prompt
  */
-const onboardingQuestions = [
-    "Salut ! Je suis ton nouvel assistant. Comment tu t'appelles ?",
-    "Enchanté {name} ! Tu fais quoi dans la vie ? (Job, études, passion...)",
-    "Cool ! Et c'est quoi ton plus gros défi en ce moment ? Ce qui te prend du temps ou t'énerve ?",
-    "Je vois. Et si je pouvais faire UNE chose pour toi là maintenant, ce serait quoi ?",
-    "Parfait, j'ai compris ce dont tu as besoin. On va bien s'entendre ! Tu peux me demander ce que tu veux, je suis là pour toi."
-];
-
-function getOnboardingPrompt(step, previousAnswers = {}) {
-    let prompt = onboardingQuestions[step] || onboardingQuestions[0];
+function getOnboardingPrompt(step, memory = {}) {
+    const prompts = {
+        0: `Tu es Alex. C'est ta première rencontre avec cette personne. 
+Dis juste: "Hey ! Moi c'est Alex, ton nouvel assistant. Et toi, c'est quoi ton petit nom ?"
+RIEN D'AUTRE. Une seule phrase.`,
+        
+        1: `L'utilisateur vient de te donner son prénom. 
+Réponds: "Enchanté [prénom] ! Tu fais quoi dans la vie ?" 
+UNE SEULE PHRASE.`,
+        
+        2: `L'utilisateur t'a dit ce qu'il fait.
+Réponds: "Cool ! Et c'est quoi ton plus gros défi en ce moment ? Le truc qui te prend la tête."
+UNE SEULE PHRASE.`,
+        
+        3: `L'utilisateur t'a parlé de son défi.
+Réponds: "Je vois. Si je pouvais faire UN truc pour toi là maintenant, ce serait quoi ?"
+UNE SEULE PHRASE.`,
+        
+        4: `L'onboarding est fini.
+Réponds: "Parfait, j'ai compris ce qu'il te faut ! Je suis prêt. Demande-moi ce que tu veux."
+UNE SEULE PHRASE.`
+    };
     
-    // Replace placeholders
-    if (previousAnswers.name) {
-        prompt = prompt.replace('{name}', previousAnswers.name);
-    }
-    
-    return prompt;
+    return prompts[step] || prompts[4];
 }
 
 module.exports = {
     generateResponse,
     getDefaultSystemPrompt,
-    getOnboardingPrompt,
-    onboardingQuestions
+    getOnboardingPrompt
 };

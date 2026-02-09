@@ -2,7 +2,7 @@ const express = require('express');
 const { nanoid } = require('nanoid');
 const { authMiddleware } = require('../middleware/auth');
 const db = require('../db/db');
-const { generateResponse, getDefaultSystemPrompt } = require('../services/claude');
+const { generateResponse, getDefaultSystemPrompt, getOnboardingPrompt } = require('../services/claude');
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ router.get('/me', authMiddleware, (req, res) => {
     res.json({
         agent: {
             id: agent.id,
-            name: agent.name,
+            name: agent.name || 'Alex',
             telegramConnected: !!agent.telegram_chat_id,
             onboardingComplete: !!agent.onboarding_complete
         },
@@ -61,7 +61,7 @@ router.post('/chat', authMiddleware, async (req, res) => {
         }
         
         // Get conversation history
-        const history = db.getRecentMessages(conversation.id, 20).reverse();
+        const history = db.getRecentMessages(conversation.id, 10).reverse();
         
         // Get memory
         const memories = db.getAllMemories(agent.id);
@@ -71,8 +71,42 @@ router.post('/chat', authMiddleware, async (req, res) => {
         // Add user message
         db.addMessage(nanoid(), conversation.id, 'user', message);
         
+        // Determine if onboarding or normal chat
+        let systemPrompt;
+        const onboardingStep = parseInt(memoryMap.onboarding_step || '0');
+        
+        if (!agent.onboarding_complete && onboardingStep < 5) {
+            // Still onboarding
+            systemPrompt = getOnboardingPrompt(onboardingStep, memoryMap);
+            
+            // Extract info from user message based on step
+            if (onboardingStep === 0) {
+                // They gave their name
+                const name = message.trim().split(' ')[0].replace(/[^a-zA-ZÀ-ÿ]/g, '');
+                if (name) {
+                    db.setMemory(nanoid(), agent.id, 'name', name);
+                }
+            } else if (onboardingStep === 1) {
+                db.setMemory(nanoid(), agent.id, 'job', message.substring(0, 200));
+            } else if (onboardingStep === 2) {
+                db.setMemory(nanoid(), agent.id, 'challenge', message.substring(0, 200));
+            } else if (onboardingStep === 3) {
+                db.setMemory(nanoid(), agent.id, 'first_need', message.substring(0, 200));
+            }
+            
+            // Increment onboarding step
+            db.setMemory(nanoid(), agent.id, 'onboarding_step', String(onboardingStep + 1));
+            
+            // Mark complete after step 4
+            if (onboardingStep >= 4) {
+                db.updateAgentOnboarding(agent.id);
+            }
+        } else {
+            // Normal chat
+            systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name);
+        }
+        
         // Generate response
-        const systemPrompt = getDefaultSystemPrompt(agent.name, memoryMap.name || req.user.name);
         const response = await generateResponse({
             systemPrompt,
             messages: [...history, { role: 'user', content: message }],
