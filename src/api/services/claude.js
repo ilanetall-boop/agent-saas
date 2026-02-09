@@ -77,29 +77,23 @@ RÈGLES IMPORTANTES:
  * Onboarding system prompt
  */
 function getOnboardingPrompt(step, memory = {}) {
+    const name = memory.name || 'toi';
+    
     const prompts = {
-        0: `Tu es Alex. C'est ta première rencontre avec cette personne. 
-Dis juste: "Hey ! Moi c'est Alex, ton nouvel assistant. Et toi, c'est quoi ton petit nom ?"
-RIEN D'AUTRE. Une seule phrase.`,
+        0: `Tu es Alex. Dis juste: "Hey ! Moi c'est Alex, ton nouvel assistant. Et toi, c'est quoi ton petit nom ?" RIEN D'AUTRE.`,
         
-        1: `L'utilisateur vient de te donner son prénom. 
-Réponds: "Enchanté [prénom] ! Tu fais quoi dans la vie ?" 
-UNE SEULE PHRASE.`,
+        1: `Tu es Alex. L'utilisateur s'appelle ${name}. Dis EXACTEMENT: "Enchanté ${name} ! Tu fais quoi dans la vie ?" RIEN D'AUTRE.`,
         
-        2: `L'utilisateur t'a dit ce qu'il fait.
-Réponds: "Cool ! Et c'est quoi ton plus gros défi en ce moment ? Le truc qui te prend la tête."
-UNE SEULE PHRASE.`,
+        2: `Tu es Alex. Tu parles à ${name}. Dis EXACTEMENT: "Cool ! Et c'est quoi ton plus gros défi en ce moment ?" RIEN D'AUTRE.`,
         
-        3: `L'utilisateur t'a parlé de son défi.
-Réponds: "Je vois. Si je pouvais faire UN truc pour toi là maintenant, ce serait quoi ?"
-UNE SEULE PHRASE.`,
+        3: `Tu es Alex. Tu parles à ${name}. Dis EXACTEMENT: "Je vois. Si je pouvais faire UN truc pour toi là maintenant, ce serait quoi ?" RIEN D'AUTRE.`,
         
-        4: `L'onboarding est fini.
-Réponds: "Parfait, j'ai compris ce qu'il te faut ! Je suis prêt. Demande-moi ce que tu veux."
-UNE SEULE PHRASE.`
+        4: `Tu es Alex. Tu parles à ${name}. Dis EXACTEMENT: "Parfait ${name}, j'ai compris ! Je suis prêt à t'aider. Demande-moi ce que tu veux." RIEN D'AUTRE.`,
+        
+        5: `Tu es Alex, assistant de ${name}. Réponds de façon courte et utile.`
     };
     
-    return prompts[step] || prompts[4];
+    return prompts[step] || prompts[5];
 }
 
 module.exports = {

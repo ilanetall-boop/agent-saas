@@ -76,15 +76,14 @@ router.post('/chat', authMiddleware, async (req, res) => {
         const onboardingStep = parseInt(memoryMap.onboarding_step || '0');
         
         if (!agent.onboarding_complete && onboardingStep < 5) {
-            // Still onboarding
-            systemPrompt = getOnboardingPrompt(onboardingStep, memoryMap);
-            
-            // Extract info from user message based on step
+            // Extract info from user message based on CURRENT step
+            // Then use NEXT step's prompt for response
             if (onboardingStep === 0) {
                 // They gave their name
                 const name = message.trim().split(' ')[0].replace(/[^a-zA-ZÀ-ÿ]/g, '');
                 if (name) {
                     db.setMemory(nanoid(), agent.id, 'name', name);
+                    memoryMap.name = name; // Update local copy
                 }
             } else if (onboardingStep === 1) {
                 db.setMemory(nanoid(), agent.id, 'job', message.substring(0, 200));
@@ -94,11 +93,15 @@ router.post('/chat', authMiddleware, async (req, res) => {
                 db.setMemory(nanoid(), agent.id, 'first_need', message.substring(0, 200));
             }
             
-            // Increment onboarding step
-            db.setMemory(nanoid(), agent.id, 'onboarding_step', String(onboardingStep + 1));
+            // Increment onboarding step BEFORE generating response
+            const nextStep = onboardingStep + 1;
+            db.setMemory(nanoid(), agent.id, 'onboarding_step', String(nextStep));
+            
+            // Use the NEXT step's prompt for the response
+            systemPrompt = getOnboardingPrompt(nextStep, memoryMap);
             
             // Mark complete after step 4
-            if (onboardingStep >= 4) {
+            if (nextStep >= 5) {
                 db.updateAgentOnboarding(agent.id);
             }
         } else {
