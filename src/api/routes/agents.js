@@ -38,14 +38,24 @@ router.post('/chat', authMiddleware, async (req, res) => {
             return res.status(400).json({ error: 'Message requis' });
         }
         
-        // Check message limit
-        if (req.user.messages_used >= req.user.messages_limit) {
+        // Refresh user data to get latest message count
+        const freshUser = db.getUserById(req.user.id);
+        if (!freshUser) {
+            return res.status(401).json({ error: 'Utilisateur non trouvé' });
+        }
+        
+        // Check message limit (strict: each chat counts as 1 message)
+        if (freshUser.messages_used >= freshUser.messages_limit) {
             return res.status(429).json({ 
                 error: 'Limite de messages atteinte',
-                limit: req.user.messages_limit,
-                used: req.user.messages_used
+                limit: freshUser.messages_limit,
+                used: freshUser.messages_used,
+                remaining: 0
             });
         }
+        
+        // Update reference
+        req.user = freshUser;
         
         const agent = db.getAgentByUserId(req.user.id);
         if (!agent) {
@@ -126,16 +136,24 @@ router.post('/chat', authMiddleware, async (req, res) => {
         // Update message count
         db.updateUserMessages(req.user.id);
         
+        // Fetch updated user data for accurate usage
+        const updatedUser = db.getUserById(req.user.id);
+        
         res.json({
             response: response.content,
             usage: {
-                messagesUsed: req.user.messages_used + 1,
-                messagesLimit: req.user.messages_limit
+                messagesUsed: updatedUser.messages_used,
+                messagesLimit: updatedUser.messages_limit,
+                remaining: Math.max(0, updatedUser.messages_limit - updatedUser.messages_used)
             }
         });
     } catch (error) {
-        console.error('Chat error:', error);
-        res.status(500).json({ error: 'Erreur lors du chat' });
+        console.error(`[CHAT ERROR] User: ${req.user?.id}, Message: "${req.body?.message?.substring(0, 50)}", Error:`, error.message);
+        console.error('Stack:', error.stack);
+        res.status(500).json({ 
+            error: 'Erreur lors du chat',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 

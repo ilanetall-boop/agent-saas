@@ -653,12 +653,16 @@
                     user.messagesLimit = data.usage.messagesLimit;
                     updateUsage();
                 } else {
+                    removeTypingIndicator();
                     const data = await res.json();
-                    addMessage('assistant', `Erreur: ${data.error || 'Une erreur est survenue'}`);
+                    const errorMsg = data.error || 'Une erreur est survenue';
+                    console.error(`[CHAT ERROR] Status ${res.status}: ${errorMsg}`);
+                    addMessage('assistant', `Erreur (${res.status}): ${errorMsg}`);
                 }
             } catch (e) {
                 removeTypingIndicator();
-                addMessage('assistant', 'Erreur de connexion au serveur');
+                console.error('[NETWORK ERROR]', e);
+                addMessage('assistant', `Erreur réseau: ${e.message || 'Impossible de se connecter'}`);
             }
 
             // Re-enable input

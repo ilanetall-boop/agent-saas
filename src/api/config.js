@@ -3,7 +3,7 @@ require('dotenv').config();
 module.exports = {
     port: process.env.PORT || 3000,
     jwtSecret: process.env.JWT_SECRET || 'change-me-in-production',
-    jwtExpiresIn: '7d',
+    jwtExpiresIn: '30d',
     
     // Anthropic
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
