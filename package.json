@@ -18,6 +18,8 @@
     "node-telegram-bot-api": "^0.64.0",
     "@anthropic-ai/sdk": "^0.74.0",
     "nanoid": "^5.0.5",
-    "@sentry/node": "^7.88.0"
+    "@sentry/node": "^7.88.0",
+    "openai": "^4.52.0",
+    "axios": "^1.6.5"
   }
 }

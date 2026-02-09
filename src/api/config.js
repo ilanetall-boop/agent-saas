@@ -9,6 +9,9 @@ module.exports = {
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
     defaultModel: 'claude-3-5-haiku-20241022',
     
+    // OpenAI (Whisper for transcription, TTS for voice responses)
+    openaiApiKey: process.env.OPENAI_API_KEY,
+    
     // Telegram
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN, // Master bot for onboarding
     

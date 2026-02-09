@@ -2,6 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const config = require('../config');
 const { getDefaultSystemPrompt } = require('./claude');
 const { generateResponse } = require('./claude');
+const { transcribeAudio, textToSpeech, downloadAudio } = require('./audio');
 const db = require('../db/db');
 const { nanoid } = require('nanoid');
 
@@ -61,18 +62,54 @@ async function initBot({ agentId, botToken, webhookUrl = null }) {
 }
 
 /**
- * Handle incoming Telegram message
+ * Handle incoming Telegram message (text or voice)
  */
 async function handleMessage(msg, agentId, bot) {
     try {
         const chatId = msg.chat.id;
-        const text = msg.text;
         const userId = msg.from.id;
         const userName = msg.from.first_name || 'Ami';
 
-        // Skip commands and non-text messages
-        if (!text || text.startsWith('/')) {
+        // Handle commands
+        if (msg.text && msg.text.startsWith('/')) {
             return handleCommand(msg, agentId, bot);
+        }
+
+        let userText = msg.text;
+        let isVoiceMessage = false;
+
+        // Handle voice messages
+        if (msg.voice) {
+            isVoiceMessage = true;
+            await bot.sendChatAction(chatId, 'typing');
+            
+            console.log(`[VOICE] Transcribing voice message from user ${userId}`);
+            
+            try {
+                // Get file URL from Telegram
+                const fileUrl = await bot.getFileLink(msg.voice.file_id);
+                
+                // Download audio
+                const audioBuffer = await downloadAudio(fileUrl);
+                
+                // Transcribe with Whisper
+                const transcription = await transcribeAudio(audioBuffer, 'audio/ogg');
+                
+                if (!transcription.success) {
+                    await bot.sendMessage(chatId, '❌ Impossible de transcrire le message vocal. Réessaye.');
+                    return;
+                }
+                
+                userText = transcription.text;
+                console.log(`[VOICE] Transcribed: "${userText}"`);
+            } catch (error) {
+                console.error('[VOICE ERROR]', error.message);
+                await bot.sendMessage(chatId, '❌ Erreur lors de la transcription. Réessaye.');
+                return;
+            }
+        } else if (!userText) {
+            // No text and no voice
+            return;
         }
 
         // Get or create conversation
@@ -93,7 +130,7 @@ async function handleMessage(msg, agentId, bot) {
         memories.forEach(m => { memoryMap[m.key] = m.value; });
 
         // Store user message
-        db.addMessage(nanoid(), conversation.id, 'user', text);
+        db.addMessage(nanoid(), conversation.id, 'user', userText);
 
         // Show typing indicator
         await bot.sendChatAction(chatId, 'typing');
@@ -102,7 +139,7 @@ async function handleMessage(msg, agentId, bot) {
         const systemPrompt = getDefaultSystemPrompt(agent.name, memoryMap.name || userName);
         const response = await generateResponse({
             systemPrompt,
-            messages: [...history, { role: 'user', content: text }],
+            messages: [...history, { role: 'user', content: userText }],
             memory: memoryMap
         });
 
@@ -114,15 +151,40 @@ async function handleMessage(msg, agentId, bot) {
         // Store assistant message
         db.addMessage(nanoid(), conversation.id, 'assistant', response.content);
 
-        // Send response (split if too long)
-        const maxLength = 4096;
-        if (response.content.length > maxLength) {
-            const chunks = response.content.match(new RegExp(`.{1,${maxLength}}`, 'g'));
-            for (const chunk of chunks) {
-                await bot.sendMessage(chatId, chunk);
+        // If user sent voice, respond with voice
+        if (isVoiceMessage && config.openaiApiKey) {
+            console.log(`[TTS] Generating voice response`);
+            
+            try {
+                // Generate voice response
+                const tts = await textToSpeech(response.content, 'nova');
+                
+                if (!tts.success) {
+                    // Fallback to text
+                    console.warn(`[TTS] Failed, sending as text: ${tts.error}`);
+                    await bot.sendMessage(chatId, response.content);
+                    return;
+                }
+                
+                // Send voice message
+                await bot.sendVoice(chatId, tts.buffer);
+                console.log(`[TTS] Voice response sent`);
+            } catch (error) {
+                console.error('[TTS ERROR]', error.message);
+                // Fallback to text
+                await bot.sendMessage(chatId, response.content);
             }
         } else {
-            await bot.sendMessage(chatId, response.content);
+            // Send text response (split if too long)
+            const maxLength = 4096;
+            if (response.content.length > maxLength) {
+                const chunks = response.content.match(new RegExp(`.{1,${maxLength}}`, 'g'));
+                for (const chunk of chunks) {
+                    await bot.sendMessage(chatId, chunk);
+                }
+            } else {
+                await bot.sendMessage(chatId, response.content);
+            }
         }
     } catch (error) {
         console.error('Error handling Telegram message:', error);
