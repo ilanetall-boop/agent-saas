@@ -74,12 +74,12 @@ function generateDualTokens(userId) {
         { expiresIn: REFRESH_TOKEN_EXPIRY }
     );
     
-    // Calculate expiry time for database
+    // Calculate expiry time for database (as ISO string)
     const expiresAt = new Date();
     expiresAt.setSeconds(expiresAt.getSeconds() + REFRESH_TOKEN_EXPIRY);
     
     // Store refresh token in database
-    db.saveRefreshToken(userId, refreshToken, expiresAt);
+    db.saveRefreshToken(userId, refreshToken, expiresAt.toISOString());
     
     return {
         accessToken,
