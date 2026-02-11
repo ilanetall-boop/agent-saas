@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const Sentry = require('@sentry/node');
 const config = require('./config');
@@ -22,6 +23,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser()); // Parse cookies (for refresh token)
 
 // Sentry error tracking middleware
 if (config.sentryDsn) {
@@ -81,10 +83,14 @@ async function start() {
    Local:    http://localhost:${config.port}
    API:      http://localhost:${config.port}/api
    
+   ✨ DUAL-TOKEN AUTHENTICATION (Access + Refresh)
+   
    Endpoints:
-   Auth:
-   - POST /api/auth/register
-   - POST /api/auth/login
+   Auth (Dual-Token):
+   - POST /api/auth/register  (returns: accessToken + refreshToken)
+   - POST /api/auth/login     (returns: accessToken + refreshToken)
+   - POST /api/auth/refresh   (returns: new accessToken, expires in 30 min)
+   - POST /api/auth/logout    (revokes refresh token)
    - GET  /api/auth/me
    
    Agent:

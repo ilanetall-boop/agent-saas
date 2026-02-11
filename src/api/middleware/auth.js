@@ -1,6 +1,10 @@
 const jwt = require('jsonwebtoken');
+const { nanoid } = require('nanoid');
 const config = require('../config');
 const db = require('../db/db');
+
+const ACCESS_TOKEN_EXPIRY = '30m'; // 30 minutes
+const REFRESH_TOKEN_EXPIRY = 7776000; // 90 days in seconds
 
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -22,7 +26,7 @@ function authMiddleware(req, res, next) {
         req.user = user;
         next();
     } catch (error) {
-        return res.status(401).json({ error: 'Token invalide' });
+        return res.status(401).json({ error: 'Token invalide ou expiré' });
     }
 }
 
@@ -48,8 +52,79 @@ function optionalAuth(req, res, next) {
     next();
 }
 
+// Legacy: single token (for backward compatibility)
 function generateToken(userId) {
     return jwt.sign({ userId }, config.jwtSecret, { expiresIn: config.jwtExpiresIn });
 }
 
-module.exports = { authMiddleware, optionalAuth, generateToken };
+// NEW: Generate dual tokens (access + refresh)
+function generateDualTokens(userId) {
+    // Access token: 30 minutes (short-lived, secure)
+    const accessToken = jwt.sign(
+        { userId, type: 'access' },
+        config.jwtSecret,
+        { expiresIn: ACCESS_TOKEN_EXPIRY }
+    );
+    
+    // Refresh token: 90 days (long-lived, stored in cookie)
+    const refreshTokenId = nanoid();
+    const refreshToken = jwt.sign(
+        { userId, tokenId: refreshTokenId, type: 'refresh' },
+        config.jwtSecret,
+        { expiresIn: REFRESH_TOKEN_EXPIRY }
+    );
+    
+    // Calculate expiry time for database
+    const expiresAt = new Date();
+    expiresAt.setSeconds(expiresAt.getSeconds() + REFRESH_TOKEN_EXPIRY);
+    
+    // Store refresh token in database
+    db.saveRefreshToken(userId, refreshToken, expiresAt);
+    
+    return {
+        accessToken,
+        refreshToken,
+        expiresIn: 1800 // 30 minutes in seconds
+    };
+}
+
+// Verify refresh token and generate new access token
+async function refreshAccessToken(refreshToken) {
+    try {
+        // Verify refresh token signature
+        const decoded = jwt.verify(refreshToken, config.jwtSecret);
+        
+        if (decoded.type !== 'refresh') {
+            throw new Error('Type token invalide');
+        }
+        
+        // Check if refresh token exists in database
+        const storedToken = await db.getRefreshToken(decoded.userId);
+        if (!storedToken || storedToken.token !== refreshToken) {
+            throw new Error('Refresh token révoqué');
+        }
+        
+        // Generate new access token
+        const newAccessToken = jwt.sign(
+            { userId: decoded.userId, type: 'access' },
+            config.jwtSecret,
+            { expiresIn: ACCESS_TOKEN_EXPIRY }
+        );
+        
+        return {
+            accessToken: newAccessToken,
+            expiresIn: 1800 // 30 minutes
+        };
+    } catch (error) {
+        console.error('Refresh token error:', error.message);
+        throw new Error('Refresh échoué: ' + error.message);
+    }
+}
+
+module.exports = { 
+    authMiddleware, 
+    optionalAuth, 
+    generateToken,
+    generateDualTokens,
+    refreshAccessToken
+};

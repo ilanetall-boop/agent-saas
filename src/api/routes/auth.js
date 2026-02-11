@@ -2,11 +2,11 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { nanoid } = require('nanoid');
 const db = require('../db/db');
-const { generateToken, authMiddleware } = require('../middleware/auth');
+const { generateDualTokens, refreshAccessToken, authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Register
+// Register (Dual-Token)
 router.post('/register', async (req, res) => {
     try {
         const { email, password, name } = req.body;
@@ -32,12 +32,22 @@ router.post('/register', async (req, res) => {
         const agentId = nanoid();
         db.createAgent(agentId, userId, 'Mon Agent');
         
-        // Generate token
-        const token = generateToken(userId);
+        // Generate dual tokens (access + refresh)
+        const tokens = generateDualTokens(userId);
+        
+        // Set refresh token in secure HttpOnly cookie (optional)
+        res.cookie('refreshToken', tokens.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
+        });
         
         res.status(201).json({
             success: true,
-            token,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken, // Also send in body for mobile apps
+            expiresIn: tokens.expiresIn,
             user: {
                 id: userId,
                 email,
@@ -55,7 +65,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Login
+// Login (Dual-Token)
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -76,12 +86,22 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
         }
         
-        // Generate token
-        const token = generateToken(user.id);
+        // Generate dual tokens
+        const tokens = generateDualTokens(user.id);
+        
+        // Set refresh token in secure HttpOnly cookie (optional)
+        res.cookie('refreshToken', tokens.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
+        });
         
         res.json({
             success: true,
-            token,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken, // Also send in body for mobile apps
+            expiresIn: tokens.expiresIn,
             user: {
                 id: user.id,
                 email: user.email,
@@ -97,6 +117,30 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Refresh Access Token (NEW)
+router.post('/refresh', async (req, res) => {
+    try {
+        // Get refresh token from body or cookie
+        const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
+        
+        if (!refreshToken) {
+            return res.status(401).json({ error: 'Refresh token manquant' });
+        }
+        
+        // Validate and generate new access token
+        const tokens = await refreshAccessToken(refreshToken);
+        
+        res.json({
+            success: true,
+            accessToken: tokens.accessToken,
+            expiresIn: tokens.expiresIn
+        });
+    } catch (error) {
+        console.error('Refresh error:', error);
+        res.status(401).json({ error: error.message });
+    }
+});
+
 // Get current user
 router.get('/me', authMiddleware, (req, res) => {
     res.json({
@@ -109,6 +153,22 @@ router.get('/me', authMiddleware, (req, res) => {
             messagesLimit: req.user.messages_limit
         }
     });
+});
+
+// Logout (revoke refresh token) (NEW)
+router.post('/logout', authMiddleware, async (req, res) => {
+    try {
+        // Delete refresh token from database
+        await db.deleteRefreshToken(req.user.id);
+        
+        // Clear cookie
+        res.clearCookie('refreshToken');
+        
+        res.json({ success: true, message: 'Déconnecté avec succès' });
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({ error: 'Erreur lors de la déconnexion' });
+    }
 });
 
 module.exports = router;
