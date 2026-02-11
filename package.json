@@ -1,7 +1,7 @@
 {
   "name": "agent-saas",
-  "version": "0.1.0",
-  "description": "Your personal AI agent - SaaS platform",
+  "version": "0.1.1",
+  "description": "Your personal AI agent - SaaS platform (Phase 3b: PostgreSQL)",
   "main": "src/api/server.js",
   "scripts": {
     "start": "node src/api/server.js",
