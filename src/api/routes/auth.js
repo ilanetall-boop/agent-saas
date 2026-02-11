@@ -172,6 +172,11 @@ router.post('/refresh', validateRequest(schemas.refresh), async (req, res) => {
         // Validate and generate new access token
         const tokens = await refreshAccessToken(refreshToken);
         
+        // ✅ NEW: Track token rotation timestamp
+        if (tokens.userId) {
+            await db.updateTokenRotation(tokens.userId, new Date().toISOString());
+        }
+        
         // Log token refresh
         auditLog({
             type: 'token_refreshed',

@@ -23,7 +23,21 @@ async function authMiddleware(req, res, next) {
             return res.status(401).json({ error: 'Utilisateur non trouvé' });
         }
         
+        // ✅ NEW: Check if token rotation is needed (30-day max)
+        const lastRotation = await db.getLastTokenRotation(decoded.userId);
+        if (lastRotation) {
+            const daysSinceRotation = (Date.now() - new Date(lastRotation).getTime()) / (1000 * 60 * 60 * 24);
+            if (daysSinceRotation > 30) {
+                // Token needs rotation
+                return res.status(401).json({ 
+                    error: 'Token expired - please refresh',
+                    code: 'TOKEN_ROTATION_REQUIRED'
+                });
+            }
+        }
+        
         req.user = user;
+        req.token = decoded;
         next();
     } catch (error) {
         return res.status(401).json({ error: 'Token invalide ou expiré' });
