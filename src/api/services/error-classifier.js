@@ -1,134 +1,116 @@
-// Error Classifier
-// Identifier le type d'erreur pour appliquer la bonne stratégie
+/**
+ * Error Classifier
+ * Categorizes errors into: transient, logic, or blocked
+ * 
+ * Transient: Retry auto (network, timeouts)
+ * Logic: Fix smart (validation, parsing)
+ * Blocked: Ask user (permission, resource not found)
+ */
 
-class ErrorClassifier {
-    constructor() {
-        // Transient errors (retry auto)
-        this.transientPatterns = [
-            /timeout/i,
-            /ECONNREFUSED/,
-            /ECONNRESET/,
-            /EHOSTUNREACH/,
-            /ENETUNREACH/,
-            /5\d{2}/, // HTTP 500-599
-            /429/, // Rate limit
-            /temporarily unavailable/i,
-            /service unavailable/i,
-            /try again later/i
-        ];
-        
-        // Logic errors (try alternative)
-        this.logicPatterns = [
-            /parsing failed/i,
-            /invalid format/i,
-            /unexpected response/i,
-            /malformed/i,
-            /null/i,
-            /undefined/i,
-            /4\d{2}/, // HTTP 400-499 (except 429)
-            /selector not found/i,
-            /element not found/i,
-            /no matching element/i
-        ];
-        
-        // Blocked errors (ask user)
-        this.blockedPatterns = [
-            /authentication failed/i,
-            /unauthorized/i,
-            /forbidden/i,
-            /access denied/i,
-            /permission denied/i,
-            /401/,
-            /403/,
-            /API key invalid/i,
-            /credentials invalid/i,
-            /quota exceeded/i
-        ];
-    }
+const ERROR_PATTERNS = {
+    transient: [
+        /timeout/i,
+        /ECONNREFUSED/,
+        /ECONNRESET/,
+        /ETIMEDOUT/,
+        /socket hang up/i,
+        /network error/i,
+        /temporarily unavailable/i,
+        /please try again/i,
+        /rate limit/i,
+        /too many requests/i,
+        /503|502|504/
+    ],
+    logic: [
+        /invalid format/i,
+        /parse error/i,
+        /unexpected token/i,
+        /malformed/i,
+        /syntax error/i,
+        /json.parse/i,
+        /validation failed/i,
+        /required field/i,
+        /type mismatch/i
+    ],
+    blocked: [
+        /permission denied/i,
+        /forbidden/i,
+        /unauthorized/i,
+        /not found/i,
+        /does not exist/i,
+        /404/,
+        /403/,
+        /401/,
+        /access denied/i,
+        /invalid credentials/i,
+        /expired/i
+    ]
+};
+
+function classifyError(error) {
+    const errorMsg = (error.message || String(error)).toLowerCase();
+    const errorCode = error.code || error.status || '';
     
-    classify(error) {
-        const errorString = error.toString() + (error.message || '');
-        
-        // Check blocked first (highest priority)
-        if (this.matches(errorString, this.blockedPatterns)) {
+    // Check against transient patterns
+    for (const pattern of ERROR_PATTERNS.transient) {
+        if (pattern.test(errorMsg) || pattern.test(String(errorCode))) {
             return {
-                type: 'BLOCKED',
-                message: error.message || 'Erreur d\'authentification',
-                retry: false,
-                ask: true
+                type: 'transient',
+                message: 'Erreur réseau temporaire',
+                retryable: true,
+                originalError: error
             };
         }
-        
-        // Check transient
-        if (this.matches(errorString, this.transientPatterns)) {
-            return {
-                type: 'TRANSIENT',
-                message: error.message || 'Erreur temporaire',
-                retry: true,
-                attempt: 0,
-                maxAttempts: 3
-            };
-        }
-        
-        // Check logic
-        if (this.matches(errorString, this.logicPatterns)) {
-            return {
-                type: 'LOGIC',
-                message: error.message || 'Erreur logique',
-                retry: false,
-                tryAlternative: true
-            };
-        }
-        
-        // Default: treat as transient (retry)
-        return {
-            type: 'UNKNOWN',
-            message: error.message || 'Erreur inconnue',
-            retry: true,
-            attempt: 0,
-            maxAttempts: 2
-        };
     }
     
-    matches(text, patterns) {
-        return patterns.some(pattern => pattern.test(text));
-    }
-    
-    getStrategy(classification) {
-        switch (classification.type) {
-            case 'TRANSIENT':
-                return {
-                    action: 'retry',
-                    backoff: 'exponential', // 1s, 2s, 4s
-                    maxAttempts: 3
-                };
-            
-            case 'LOGIC':
-                return {
-                    action: 'alternate',
-                    backoff: 'none',
-                    strategies: [
-                        'try_alternative_selector',
-                        'try_alternative_method',
-                        'try_alternative_endpoint'
-                    ]
-                };
-            
-            case 'BLOCKED':
-                return {
-                    action: 'ask_user',
-                    backoff: 'none',
-                    context: 'detailed_error'
-                };
-            
-            default:
-                return {
-                    action: 'retry',
-                    backoff: 'linear', // 1s, 2s, 3s
-                    maxAttempts: 2
-                };
+    // Check against logic patterns
+    for (const pattern of ERROR_PATTERNS.logic) {
+        if (pattern.test(errorMsg)) {
+            return {
+                type: 'logic',
+                message: 'Erreur de logique/validation',
+                retryable: false,
+                originalError: error,
+                requiresFix: true
+            };
         }
     }
+    
+    // Check against blocked patterns
+    for (const pattern of ERROR_PATTERNS.blocked) {
+        if (pattern.test(errorMsg) || pattern.test(String(errorCode))) {
+            return {
+                type: 'blocked',
+                message: 'Ressource inaccessible',
+                retryable: false,
+                originalError: error,
+                requiresUser: true
+            };
+        }
+    }
+    
+    // Default: assume transient for unknown errors
+    return {
+        type: 'unknown',
+        message: 'Erreur inconnue',
+        retryable: true,
+        originalError: error
+    };
 }
 
-module.exports = new ErrorClassifier();
+function shouldRetry(classification, attempt = 1) {
+    const maxRetries = {
+        transient: 3,
+        logic: 1,
+        blocked: 0,
+        unknown: 2
+    };
+    
+    return attempt <= maxRetries[classification.type];
+}
+
+module.exports = {
+    classifyError,
+    shouldRetry,
+    ERROR_PATTERNS
+};

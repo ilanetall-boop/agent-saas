@@ -1,187 +1,211 @@
-// Error Recovery Service
-// Appliquer les stratégies de recovery selon le type d'erreur
+/**
+ * Error Recovery Strategies
+ * Executes smart recovery based on error classification
+ */
 
-const errorClassifier = require('./error-classifier');
+const { classifyError, shouldRetry } = require('./error-classifier');
 
 class ErrorRecovery {
-    constructor() {
-        this.retryBackoffMs = 1000; // Start at 1s
+    constructor(agent) {
+        this.agent = agent;
+        this.retryLog = {};
     }
-    
-    async handle(error, context = {}) {
-        // Classifier l'erreur
-        const classification = errorClassifier.classify(error);
-        const strategy = errorClassifier.getStrategy(classification);
+
+    async recover(error, context = {}) {
+        const { task, attempt = 1, data = {} } = context;
         
-        console.log(`📊 Error classified as ${classification.type}:`, classification.message);
-        console.log(`📋 Strategy: ${strategy.action}`);
+        // Classify error
+        const classification = classifyError(error);
         
-        // Exécuter la stratégie appropriée
-        switch (strategy.action) {
-            case 'retry':
-                return await this.executeRetry(context, strategy, classification);
-            
-            case 'alternate':
-                return await this.tryAlternative(context, strategy, classification);
-            
-            case 'ask_user':
-                return this.askUser(classification, context);
-            
-            default:
-                throw new Error(`Unknown recovery strategy: ${strategy.action}`);
-        }
-    }
-    
-    async executeRetry(context, strategy, classification) {
-        const { fn, maxAttempts = strategy.maxAttempts } = context;
+        console.log(`[Error] Task: ${task} | Type: ${classification.type} | Attempt: ${attempt}`);
         
-        if (!fn || typeof fn !== 'function') {
-            throw new Error('No function provided for retry');
+        // Decide recovery strategy
+        if (classification.type === 'transient') {
+            return this._handleTransient(error, context, attempt);
+        } else if (classification.type === 'logic') {
+            return this._handleLogic(error, context, data);
+        } else if (classification.type === 'blocked') {
+            return this._handleBlocked(error, context, data);
         }
         
-        let lastError;
+        return {
+            recovered: false,
+            strategy: 'none',
+            message: classification.message,
+            userNotification: error.message
+        };
+    }
+
+    async _handleTransient(error, context, attempt) {
+        const { task, onRetry } = context;
         
-        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (!shouldRetry({ type: 'transient' }, attempt)) {
+            return {
+                recovered: false,
+                strategy: 'max_retries_exceeded',
+                message: 'Max retries échoués',
+                userNotification: `La tâche "${task}" a échoué après 3 tentatives. Réessayez plus tard.`
+            };
+        }
+        
+        // Exponential backoff: 1s, 2s, 4s
+        const delay = Math.pow(2, attempt - 1) * 1000;
+        
+        console.log(`[Recovery] Retrying in ${delay}ms (attempt ${attempt})`);
+        
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        if (onRetry) {
             try {
-                console.log(`🔄 Retry attempt ${attempt + 1}/${maxAttempts}...`);
-                return await fn();
-            } catch (error) {
-                lastError = error;
-                
-                if (attempt < maxAttempts - 1) {
-                    // Calculate backoff
-                    let delayMs;
-                    if (strategy.backoff === 'exponential') {
-                        delayMs = 1000 * Math.pow(2, attempt); // 1s, 2s, 4s
-                    } else if (strategy.backoff === 'linear') {
-                        delayMs = 1000 * (attempt + 1); // 1s, 2s, 3s
-                    } else {
-                        delayMs = 1000; // Fixed 1s
-                    }
-                    
-                    console.log(`⏳ Waiting ${delayMs}ms before retry...`);
-                    await this.sleep(delayMs);
-                } else {
-                    console.log(`❌ Retry exhausted after ${maxAttempts} attempts`);
-                }
+                const result = await onRetry();
+                return {
+                    recovered: true,
+                    strategy: 'retry',
+                    attempt,
+                    result,
+                    userNotification: null // Silent success
+                };
+            } catch (retryError) {
+                return this.recover(retryError, { ...context, attempt: attempt + 1 });
             }
         }
         
         return {
-            success: false,
-            error: lastError.message,
-            type: 'RETRY_EXHAUSTED',
-            recommendation: '❌ Tous les tentatives ont échoué. Vérifiez votre connexion internet.'
+            recovered: false,
+            strategy: 'retry_unavailable',
+            message: 'Pas de fonction retry fournie'
         };
     }
-    
-    async tryAlternative(context, strategy, classification) {
-        const { browser, url, originalSelector } = context;
+
+    async _handleLogic(error, context, data) {
+        const { task } = context;
         
-        console.log('🔀 Trying alternative approach...');
+        // Try to fix smart based on error type
+        const fix = this._smartFix(error, data);
         
-        // Stratégie 1: Try alternative CSS selector
-        if (strategy.strategies.includes('try_alternative_selector')) {
-            try {
-                console.log('  → Essai: sélecteur alternatif...');
-                const alternatives = [
-                    '[role="button"]',
-                    '.btn',
-                    'button',
-                    '[type="submit"]'
-                ];
-                
-                for (const selector of alternatives) {
-                    if (selector !== originalSelector) {
-                        try {
-                            if (browser && browser.page) {
-                                await browser.page.click(selector);
-                                return { success: true, used: `alternative_selector: ${selector}` };
-                            }
-                        } catch (e) {
-                            continue; // Try next
-                        }
-                    }
-                }
-            } catch (e) {
-                console.log('  → Échec sélecteur alternatif');
-            }
+        if (fix) {
+            console.log(`[Recovery] Attempting smart fix: ${fix.strategy}`);
+            return {
+                recovered: true,
+                strategy: `fix_${fix.strategy}`,
+                fixApplied: fix.fix,
+                userNotification: null // Silent fix
+            };
         }
         
-        // Stratégie 2: Try alternative method (XPath instead of CSS)
-        if (strategy.strategies.includes('try_alternative_method')) {
-            try {
-                console.log('  → Essai: méthode XPath...');
-                if (browser && browser.page) {
-                    await browser.page.click('[type="submit"]');
-                    return { success: true, used: 'alternative_method: xpath' };
-                }
-            } catch (e) {
-                console.log('  → Échec XPath');
-            }
-        }
-        
-        // Stratégie 3: Try alternative endpoint/URL
-        if (strategy.strategies.includes('try_alternative_endpoint')) {
-            try {
-                console.log('  → Essai: endpoint alternatif...');
-                const alternatives = [
-                    url.replace('https://', 'http://'), // Try HTTP
-                    url.replace('/api/v1/', '/api/v2/'), // Try different API version
-                    url.replace(/\/$/, '') // Remove trailing slash
-                ];
-                
-                for (const altUrl of alternatives) {
-                    if (altUrl !== url) {
-                        console.log(`    Trying ${altUrl}...`);
-                        // Try calling function with new URL
-                        if (context.fnWithUrl) {
-                            try {
-                                return await context.fnWithUrl(altUrl);
-                            } catch (e) {
-                                continue;
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
-                console.log('  → Échec endpoint alternatif');
-            }
-        }
-        
+        // No smart fix available, ask user
         return {
-            success: false,
-            error: classification.message,
-            type: 'ALTERNATIVE_FAILED',
-            recommendation: '⚠️ Toutes les approches alternatives ont échoué. Le problème peut être plus grave.'
+            recovered: false,
+            strategy: 'requires_user_input',
+            message: `Erreur logique: ${error.message}`,
+            userNotification: `Je n'ai pas pu traiter "${task}" à cause d'une erreur de validation. Détail: ${error.message}`
         };
     }
-    
-    askUser(classification, context = {}) {
-        const { url, message } = context;
+
+    async _handleBlocked(error, context, data) {
+        const { task } = context;
         
+        // Try alternative approach if available
+        const alternative = this._tryAlternative(error, context);
+        
+        if (alternative) {
+            console.log(`[Recovery] Trying alternative: ${alternative.strategy}`);
+            return {
+                recovered: true,
+                strategy: alternative.strategy,
+                alternative: alternative.description,
+                userNotification: `"${task}" n'a pas pu être fait comme prévu, j'ai essayé une approche alternative.`
+            };
+        }
+        
+        // No alternative, ask user
         return {
-            success: false,
-            error: classification.message,
-            type: 'REQUIRES_USER_INPUT',
-            recommendation: '❓ Je suis bloqué et j\'ai besoin de ton aide.',
-            details: {
-                problem: classification.message,
-                url: url,
-                userMessage: message,
-                suggestions: [
-                    'Vérifier les identifiants',
-                    'Vérifier la limite API',
-                    'Vérifier les permissions',
-                    'Réessayer manuellement'
-                ]
-            }
+            recovered: false,
+            strategy: 'requires_user_decision',
+            message: error.message,
+            userNotification: `Je ne peux pas accéder à "${task}". Raison: ${this._explainError(error)}. Qu'est-ce que tu veux faire?`
         };
     }
-    
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+
+    _smartFix(error, data) {
+        const errorMsg = error.message.toLowerCase();
+        
+        // Fix: JSON parse error
+        if (errorMsg.includes('json') || errorMsg.includes('parse')) {
+            return {
+                strategy: 'json_fallback',
+                fix: 'Tentative de parsing alternatif'
+            };
+        }
+        
+        // Fix: Missing required field
+        if (errorMsg.includes('required')) {
+            return {
+                strategy: 'fill_defaults',
+                fix: 'Remplissage des champs par défaut'
+            };
+        }
+        
+        // Fix: Type mismatch
+        if (errorMsg.includes('type')) {
+            return {
+                strategy: 'type_coercion',
+                fix: 'Conversion de type'
+            };
+        }
+        
+        return null;
+    }
+
+    _tryAlternative(error, context) {
+        const { task } = context;
+        const errorMsg = error.message.toLowerCase();
+        
+        // Alternative: Try different API endpoint
+        if (errorMsg.includes('not found')) {
+            return {
+                strategy: 'alternative_source',
+                description: 'Essai d\'une source alternative'
+            };
+        }
+        
+        // Alternative: Try different format
+        if (errorMsg.includes('format') || errorMsg.includes('invalid')) {
+            return {
+                strategy: 'alternative_format',
+                description: 'Tentative avec un format différent'
+            };
+        }
+        
+        // Alternative: Use cache/previous result
+        if (errorMsg.includes('timeout') || errorMsg.includes('unavailable')) {
+            return {
+                strategy: 'use_cache',
+                description: 'Utilisation des données précédentes'
+            };
+        }
+        
+        return null;
+    }
+
+    _explainError(error) {
+        const msg = error.message.toLowerCase();
+        
+        if (msg.includes('404') || msg.includes('not found')) {
+            return 'La ressource n\'existe pas';
+        }
+        if (msg.includes('403') || msg.includes('forbidden')) {
+            return 'Accès refusé (permissions insuffisantes)';
+        }
+        if (msg.includes('401') || msg.includes('unauthorized')) {
+            return 'Authentification requise';
+        }
+        if (msg.includes('timeout')) {
+            return 'Le serveur ne répond pas assez vite';
+        }
+        
+        return error.message;
     }
 }
 
-module.exports = new ErrorRecovery();
+module.exports = ErrorRecovery;

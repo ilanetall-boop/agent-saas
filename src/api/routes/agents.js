@@ -3,6 +3,7 @@ const { nanoid } = require('nanoid');
 const { authMiddleware } = require('../middleware/auth');
 const db = require('../db/db');
 const { generateResponse, getDefaultSystemPrompt, getOnboardingPrompt } = require('../services/claude');
+const ErrorRecovery = require('../services/error-recovery');
 
 const router = express.Router();
 
@@ -119,12 +120,40 @@ router.post('/chat', authMiddleware, async (req, res) => {
             systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name);
         }
         
-        // Generate response
-        const response = await generateResponse({
-            systemPrompt,
-            messages: [...history, { role: 'user', content: message }],
-            memory: memoryMap
-        });
+        // Generate response with smart error recovery
+        let response;
+        let errorRecovery = null;
+        let recoveryAttempt = 1;
+        
+        async function attemptGenerate() {
+            return generateResponse({
+                systemPrompt,
+                messages: [...history, { role: 'user', content: message }],
+                memory: memoryMap
+            });
+        }
+        
+        try {
+            response = await attemptGenerate();
+        } catch (genError) {
+            errorRecovery = new ErrorRecovery(agent);
+            const recovery = await errorRecovery.recover(genError, {
+                task: 'Génération de réponse',
+                attempt: recoveryAttempt,
+                onRetry: attemptGenerate
+            });
+            
+            if (recovery.recovered) {
+                response = recovery.result;
+                console.log(`[Recovery] Success with strategy: ${recovery.strategy}`);
+            } else {
+                // Recovery failed, return error to user
+                return res.status(500).json({ 
+                    error: recovery.userNotification || 'Erreur lors du chat',
+                    recoveryStatus: recovery.strategy
+                });
+            }
+        }
         
         if (!response.success) {
             return res.status(500).json({ error: 'Erreur lors de la génération de réponse' });

@@ -163,6 +163,21 @@ const dbOps = {
     getRecentMessages: (conversationId, limit) => {
         return all('SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT ?',
             [conversationId, limit]);
+    },
+    
+    // Refresh Tokens (for dual-token auth)
+    saveRefreshToken: (userId, token, expiresAt) => {
+        const tokenId = require('nanoid').nanoid();
+        run('INSERT INTO sessions (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)',
+            [tokenId, userId, token, expiresAt]);
+    },
+    
+    getRefreshToken: (userId) => {
+        return get('SELECT * FROM sessions WHERE user_id = ? AND expires_at > datetime("now") ORDER BY created_at DESC LIMIT 1', [userId]);
+    },
+    
+    deleteRefreshToken: (userId) => {
+        run('DELETE FROM sessions WHERE user_id = ?', [userId]);
     }
 };
 
