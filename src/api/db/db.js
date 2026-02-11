@@ -2,16 +2,16 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-const DATABASE_URL = process.env.DATABASE_URL;
-
-if (!DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable not set. PostgreSQL required for production.');
-}
-
 let pool = null;
 
 // Initialize PostgreSQL connection pool
 async function initDb() {
+    const DATABASE_URL = process.env.DATABASE_URL;
+    
+    if (!DATABASE_URL) {
+        throw new Error('DATABASE_URL environment variable not set. PostgreSQL required for production.');
+    }
+    
     pool = new Pool({
         connectionString: DATABASE_URL,
         ssl: {
