@@ -5,6 +5,7 @@ const db = require('../db/db');
 const { generateDualTokens, refreshAccessToken, authMiddleware } = require('../middleware/auth');
 const { validateRequest, schemas } = require('../middleware/validation');
 const { log: auditLog } = require('../services/audit-log');
+const { verifyRefreshToken, shouldRotate, rotateToken, getRotationStatus } = require('../services/jwt-rotation');
 
 const router = express.Router();
 
@@ -159,7 +160,7 @@ router.post('/login', validateRequest(schemas.login), async (req, res) => {
     }
 });
 
-// Refresh Access Token (NEW)
+// Refresh Access Token (with automatic token rotation)
 router.post('/refresh', validateRequest(schemas.refresh), async (req, res) => {
     try {
         // Get refresh token from body or cookie
@@ -169,18 +170,76 @@ router.post('/refresh', validateRequest(schemas.refresh), async (req, res) => {
             return res.status(401).json({ error: 'Refresh token manquant' });
         }
         
-        // Validate and generate new access token
-        const tokens = await refreshAccessToken(refreshToken);
-        
-        // ✅ NEW: Track token rotation timestamp
-        if (tokens.userId) {
-            await db.updateTokenRotation(tokens.userId, new Date().toISOString());
+        // Validate refresh token structure
+        let decoded;
+        try {
+            decoded = verifyRefreshToken(refreshToken);
+        } catch (error) {
+            auditLog({
+                type: 'token_refresh_failed',
+                reason: 'invalid_token_structure',
+                ipAddress: req.ip,
+                userAgent: req.get('user-agent')
+            });
+            return res.status(401).json({ error: error.message });
         }
         
-        // Log token refresh
+        const userId = decoded.userId;
+        
+        // Check if token should be rotated (sliding window)
+        const shouldRotateToken = shouldRotate(decoded);
+        
+        if (shouldRotateToken) {
+            // Perform automatic token rotation
+            try {
+                const rotationResult = await rotateToken(db, userId, refreshToken, decoded);
+                
+                // Generate new access token
+                const tokens = await refreshAccessToken(refreshToken);
+                
+                // Set new refresh token in cookie
+                res.cookie('refreshToken', rotationResult.newToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
+                });
+                
+                auditLog({
+                    type: 'token_rotated',
+                    userId,
+                    generation: rotationResult.generation,
+                    ipAddress: req.ip,
+                    userAgent: req.get('user-agent')
+                });
+                
+                return res.json({
+                    success: true,
+                    accessToken: tokens.accessToken,
+                    refreshToken: rotationResult.newToken, // Send new refresh token in body (also in cookie)
+                    expiresIn: tokens.expiresIn,
+                    rotated: true,
+                    generation: rotationResult.generation
+                });
+            } catch (rotationError) {
+                console.error('Token rotation error:', rotationError);
+                auditLog({
+                    type: 'token_rotation_failed',
+                    userId,
+                    reason: rotationError.message,
+                    ipAddress: req.ip,
+                    userAgent: req.get('user-agent')
+                });
+                return res.status(401).json({ error: 'Token rotation failed' });
+            }
+        }
+        
+        // Normal refresh (no rotation needed yet)
+        const tokens = await refreshAccessToken(refreshToken);
+        
         auditLog({
             type: 'token_refreshed',
-            userId: tokens.userId || 'unknown',
+            userId,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
@@ -188,7 +247,8 @@ router.post('/refresh', validateRequest(schemas.refresh), async (req, res) => {
         res.json({
             success: true,
             accessToken: tokens.accessToken,
-            expiresIn: tokens.expiresIn
+            expiresIn: tokens.expiresIn,
+            rotated: false
         });
     } catch (error) {
         console.error('Refresh error:', error);
@@ -241,6 +301,23 @@ router.post('/logout', authMiddleware, async (req, res) => {
     } catch (error) {
         console.error('Logout error:', error);
         res.status(500).json({ error: 'Erreur lors de la déconnexion' });
+    }
+});
+
+// Token rotation status (monitoring endpoint)
+router.get('/rotation-status', authMiddleware, async (req, res) => {
+    try {
+        const status = await getRotationStatus(db, req.user.id);
+        
+        res.json({
+            success: true,
+            rotationStatus: status,
+            userId: req.user.id,
+            message: status.needsRotation ? 'Token requires rotation' : 'Token is current'
+        });
+    } catch (error) {
+        console.error('Rotation status error:', error);
+        res.status(500).json({ error: 'Failed to get rotation status' });
     }
 });
 
