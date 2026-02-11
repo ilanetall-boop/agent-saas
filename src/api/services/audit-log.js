@@ -6,7 +6,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const LOG_DIR = path.join(__dirname, '../../data');
+// Resolve to project root/data directory
+const LOG_DIR = path.join(__dirname, '../../../data');
 const LOG_FILE = path.join(LOG_DIR, 'audit.log');
 
 // Ensure log directory exists

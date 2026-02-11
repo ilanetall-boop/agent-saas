@@ -1,7 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { nanoid } = require('nanoid');
-const rateLimit = require('express-rate-limit');
 const db = require('../db/db');
 const { generateDualTokens, refreshAccessToken, authMiddleware } = require('../middleware/auth');
 const { validateRequest, schemas } = require('../middleware/validation');
@@ -9,17 +8,11 @@ const { log: auditLog } = require('../services/audit-log');
 
 const router = express.Router();
 
-// Strict rate limiter for authentication endpoints
-const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 10, // 10 attempts per hour
-    message: 'Trop de tentatives d\'authentification, réessayez dans 1 heure',
-    skipSuccessfulRequests: true,
-    keyGenerator: (req) => req.body.email || req.ip
-});
+// NOTE: Auth endpoints already protected by global limiter in server.js
+// No need for additional rate limiting here
 
 // Register (Dual-Token)
-router.post('/register', authLimiter, validateRequest(schemas.register), async (req, res) => {
+router.post('/register', validateRequest(schemas.register), async (req, res) => {
     try {
         const { email, password, name } = req.validatedBody;
         
@@ -88,7 +81,7 @@ router.post('/register', authLimiter, validateRequest(schemas.register), async (
 });
 
 // Login (Dual-Token)
-router.post('/login', authLimiter, validateRequest(schemas.login), async (req, res) => {
+router.post('/login', validateRequest(schemas.login), async (req, res) => {
     try {
         const { email, password } = req.validatedBody;
         
