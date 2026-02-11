@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 const { encryptToken, decryptToken } = require('../services/token-encryption');
+const { encryptUserFields, decryptUserFields } = require('../services/field-encryption');
 
 let pool = null;
 
@@ -75,20 +76,26 @@ async function all(sql, params = []) {
 
 // Database operations (PostgreSQL syntax)
 const dbOps = {
-    // Users
+    // Users (with field encryption)
     createUser: async (id, email, passwordHash, name) => {
+        // ✅ Encrypt sensitive fields before storing
+        const encryptedName = name ? encryptUserFields({ name }).name : null;
         await run(
             'INSERT INTO users (id, email, password_hash, name) VALUES ($1, $2, $3, $4)',
-            [id, email, passwordHash, name]
+            [id, email, passwordHash, encryptedName]
         );
     },
     
     getUserByEmail: async (email) => {
-        return await get('SELECT * FROM users WHERE email = $1', [email]);
+        const user = await get('SELECT * FROM users WHERE email = $1', [email]);
+        // ✅ Decrypt sensitive fields when retrieving
+        return user ? decryptUserFields(user) : null;
     },
     
     getUserById: async (id) => {
-        return await get('SELECT * FROM users WHERE id = $1', [id]);
+        const user = await get('SELECT * FROM users WHERE id = $1', [id]);
+        // ✅ Decrypt sensitive fields when retrieving
+        return user ? decryptUserFields(user) : null;
     },
     
     updateUserMessages: async (id) => {
