@@ -243,6 +243,40 @@ const dbOps = {
                    COUNT(CASE WHEN status = 'error' THEN 1 END) as errors
             FROM audit_logs
         `);
+    },
+    
+    // Vault operations (for encrypted API keys)
+    storeVaultKey: async (id, keyName, encryptedValue) => {
+        await run(`
+            INSERT INTO vaults (id, key_name, value)
+            VALUES ($1, $2, $3)
+            ON CONFLICT(key_name) DO UPDATE
+            SET value = EXCLUDED.value, encrypted_at = CURRENT_TIMESTAMP
+        `, [id, keyName, encryptedValue]);
+    },
+    
+    getVaultKey: async (keyName) => {
+        return await get('SELECT * FROM vaults WHERE key_name = $1', [keyName]);
+    },
+    
+    deleteVaultKey: async (keyName) => {
+        await run('DELETE FROM vaults WHERE key_name = $1', [keyName]);
+    },
+    
+    // Token rotation tracking
+    updateTokenRotation: async (userId, rotatedAt) => {
+        await run(
+            'UPDATE sessions SET last_rotated_at = $1 WHERE user_id = $2',
+            [rotatedAt, userId]
+        );
+    },
+    
+    getLastTokenRotation: async (userId) => {
+        const result = await get(
+            'SELECT last_rotated_at FROM sessions WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+            [userId]
+        );
+        return result?.last_rotated_at;
     }
 };
 
