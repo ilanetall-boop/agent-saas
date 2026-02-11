@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
+const { encryptToken, decryptToken } = require('../services/token-encryption');
 
 let pool = null;
 
@@ -15,7 +16,8 @@ async function initDb() {
     pool = new Pool({
         connectionString: DATABASE_URL,
         ssl: {
-            rejectUnauthorized: false // Required for Render.com
+            rejectUnauthorized: true, // ✅ FIXED: Validate server certificate
+            ca: process.env.RENDER_CA_CERT // Optional: Use Render's CA cert if provided
         },
         max: 20,
         idleTimeoutMillis: 30000,
@@ -185,20 +187,34 @@ const dbOps = {
         );
     },
     
-    // Refresh Tokens (for dual-token auth)
+    // Refresh Tokens (for dual-token auth) - ENCRYPTED
     saveRefreshToken: async (userId, token, expiresAt) => {
         const tokenId = require('nanoid').nanoid();
+        // ✅ ENCRYPTION: Encrypt token before storing
+        const encryptedToken = encryptToken(token);
         await run(
             'INSERT INTO sessions (id, user_id, token, expires_at) VALUES ($1, $2, $3, $4)',
-            [tokenId, userId, token, expiresAt]
+            [tokenId, userId, encryptedToken, expiresAt]
         );
     },
     
     getRefreshToken: async (userId) => {
-        return await get(
+        const session = await get(
             'SELECT * FROM sessions WHERE user_id = $1 AND expires_at > CURRENT_TIMESTAMP ORDER BY created_at DESC LIMIT 1',
             [userId]
         );
+        
+        if (session && session.token) {
+            // ✅ DECRYPTION: Decrypt token when retrieving
+            try {
+                session.token = decryptToken(session.token);
+            } catch (error) {
+                console.error('Token decryption failed:', error.message);
+                return null; // Invalid token, return null
+            }
+        }
+        
+        return session;
     },
     
     deleteRefreshToken: async (userId) => {
