@@ -6,7 +6,7 @@ const db = require('../db/db');
 const ACCESS_TOKEN_EXPIRY = '30m'; // 30 minutes
 const REFRESH_TOKEN_EXPIRY = 7776000; // 90 days in seconds
 
-function authMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -17,7 +17,7 @@ function authMiddleware(req, res, next) {
     
     try {
         const decoded = jwt.verify(token, config.jwtSecret);
-        const user = db.getUserById(decoded.userId);
+        const user = await db.getUserById(decoded.userId);
         
         if (!user) {
             return res.status(401).json({ error: 'Utilisateur non trouvé' });
@@ -30,7 +30,7 @@ function authMiddleware(req, res, next) {
     }
 }
 
-function optionalAuth(req, res, next) {
+async function optionalAuth(req, res, next) {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -41,7 +41,7 @@ function optionalAuth(req, res, next) {
     
     try {
         const decoded = jwt.verify(token, config.jwtSecret);
-        const user = db.getUserById(decoded.userId);
+        const user = await db.getUserById(decoded.userId);
         if (user) {
             req.user = user;
         }
@@ -58,7 +58,7 @@ function generateToken(userId) {
 }
 
 // NEW: Generate dual tokens (access + refresh)
-function generateDualTokens(userId) {
+async function generateDualTokens(userId) {
     // Access token: 30 minutes (short-lived, secure)
     const accessToken = jwt.sign(
         { userId, type: 'access' },
@@ -79,7 +79,7 @@ function generateDualTokens(userId) {
     expiresAt.setSeconds(expiresAt.getSeconds() + REFRESH_TOKEN_EXPIRY);
     
     // Store refresh token in database
-    db.saveRefreshToken(userId, refreshToken, expiresAt.toISOString());
+    await db.saveRefreshToken(userId, refreshToken, expiresAt.toISOString());
     
     return {
         accessToken,

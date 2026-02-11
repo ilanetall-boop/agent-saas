@@ -71,9 +71,9 @@ async function handleMessage(msg, agentId, bot) {
         const userName = msg.from.first_name || 'Ami';
         
         // Store chatId if not already stored
-        const agent = db.getAgentByUserId(agentId);
+        const agent = await db.getAgentByUserId(agentId);
         if (agent && !agent.telegram_chat_id) {
-            db.updateAgentTelegram(agent.id, agent.telegram_bot_token, chatId);
+            await db.updateAgentTelegram(agent.id, agent.telegram_bot_token, chatId);
             console.log(`[TELEGRAM] Captured chatId ${chatId} for agent ${agentId}`);
         }
 
@@ -120,23 +120,24 @@ async function handleMessage(msg, agentId, bot) {
         }
 
         // Get or create conversation
-        let conversation = db.getActiveConversation(agentId);
+        let conversation = await db.getActiveConversation(agentId);
         if (!conversation) {
             const convId = nanoid();
-            db.createConversation(convId, agentId, 'telegram');
+            await db.createConversation(convId, agentId, 'telegram');
             conversation = { id: convId };
         }
 
         // Get conversation history (last 10 messages)
-        const history = db.getRecentMessages(conversation.id, 10).reverse();
+        const historyRaw = await db.getRecentMessages(conversation.id, 10);
+        const history = historyRaw.reverse();
 
         // Get memory (agent already fetched above)
-        const memories = db.getAllMemories(agentId);
+        const memories = await db.getAllMemories(agentId);
         const memoryMap = {};
         memories.forEach(m => { memoryMap[m.key] = m.value; });
 
         // Store user message
-        db.addMessage(nanoid(), conversation.id, 'user', userText);
+        await db.addMessage(nanoid(), conversation.id, 'user', userText);
 
         // Show typing indicator
         await bot.sendChatAction(chatId, 'typing');
@@ -155,7 +156,7 @@ async function handleMessage(msg, agentId, bot) {
         }
 
         // Store assistant message
-        db.addMessage(nanoid(), conversation.id, 'assistant', response.content);
+        await db.addMessage(nanoid(), conversation.id, 'assistant', response.content);
 
         // If user sent voice, respond with voice
         if (isVoiceMessage && config.openaiApiKey) {
@@ -239,8 +240,8 @@ Ou écris simplement un message!
             break;
 
         case '/memory':
-            const agent = db.getAgentByUserId(agentId);
-            const memories = db.getAllMemories(agentId);
+            const agent = await db.getAgentByUserId(agentId);
+            const memories = await db.getAllMemories(agentId);
             
             if (memories.length === 0) {
                 await bot.sendMessage(chatId, '📝 Je ne sais rien sur toi encore. Dis-moi des choses! 😊');
@@ -258,7 +259,7 @@ Ou écris simplement un message!
         case '/reset':
             // Create new conversation
             const newConvId = nanoid();
-            db.createConversation(newConvId, agentId, 'telegram');
+            await db.createConversation(newConvId, agentId, 'telegram');
             await bot.sendMessage(chatId, '🔄 Conversation réinitialisée. On recommence! 🚀');
             break;
 
@@ -294,7 +295,7 @@ async function handleCallbackQuery(query, agentId, bot) {
 async function linkTelegramChat(agentId, botToken, chatId, webhookUrl = null) {
     try {
         // Update agent with Telegram info
-        db.updateAgentTelegram(agentId, botToken, chatId);
+        await db.updateAgentTelegram(agentId, botToken, chatId);
 
         // Initialize bot if not already done
         if (!activeBots.has(agentId)) {
@@ -306,7 +307,7 @@ async function linkTelegramChat(agentId, botToken, chatId, webhookUrl = null) {
 
         // Send welcome message
         const bot = activeBots.get(agentId);
-        const agent = db.getAgentByUserId(agentId);
+        const agent = await db.getAgentByUserId(agentId);
         
         await bot.sendMessage(chatId, `
 ✨ Bienvenue sur Telegram, ${agent.name}!
@@ -328,7 +329,7 @@ Je suis prêt à t'aider. Posez-moi une question ou dites-moi ce que vous voulez
  */
 async function sendTelegramMessage(agentId, message) {
     try {
-        const agent = db.getAgentByUserId(agentId);
+        const agent = await db.getAgentByUserId(agentId);
         
         if (!agent || !agent.telegram_chat_id) {
             return { success: false, error: 'Telegram non lié' };

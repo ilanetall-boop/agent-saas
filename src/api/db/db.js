@@ -1,184 +1,233 @@
-const initSqlJs = require('sql.js');
-const path = require('path');
+const { Pool } = require('pg');
 const fs = require('fs');
+const path = require('path');
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../../data/agent-saas.db');
+const DATABASE_URL = process.env.DATABASE_URL;
 
-let db = null;
-
-// Ensure data directory exists
-const dataDir = path.dirname(DB_PATH);
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL environment variable not set. PostgreSQL required for production.');
 }
 
-// Initialize database
+let pool = null;
+
+// Initialize PostgreSQL connection pool
 async function initDb() {
-    const SQL = await initSqlJs();
-    
-    // Load existing database or create new one
-    if (fs.existsSync(DB_PATH)) {
-        const buffer = fs.readFileSync(DB_PATH);
-        db = new SQL.Database(buffer);
-    } else {
-        db = new SQL.Database();
+    pool = new Pool({
+        connectionString: DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false // Required for Render.com
+        },
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000
+    });
+
+    // Test connection
+    try {
+        const client = await pool.connect();
+        console.log('PostgreSQL connection successful');
+        
+        // Create schema
+        const schema = fs.readFileSync(path.join(__dirname, 'schema-postgres.sql'), 'utf8');
+        
+        // Split schema into individual statements and execute each
+        const statements = schema.split(';').filter(stmt => stmt.trim());
+        for (const statement of statements) {
+            if (statement.trim()) {
+                await client.query(statement);
+            }
+        }
+        
+        console.log('Database schema initialized');
+        client.release();
+    } catch (error) {
+        console.error('Database initialization error:', error);
+        throw error;
     }
     
-    // Run schema
-    const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
-    db.run(schema);
-    
-    // Save to file
-    saveDb();
-    
-    console.log('Database initialized');
-    return db;
+    return pool;
 }
 
-function saveDb() {
-    if (!db) return;
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(DB_PATH, buffer);
-}
-
-// Auto-save every 30 seconds
-setInterval(saveDb, 30000);
-
-// Helper to run queries
-function run(sql, params = []) {
-    if (!db) throw new Error('Database not initialized');
-    db.run(sql, params);
-    saveDb();
-}
-
-function get(sql, params = []) {
-    if (!db) throw new Error('Database not initialized');
-    const stmt = db.prepare(sql);
-    stmt.bind(params);
-    if (stmt.step()) {
-        const row = stmt.getAsObject();
-        stmt.free();
-        return row;
+// Helper to run queries (no save needed for PostgreSQL)
+async function run(sql, params = []) {
+    if (!pool) throw new Error('Database not initialized');
+    try {
+        return await pool.query(sql, params);
+    } catch (error) {
+        console.error('Database error:', error.message);
+        throw error;
     }
-    stmt.free();
-    return null;
 }
 
-function all(sql, params = []) {
-    if (!db) throw new Error('Database not initialized');
-    const stmt = db.prepare(sql);
-    stmt.bind(params);
-    const results = [];
-    while (stmt.step()) {
-        results.push(stmt.getAsObject());
-    }
-    stmt.free();
-    return results;
+async function get(sql, params = []) {
+    if (!pool) throw new Error('Database not initialized');
+    const result = await pool.query(sql, params);
+    return result.rows[0] || null;
 }
 
-// Database operations
+async function all(sql, params = []) {
+    if (!pool) throw new Error('Database not initialized');
+    const result = await pool.query(sql, params);
+    return result.rows;
+}
+
+// Database operations (PostgreSQL syntax)
 const dbOps = {
     // Users
-    createUser: (id, email, passwordHash, name) => {
-        run('INSERT INTO users (id, email, password_hash, name) VALUES (?, ?, ?, ?)', 
-            [id, email, passwordHash, name]);
+    createUser: async (id, email, passwordHash, name) => {
+        await run(
+            'INSERT INTO users (id, email, password_hash, name) VALUES ($1, $2, $3, $4)',
+            [id, email, passwordHash, name]
+        );
     },
     
-    getUserByEmail: (email) => {
-        return get('SELECT * FROM users WHERE email = ?', [email]);
+    getUserByEmail: async (email) => {
+        return await get('SELECT * FROM users WHERE email = $1', [email]);
     },
     
-    getUserById: (id) => {
-        return get('SELECT * FROM users WHERE id = ?', [id]);
+    getUserById: async (id) => {
+        return await get('SELECT * FROM users WHERE id = $1', [id]);
     },
     
-    updateUserMessages: (id) => {
-        run('UPDATE users SET messages_used = messages_used + 1, updated_at = datetime("now") WHERE id = ?', [id]);
+    updateUserMessages: async (id) => {
+        await run(
+            'UPDATE users SET messages_used = messages_used + 1, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+            [id]
+        );
     },
     
     // Agents
-    createAgent: (id, userId, name) => {
-        run('INSERT INTO agents (id, user_id, name) VALUES (?, ?, ?)', [id, userId, name]);
+    createAgent: async (id, userId, name) => {
+        await run(
+            'INSERT INTO agents (id, user_id, name) VALUES ($1, $2, $3)',
+            [id, userId, name]
+        );
     },
     
-    getAgentByUserId: (userId) => {
-        return get('SELECT * FROM agents WHERE user_id = ?', [userId]);
+    getAgentByUserId: async (userId) => {
+        return await get('SELECT * FROM agents WHERE user_id = $1', [userId]);
     },
     
-    getAgentByTelegramChat: (chatId) => {
-        return get(`
+    getAgentByTelegramChat: async (chatId) => {
+        return await get(`
             SELECT a.*, u.messages_used, u.messages_limit, u.plan 
             FROM agents a 
             JOIN users u ON a.user_id = u.id 
-            WHERE a.telegram_chat_id = ?
+            WHERE a.telegram_chat_id = $1
         `, [chatId]);
     },
     
-    updateAgentTelegram: (agentId, botToken, chatId) => {
-        run('UPDATE agents SET telegram_bot_token = ?, telegram_chat_id = ? WHERE id = ?', 
-            [botToken, chatId, agentId]);
+    updateAgentTelegram: async (agentId, botToken, chatId) => {
+        await run(
+            'UPDATE agents SET telegram_bot_token = $1, telegram_chat_id = $2 WHERE id = $3',
+            [botToken, chatId, agentId]
+        );
     },
     
-    updateAgentOnboarding: (agentId) => {
-        run('UPDATE agents SET onboarding_complete = 1 WHERE id = ?', [agentId]);
+    updateAgentOnboarding: async (agentId) => {
+        await run('UPDATE agents SET onboarding_complete = 1 WHERE id = $1', [agentId]);
     },
     
     // Memories
-    setMemory: (id, agentId, key, value) => {
-        run(`INSERT INTO memories (id, agent_id, key, value) VALUES (?, ?, ?, ?)
-             ON CONFLICT(agent_id, key) DO UPDATE SET value = excluded.value, updated_at = datetime("now")`,
-            [id, agentId, key, value]);
+    setMemory: async (id, agentId, key, value) => {
+        // PostgreSQL UPSERT syntax
+        await run(`
+            INSERT INTO memories (id, agent_id, key, value) 
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT(agent_id, key) DO UPDATE 
+            SET value = EXCLUDED.value, updated_at = CURRENT_TIMESTAMP
+        `, [id, agentId, key, value]);
     },
     
-    getMemory: (agentId, key) => {
-        const row = get('SELECT value FROM memories WHERE agent_id = ? AND key = ?', [agentId, key]);
+    getMemory: async (agentId, key) => {
+        const row = await get('SELECT value FROM memories WHERE agent_id = $1 AND key = $2', [agentId, key]);
         return row ? row.value : null;
     },
     
-    getAllMemories: (agentId) => {
-        return all('SELECT key, value FROM memories WHERE agent_id = ?', [agentId]);
+    getAllMemories: async (agentId) => {
+        return await all('SELECT key, value FROM memories WHERE agent_id = $1', [agentId]);
     },
     
     // Conversations
-    createConversation: (id, agentId, channel) => {
-        run('INSERT INTO conversations (id, agent_id, channel) VALUES (?, ?, ?)', [id, agentId, channel]);
+    createConversation: async (id, agentId, channel) => {
+        await run(
+            'INSERT INTO conversations (id, agent_id, channel) VALUES ($1, $2, $3)',
+            [id, agentId, channel]
+        );
     },
     
-    getActiveConversation: (agentId) => {
-        return get('SELECT * FROM conversations WHERE agent_id = ? ORDER BY created_at DESC LIMIT 1', [agentId]);
+    getActiveConversation: async (agentId) => {
+        return await get(
+            'SELECT * FROM conversations WHERE agent_id = $1 ORDER BY created_at DESC LIMIT 1',
+            [agentId]
+        );
     },
     
     // Messages
-    addMessage: (id, conversationId, role, content) => {
-        run('INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)', 
-            [id, conversationId, role, content]);
+    addMessage: async (id, conversationId, role, content) => {
+        await run(
+            'INSERT INTO messages (id, conversation_id, role, content) VALUES ($1, $2, $3, $4)',
+            [id, conversationId, role, content]
+        );
     },
     
-    getMessages: (conversationId, limit) => {
-        return all('SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at ASC LIMIT ?', 
-            [conversationId, limit]);
+    getMessages: async (conversationId, limit) => {
+        return await all(
+            'SELECT role, content FROM messages WHERE conversation_id = $1 ORDER BY created_at ASC LIMIT $2',
+            [conversationId, limit]
+        );
     },
     
-    getRecentMessages: (conversationId, limit) => {
-        return all('SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT ?',
-            [conversationId, limit]);
+    getRecentMessages: async (conversationId, limit) => {
+        return await all(
+            'SELECT role, content FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT $2',
+            [conversationId, limit]
+        );
     },
     
     // Refresh Tokens (for dual-token auth)
-    saveRefreshToken: (userId, token, expiresAt) => {
+    saveRefreshToken: async (userId, token, expiresAt) => {
         const tokenId = require('nanoid').nanoid();
-        run('INSERT INTO sessions (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)',
-            [tokenId, userId, token, expiresAt]);
+        await run(
+            'INSERT INTO sessions (id, user_id, token, expires_at) VALUES ($1, $2, $3, $4)',
+            [tokenId, userId, token, expiresAt]
+        );
     },
     
-    getRefreshToken: (userId) => {
-        return get('SELECT * FROM sessions WHERE user_id = ? AND expires_at > datetime("now") ORDER BY created_at DESC LIMIT 1', [userId]);
+    getRefreshToken: async (userId) => {
+        return await get(
+            'SELECT * FROM sessions WHERE user_id = $1 AND expires_at > CURRENT_TIMESTAMP ORDER BY created_at DESC LIMIT 1',
+            [userId]
+        );
     },
     
-    deleteRefreshToken: (userId) => {
-        run('DELETE FROM sessions WHERE user_id = ?', [userId]);
+    deleteRefreshToken: async (userId) => {
+        await run('DELETE FROM sessions WHERE user_id = $1', [userId]);
+    },
+    
+    // Audit logging (Phase 3a)
+    logAudit: async (id, action, userId, details, ipAddress, userAgent, status, errorMessage) => {
+        await run(`
+            INSERT INTO audit_logs (id, action, user_id, details, ip_address, user_agent, status, error_message)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [id, action, userId, details, ipAddress, userAgent, status, errorMessage]);
+    },
+    
+    getAuditLogs: async (limit = 100, offset = 0) => {
+        return await all(
+            'SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
+    },
+    
+    getAuditStats: async () => {
+        return await get(`
+            SELECT COUNT(*) as total,
+                   COUNT(CASE WHEN status = 'success' THEN 1 END) as successful,
+                   COUNT(CASE WHEN status = 'error' THEN 1 END) as errors
+            FROM audit_logs
+        `);
     }
 };
 
-module.exports = { initDb, saveDb, ...dbOps };
+module.exports = { initDb, ...dbOps };

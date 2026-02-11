@@ -21,7 +21,7 @@ router.post('/register', validateRequest(schemas.register), async (req, res) => 
         }
         
         // Check if user exists
-        const existing = db.getUserByEmail(email.toLowerCase());
+        const existing = await db.getUserByEmail(email.toLowerCase());
         if (existing) {
             return res.status(400).json({ error: 'Cet email est déjà utilisé' });
         }
@@ -31,11 +31,11 @@ router.post('/register', validateRequest(schemas.register), async (req, res) => 
         
         // Create user
         const userId = nanoid();
-        db.createUser(userId, email.toLowerCase(), passwordHash, name || null);
+        await db.createUser(userId, email.toLowerCase(), passwordHash, name || null);
         
         // Create default agent for user
         const agentId = nanoid();
-        db.createAgent(agentId, userId, 'Mon Agent');
+        await db.createAgent(agentId, userId, 'Mon Agent');
         
         // Log registration
         auditLog({
@@ -47,7 +47,7 @@ router.post('/register', validateRequest(schemas.register), async (req, res) => 
         });
         
         // Generate dual tokens (access + refresh)
-        const tokens = generateDualTokens(userId);
+        const tokens = await generateDualTokens(userId);
         
         // Set refresh token in secure HttpOnly cookie (optional)
         res.cookie('refreshToken', tokens.refreshToken, {
@@ -90,7 +90,7 @@ router.post('/login', validateRequest(schemas.login), async (req, res) => {
         }
         
         // Find user
-        const user = db.getUserByEmail(email.toLowerCase());
+        const user = await db.getUserByEmail(email.toLowerCase());
         if (!user) {
             // Log failed login
             auditLog({
@@ -128,7 +128,7 @@ router.post('/login', validateRequest(schemas.login), async (req, res) => {
         });
         
         // Generate dual tokens
-        const tokens = generateDualTokens(user.id);
+        const tokens = await generateDualTokens(user.id);
         
         // Set refresh token in secure HttpOnly cookie (optional)
         res.cookie('refreshToken', tokens.refreshToken, {

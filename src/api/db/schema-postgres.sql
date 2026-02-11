@@ -1,4 +1,5 @@
--- PostgreSQL Schema (compatible avec RenderDB)
+-- PostgreSQL Schema for Agent-SaaS
+-- Convert from SQLite to PostgreSQL
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS agents (
     telegram_bot_token TEXT,
     telegram_chat_id TEXT,
     personality TEXT,
-    onboarding_complete BOOLEAN DEFAULT false,
+    onboarding_complete INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -57,21 +58,35 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
 );
 
--- Refresh Tokens table (for JWT dual-token strategy)
-CREATE TABLE IF NOT EXISTS refresh_tokens (
-    user_id TEXT PRIMARY KEY,
+-- Sessions table (for JWT refresh)
+CREATE TABLE IF NOT EXISTS sessions (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Indexes for performance
+-- Audit logs table (from Phase 3a security hardening)
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id TEXT PRIMARY KEY,
+    action TEXT NOT NULL,
+    user_id TEXT,
+    details TEXT,
+    ip_address TEXT,
+    user_agent TEXT,
+    status TEXT,
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Indexes
 CREATE INDEX IF NOT EXISTS idx_agents_user ON agents(user_id);
 CREATE INDEX IF NOT EXISTS idx_memories_agent ON memories(agent_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_conversations_agent ON conversations(agent_id);
-CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at);
-
--- Create extensions if needed
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at);

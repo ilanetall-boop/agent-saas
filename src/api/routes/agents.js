@@ -10,26 +10,31 @@ const { log: auditLog } = require('../services/audit-log');
 const router = express.Router();
 
 // Get user's agent
-router.get('/me', authMiddleware, (req, res) => {
-    const agent = db.getAgentByUserId(req.user.id);
-    
-    if (!agent) {
-        return res.status(404).json({ error: 'Agent non trouvé' });
+router.get('/me', authMiddleware, async (req, res) => {
+    try {
+        const agent = await db.getAgentByUserId(req.user.id);
+        
+        if (!agent) {
+            return res.status(404).json({ error: 'Agent non trouvé' });
+        }
+        
+        const memories = await db.getAllMemories(agent.id);
+        const memoryMap = {};
+        memories.forEach(m => { memoryMap[m.key] = m.value; });
+        
+        res.json({
+            agent: {
+                id: agent.id,
+                name: agent.name || 'Alex',
+                telegramConnected: !!agent.telegram_chat_id,
+                onboardingComplete: !!agent.onboarding_complete
+            },
+            memory: memoryMap
+        });
+    } catch (error) {
+        console.error('Get agent error:', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération de l\'agent' });
     }
-    
-    const memories = db.getAllMemories(agent.id);
-    const memoryMap = {};
-    memories.forEach(m => { memoryMap[m.key] = m.value; });
-    
-    res.json({
-        agent: {
-            id: agent.id,
-            name: agent.name || 'Alex',
-            telegramConnected: !!agent.telegram_chat_id,
-            onboardingComplete: !!agent.onboarding_complete
-        },
-        memory: memoryMap
-    });
 });
 
 // Chat with agent
@@ -41,7 +46,7 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         message = sanitizeMessage(message);
         
         // Refresh user data to get latest message count
-        const freshUser = db.getUserById(req.user.id);
+        const freshUser = await db.getUserById(req.user.id);
         if (!freshUser) {
             return res.status(401).json({ error: 'Utilisateur non trouvé' });
         }
@@ -59,29 +64,30 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         // Update reference
         req.user = freshUser;
         
-        const agent = db.getAgentByUserId(req.user.id);
+        const agent = await db.getAgentByUserId(req.user.id);
         if (!agent) {
             return res.status(404).json({ error: 'Agent non trouvé' });
         }
         
         // Get or create conversation
-        let conversation = db.getActiveConversation(agent.id);
+        let conversation = await db.getActiveConversation(agent.id);
         if (!conversation) {
             const convId = nanoid();
-            db.createConversation(convId, agent.id, 'web');
+            await db.createConversation(convId, agent.id, 'web');
             conversation = { id: convId };
         }
         
         // Get conversation history
-        const history = db.getRecentMessages(conversation.id, 10).reverse();
+        const historyRaw = await db.getRecentMessages(conversation.id, 10);
+        const history = historyRaw.reverse();
         
         // Get memory
-        const memories = db.getAllMemories(agent.id);
+        const memories = await db.getAllMemories(agent.id);
         const memoryMap = {};
         memories.forEach(m => { memoryMap[m.key] = m.value; });
         
         // Add user message
-        db.addMessage(nanoid(), conversation.id, 'user', message);
+        await db.addMessage(nanoid(), conversation.id, 'user', message);
         
         // Determine if onboarding or normal chat
         let systemPrompt;
@@ -94,27 +100,27 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
                 // They gave their name
                 const name = message.trim().split(' ')[0].replace(/[^a-zA-ZÀ-ÿ]/g, '');
                 if (name) {
-                    db.setMemory(nanoid(), agent.id, 'name', name);
+                    await db.setMemory(nanoid(), agent.id, 'name', name);
                     memoryMap.name = name; // Update local copy
                 }
             } else if (onboardingStep === 1) {
-                db.setMemory(nanoid(), agent.id, 'job', message.substring(0, 200));
+                await db.setMemory(nanoid(), agent.id, 'job', message.substring(0, 200));
             } else if (onboardingStep === 2) {
-                db.setMemory(nanoid(), agent.id, 'challenge', message.substring(0, 200));
+                await db.setMemory(nanoid(), agent.id, 'challenge', message.substring(0, 200));
             } else if (onboardingStep === 3) {
-                db.setMemory(nanoid(), agent.id, 'first_need', message.substring(0, 200));
+                await db.setMemory(nanoid(), agent.id, 'first_need', message.substring(0, 200));
             }
             
             // Increment onboarding step BEFORE generating response
             const nextStep = onboardingStep + 1;
-            db.setMemory(nanoid(), agent.id, 'onboarding_step', String(nextStep));
+            await db.setMemory(nanoid(), agent.id, 'onboarding_step', String(nextStep));
             
             // Use the NEXT step's prompt for the response
             systemPrompt = getOnboardingPrompt(nextStep, memoryMap);
             
             // Mark complete after step 4
             if (nextStep >= 5) {
-                db.updateAgentOnboarding(agent.id);
+                await db.updateAgentOnboarding(agent.id);
             }
         } else {
             // Normal chat
@@ -161,13 +167,13 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         }
         
         // Save assistant message
-        db.addMessage(nanoid(), conversation.id, 'assistant', response.content);
+        await db.addMessage(nanoid(), conversation.id, 'assistant', response.content);
         
         // Update message count
-        db.updateUserMessages(req.user.id);
+        await db.updateUserMessages(req.user.id);
         
         // Fetch updated user data for accurate usage
-        const updatedUser = db.getUserById(req.user.id);
+        const updatedUser = await db.getUserById(req.user.id);
         
         // Log successful chat
         auditLog({
@@ -208,17 +214,22 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
 });
 
 // Update agent memory
-router.post('/memory', authMiddleware, validateRequest(schemas.memory), (req, res) => {
-    const { key, value } = req.validatedBody;
-    
-    const agent = db.getAgentByUserId(req.user.id);
-    if (!agent) {
-        return res.status(404).json({ error: 'Agent non trouvé' });
+router.post('/memory', authMiddleware, validateRequest(schemas.memory), async (req, res) => {
+    try {
+        const { key, value } = req.validatedBody;
+        
+        const agent = await db.getAgentByUserId(req.user.id);
+        if (!agent) {
+            return res.status(404).json({ error: 'Agent non trouvé' });
+        }
+        
+        await db.setMemory(nanoid(), agent.id, key, value);
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Update memory error:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour de la mémoire' });
     }
-    
-    db.setMemory(nanoid(), agent.id, key, value);
-    
-    res.json({ success: true });
 });
 
 module.exports = router;

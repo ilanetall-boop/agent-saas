@@ -53,7 +53,7 @@ router.post('/init', authMiddleware, async (req, res) => {
             return res.status(400).json({ error: 'botToken requis' });
         }
 
-        const agent = db.getAgentByUserId(req.user.id);
+        const agent = await db.getAgentByUserId(req.user.id);
         if (!agent) {
             return res.status(404).json({ error: 'Agent non trouvé' });
         }
@@ -65,7 +65,7 @@ router.post('/init', authMiddleware, async (req, res) => {
             return res.status(500).json({ error: result.error });
         }
 
-        db.updateAgentTelegram(agent.id, botToken, null);
+        await db.updateAgentTelegram(agent.id, botToken, null);
 
         res.json({
             success: true,
@@ -95,7 +95,7 @@ router.post('/link', authMiddleware, async (req, res) => {
         }
 
         // Get user's agent
-        const agent = db.getAgentByUserId(req.user.id);
+        const agent = await db.getAgentByUserId(req.user.id);
         if (!agent) {
             return res.status(404).json({ error: 'Agent non trouvé' });
         }
@@ -131,9 +131,9 @@ router.post('/link', authMiddleware, async (req, res) => {
  * GET /api/telegram/status
  * Get Telegram connection status for user's agent
  */
-router.get('/status', authMiddleware, (req, res) => {
+router.get('/status', authMiddleware, async (req, res) => {
     try {
-        const agent = db.getAgentByUserId(req.user.id);
+        const agent = await db.getAgentByUserId(req.user.id);
         if (!agent) {
             return res.status(404).json({ error: 'Agent non trouvé' });
         }
@@ -168,7 +168,7 @@ router.post('/send', authMiddleware, async (req, res) => {
         }
 
         // Get user's agent
-        const agent = db.getAgentByUserId(req.user.id);
+        const agent = await db.getAgentByUserId(req.user.id);
         if (!agent) {
             return res.status(404).json({ error: 'Agent non trouvé' });
         }
@@ -188,56 +188,12 @@ router.post('/send', authMiddleware, async (req, res) => {
 });
 
 /**
- * POST /api/telegram/init
- * Initialize Telegram bot for agent (for manual startup)
- * Body: { botToken, webhookUrl? }
- */
-router.post('/init', authMiddleware, async (req, res) => {
-    try {
-        const { botToken, webhookUrl } = req.body;
-
-        if (!botToken) {
-            return res.status(400).json({ error: 'botToken requis' });
-        }
-
-        // Get user's agent
-        const agent = db.getAgentByUserId(req.user.id);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent non trouvé' });
-        }
-
-        // Initialize bot
-        const result = await initBot({
-            agentId: req.user.id,
-            botToken,
-            webhookUrl
-        });
-
-        if (!result.success) {
-            return res.status(500).json({ error: result.error });
-        }
-
-        res.json({
-            success: true,
-            message: 'Bot Telegram initialisé avec succès',
-            agent: {
-                id: agent.id,
-                name: agent.name
-            }
-        });
-    } catch (error) {
-        console.error('Init bot error:', error);
-        res.status(500).json({ error: 'Erreur lors de l\'initialisation du bot' });
-    }
-});
-
-/**
  * POST /api/telegram/disconnect
  * Disconnect/stop Telegram bot
  */
 router.post('/disconnect', authMiddleware, async (req, res) => {
     try {
-        const agent = db.getAgentByUserId(req.user.id);
+        const agent = await db.getAgentByUserId(req.user.id);
         if (!agent) {
             return res.status(404).json({ error: 'Agent non trouvé' });
         }
@@ -250,7 +206,7 @@ router.post('/disconnect', authMiddleware, async (req, res) => {
         }
 
         // Update agent (clear Telegram info)
-        db.updateAgentTelegram(agent.id, null, null);
+        await db.updateAgentTelegram(agent.id, null, null);
 
         res.json({
             success: true,
@@ -266,9 +222,9 @@ router.post('/disconnect', authMiddleware, async (req, res) => {
  * GET /api/telegram/info
  * Get Telegram connection info
  */
-router.get('/info', authMiddleware, (req, res) => {
+router.get('/info', authMiddleware, async (req, res) => {
     try {
-        const agent = db.getAgentByUserId(req.user.id);
+        const agent = await db.getAgentByUserId(req.user.id);
         if (!agent) {
             return res.status(404).json({ error: 'Agent non trouvé' });
         }
