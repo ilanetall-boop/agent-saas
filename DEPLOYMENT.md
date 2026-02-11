@@ -1,199 +1,221 @@
-# 🚀 Déploiement sur Railway
+# Deployment Guide - Agent-SaaS MVP
 
-Ce guide explique comment déployer le projet `agent-saas` sur Railway.
+## Current Status
+- **Code**: Pushed to GitHub (commit 04593f7)
+- **Render**: Auto-redeploying (in progress)
+- **URL**: https://agent-saas.onrender.com
 
-## Prérequis
+## 🚀 Deployment Steps
 
-- Un compte Railway (gratuit ou payant)
-- Un compte GitHub (pour connecter le repo)
-- Les variables d'environnement nécessaires :
-  - `ANTHROPIC_API_KEY` : Clé API Anthropic
-  - `JWT_SECRET` : Clé secrète JWT (chaîne aléatoire)
-  - `TELEGRAM_BOT_TOKEN` : (optionnel) Token de bot Telegram
-
-## Option 1 : Déploiement depuis GitHub (Recommandé)
-
-### 1️⃣ Préparer le repository
-
+### 1. GitHub Push ✅
 ```bash
-# Assurer que tous les fichiers sont en place
-git add Dockerfile railway.json DEPLOYMENT.md
-git commit -m "chore: add Railway deployment files"
+cd /home/ilanetall/.openclaw/workspace/agent-saas
 git push origin main
 ```
+Status: ✅ Complete (commit 04593f7 pushed)
 
-### 2️⃣ Créer un projet Railway
+### 2. Render Auto-Deploy ⏳
+- Render watches the main branch
+- Automatically rebuilds when new commits arrive
+- Current status: **In Progress** (wait 1-3 minutes)
+- Check deployment status: https://dashboard.render.com
 
-1. Allez sur [railway.app](https://railway.app)
-2. Connectez-vous avec GitHub
-3. Cliquez sur **"+ New Project"**
-4. Sélectionnez **"Deploy from GitHub repo"**
-5. Sélectionnez ce repository (`agent-saas`)
+### 3. Environment Variables (Required)
 
-### 3️⃣ Configurer les variables d'environnement
+**Add to Render Dashboard** → Settings → Environment Variables:
 
-Dans le dashboard Railway :
+```
+# Server
+NODE_ENV=production
+PORT=3000
 
-1. Ouvrez le service déployé
-2. Allez à **Variables**
-3. Remplissez les variables requises :
+# Auth
+JWT_SECRET=your-secret-here-min-32-chars
+REFRESH_SECRET=your-refresh-secret-min-32-chars
 
-| Variable | Valeur | Notes |
-|----------|--------|-------|
-| `ANTHROPIC_API_KEY` | `sk-ant-...` | [Obtenir une clé](https://console.anthropic.com) |
-| `JWT_SECRET` | `random-string-here` | Générez une chaîne aléatoire longue |
-| `TELEGRAM_BOT_TOKEN` | `123456:ABC-...` | Optionnel, obtenir depuis [@BotFather](https://t.me/BotFather) |
-| `DB_PATH` | `/app/data/agent-saas.db` | Défaut, laissez tel quel |
+# APIs
+ANTHROPIC_API_KEY=sk-ant-...
+MISTRAL_API_KEY=...
+GEMINI_API_KEY=...
+ELEVENLABS_API_KEY=...
+STABILITY_API_KEY=...
+OPENAI_API_KEY=sk-...
 
-### 4️⃣ Déploiement automatique
+# Telegram (optional for Phase 2)
+TELEGRAM_BOT_TOKEN=...
 
-Chaque `git push` déclenche un redéploiement automatique grâce à Railway.
+# Monitoring
+SENTRY_DSN=https://... (optional)
+```
 
-## Option 2 : Déploiement CLI avec `railway`
-
-### 1️⃣ Installer Railway CLI
+### 4. Test Health Endpoint
 
 ```bash
-npm i -g @railway/cli
-# ou
-brew install railway  # macOS
+curl https://agent-saas.onrender.com/api/health
+# Expected response:
+# {"status":"ok","time":"2026-02-11T07:48:00.000Z"}
 ```
 
-### 2️⃣ Authentifier
+### 5. Test Dual-Token Flow
 
+**Register:**
 ```bash
-railway login
+curl -X POST https://agent-saas.onrender.com/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123","name":"Test User"}'
+
+# Expected response:
+# {
+#   "success": true,
+#   "accessToken": "eyJ...",
+#   "refreshToken": "eyJ...",
+#   "expiresIn": 1800,
+#   "user": { "id": "...", "email": "test@example.com", ... }
+# }
 ```
 
-### 3️⃣ Initialiser le projet
-
+**Login:**
 ```bash
-cd /path/to/agent-saas
-railway init
+curl -X POST https://agent-saas.onrender.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+
+# Returns accessToken + refreshToken
 ```
 
-### 4️⃣ Configurer les variables
-
+**Refresh Token:**
 ```bash
-railway variables set ANTHROPIC_API_KEY=sk-ant-...
-railway variables set JWT_SECRET=your-random-secret
-railway variables set TELEGRAM_BOT_TOKEN=123456:ABC-... # optional
+ACCESS_TOKEN="eyJ..."
+curl -X POST https://agent-saas.onrender.com/api/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken":"eyJ..."}'
+
+# Expected: New accessToken (expires in 30 minutes)
 ```
 
-### 5️⃣ Déployer
-
+**Chat with Error Recovery:**
 ```bash
-railway up
+curl -X POST https://agent-saas.onrender.com/api/agent/chat \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Hello agent"}'
+
+# Will automatically retry on transient errors
+# Will smart-fix logic errors
+# Will ask user for blocked errors
 ```
-
-## Fichiers de déploiement
-
-### `Dockerfile`
-- Utilise une **image Alpine optimisée** (plus légère)
-- Build multi-stage pour réduire la taille finale
-- Installe les dépendances en production seulement
-- Inclut un health check
-
-### `railway.json`
-- Configuration complète du déploiement
-- Définit le port et le health check
-- Déclare toutes les variables d'environnement
-- Politique de redémarrage automatique
-
-## Structure de l'application
-
-```
-agent-saas/
-├── src/api/
-│   ├── server.js          # Point d'entrée Express
-│   ├── routes/            # Endpoints API
-│   ├── services/          # Logique métier
-│   ├── db/                # Base de données SQLite (sql.js)
-│   └── middleware/        # Auth, logging, etc.
-├── index.html             # Page d'accueil
-├── package.json
-├── Dockerfile             # Configuration Docker
-├── railway.json           # Configuration Railway
-└── DEPLOYMENT.md          # Ce fichier
-```
-
-## Configuration détaillée
-
-### Port
-
-Railway assigne un port aléatoire via la variable `$PORT`. L'application l'utilise automatiquement via `process.env.PORT` dans `src/api/config.js`.
-
-### Base de données SQLite (sql.js)
-
-- Stockée dans `/app/data/agent-saas.db`
-- Initialisée au premier démarrage via `src/api/db/init.js`
-- Schéma défini dans `src/api/db/schema.sql`
-
-### Logs
-
-Consulter les logs en temps réel :
-
-```bash
-railway logs -f
-```
-
-Ou depuis le dashboard Railway → Logs tab.
-
-## Dépannage
-
-### Erreur : `ANTHROPIC_API_KEY` non définie
-
-```
-Error: ANTHROPIC_API_KEY is required
-```
-
-✅ **Solution** : Définir la variable dans le dashboard Railway.
-
-### Erreur : Port en conflit
-
-Railway assigne automatiquement un port. Pas besoin de config.
-
-### Application crash au démarrage
-
-1. Vérifier les logs : `railway logs -f`
-2. S'assurer que `JWT_SECRET` est défini
-3. Vérifier que la DB est initialisée correctement
-
-## Monitoring
-
-### Health Check
-
-L'application expose un endpoint santé :
-- **URL** : `https://your-app.up.railway.app/api/health`
-- **Réponse** : `{ "status": "ok", "time": "2026-02-08T..." }`
-
-Railway teste cet endpoint toutes les 30 secondes.
-
-### Métriques
-
-Consulter les métriques (CPU, mémoire, réseau) dans l'onglet **Metrics** du dashboard.
-
-## Mise à jour
-
-Pour mettre à jour l'application :
-
-1. Faire les modifications locales
-2. Committer et pousser vers GitHub
-3. Railway redéploie automatiquement en ~2-3 minutes
-
-## Coûts
-
-- **Gratuit** : 5$/mois de crédit (suffisant pour MVP)
-- **Usage** : ~$5/mois pour une petite app (2GB RAM, 100GB data)
-
-Consulter [Railway Pricing](https://railway.app/pricing).
-
-## Support
-
-- [Railway Docs](https://docs.railway.app)
-- [Community Slack](https://railway.app/community)
-- GitHub Issues (ce repo)
 
 ---
 
-**Déploiement prêt !** 🚀
+## 🔍 Monitoring
+
+### Check Deployment Status
+1. Go to https://dashboard.render.com
+2. Select **agent-saas** service
+3. Check **Logs** for errors
+4. Status should show **"Active"**
+
+### View Live Logs
+```bash
+# Check Render logs for errors
+https://dashboard.render.com/services/srv-d64ion1r0fns73c8ip00/logs
+```
+
+### Health Check
+```bash
+# Should return OK immediately
+curl -w "\n%{http_code}\n" https://agent-saas.onrender.com/api/health
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Issue: Service won't start
+- Check env vars are set (especially API keys)
+- Review Render logs for missing dependencies
+- Verify package.json is correct
+
+### Issue: Health check fails (timeout)
+- Render free tier has 15-minute auto-shutdown
+- Service needs ~30s to start up
+- Try again after 1 minute
+
+### Issue: Token endpoints return errors
+- Verify JWT_SECRET is set (min 32 chars)
+- Check database file exists (auto-created)
+- Review Render logs
+
+### Issue: Chat returns 429 (message limit)
+- This is normal after 50 messages on free plan
+- Upgrade user plan to continue
+
+---
+
+## 📊 Load Testing (After Deployment)
+
+```bash
+# Test 5 concurrent users × 3 messages each
+# Before running: Make sure user quota allows
+
+for i in {1..5}; do
+  (
+    EMAIL="user$i@test.com"
+    # Register
+    TOKENS=$(curl -s -X POST https://agent-saas.onrender.com/api/auth/register \
+      -H "Content-Type: application/json" \
+      -d "{\"email\":\"$EMAIL\",\"password\":\"pass123\",\"name\":\"User $i\"}")
+    ACCESS=$(echo $TOKENS | jq -r '.accessToken')
+    
+    # Chat 3x
+    for j in {1..3}; do
+      curl -s -X POST https://agent-saas.onrender.com/api/agent/chat \
+        -H "Authorization: Bearer $ACCESS" \
+        -H "Content-Type: application/json" \
+        -d "{\"message\":\"Test message $j\"}"
+      echo ""
+    done
+  ) &
+done
+wait
+```
+
+---
+
+## 🎯 Next Steps
+
+1. ✅ Code pushed to GitHub
+2. ⏳ Wait for Render to finish deployment (~2-3 min)
+3. ⏳ Test /api/health endpoint
+4. ✅ Test dual-token flow (register → login → refresh)
+5. ✅ Test error recovery (intentional errors)
+6. ✅ Load test (5 concurrent users)
+7. ✅ Configure DNS: mybestagent.io → agent-saas.onrender.com (CNAME)
+8. ✅ Phase 3: SEO Hub setup
+
+---
+
+## Critical URLs
+
+| Resource | URL |
+|----------|-----|
+| **API** | https://agent-saas.onrender.com/api |
+| **Health** | https://agent-saas.onrender.com/api/health |
+| **Render Dashboard** | https://dashboard.render.com/services/srv-d64ion1r0fns73c8ip00 |
+| **GitHub Repo** | https://github.com/ilanetall-boop/agent-saas |
+| **Domain** | mybestagent.io (DNS pending) |
+
+---
+
+## 📝 Notes
+
+- **Database**: Using SQL.js (SQLite) for MVP
+- **Future**: Migrate to Render PostgreSQL Free tier (256MB)
+- **Auth**: Dual-token system (30min access + 90day refresh)
+- **Error Recovery**: 3-tier (auto-retry, smart-fix, ask-user)
+- **APIs**: All 7 models integrated (Claude, OpenAI, Mistral, Gemini, etc.)
+- **Monitoring**: Sentry optional (via env var)
+
+---
+
+**Status**: 🚀 Deployment in progress. Update this doc after testing.

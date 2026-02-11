@@ -4,6 +4,8 @@ const { authMiddleware } = require('../middleware/auth');
 const db = require('../db/db');
 const { generateResponse, getDefaultSystemPrompt, getOnboardingPrompt } = require('../services/claude');
 const ErrorRecovery = require('../services/error-recovery');
+const { validateRequest, schemas, sanitizeMessage } = require('../middleware/validation');
+const { log: auditLog } = require('../services/audit-log');
 
 const router = express.Router();
 
@@ -31,13 +33,12 @@ router.get('/me', authMiddleware, (req, res) => {
 });
 
 // Chat with agent
-router.post('/chat', authMiddleware, async (req, res) => {
+router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, res) => {
     try {
-        const { message } = req.body;
+        let { message } = req.validatedBody;
         
-        if (!message) {
-            return res.status(400).json({ error: 'Message requis' });
-        }
+        // Sanitize message to prevent XSS
+        message = sanitizeMessage(message);
         
         // Refresh user data to get latest message count
         const freshUser = db.getUserById(req.user.id);
@@ -168,6 +169,16 @@ router.post('/chat', authMiddleware, async (req, res) => {
         // Fetch updated user data for accurate usage
         const updatedUser = db.getUserById(req.user.id);
         
+        // Log successful chat
+        auditLog({
+            type: 'chat_message',
+            userId: req.user.id,
+            agentId: agent.id,
+            messageLength: message.length,
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+        
         res.json({
             response: response.content,
             usage: {
@@ -179,6 +190,16 @@ router.post('/chat', authMiddleware, async (req, res) => {
     } catch (error) {
         console.error(`[CHAT ERROR] User: ${req.user?.id}, Message: "${req.body?.message?.substring(0, 50)}", Error:`, error.message);
         console.error('Stack:', error.stack);
+        
+        // Log chat error
+        auditLog({
+            type: 'chat_error',
+            userId: req.user?.id,
+            error: error.message.substring(0, 200),
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+        
         res.status(500).json({ 
             error: 'Erreur lors du chat',
             details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -187,12 +208,8 @@ router.post('/chat', authMiddleware, async (req, res) => {
 });
 
 // Update agent memory
-router.post('/memory', authMiddleware, (req, res) => {
-    const { key, value } = req.body;
-    
-    if (!key) {
-        return res.status(400).json({ error: 'Clé requise' });
-    }
+router.post('/memory', authMiddleware, validateRequest(schemas.memory), (req, res) => {
+    const { key, value } = req.validatedBody;
     
     const agent = db.getAgentByUserId(req.user.id);
     if (!agent) {

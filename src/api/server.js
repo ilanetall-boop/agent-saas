@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 const Sentry = require('@sentry/node');
+const helmet = require('helmet');
 const config = require('./config');
 const { initDb } = require('./db/db');
 
@@ -20,10 +22,62 @@ if (config.sentryDsn) {
 
 const app = express();
 
+// Security Headers (Helmet)
+app.use(helmet());
+
+// Rate Limiters
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 requests per window
+    message: 'Trop de requêtes, réessayez dans 15 minutes',
+    standardHeaders: false, // Don't return rate limit info in RateLimit-* headers
+    legacyHeaders: false, // Disable RateLimit-* headers
+    skip: (req) => req.path === '/api/health' // Don't rate limit health checks
+});
+
+// CORS Configuration (restrict to allowed origins only)
+const allowedOrigins = [
+    'https://mybestagent.io',
+    'https://www.mybestagent.io',
+    'https://agent-saas.onrender.com',
+    'http://localhost:3000' // Development only
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS policy: origin not allowed'));
+        }
+    },
+    credentials: true, // Allow cookies
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400 // 24 hours
+}));
+
+// Request ID middleware (for error tracking)
+app.use((req, res, next) => {
+    req.id = Math.random().toString(36).substr(2, 9);
+    next();
+});
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(cookieParser()); // Parse cookies (for refresh token)
+
+// HTTPS redirect (production only)
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        if (req.header('x-forwarded-proto') !== 'https') {
+            return res.redirect(301, `https://${req.header('host')}${req.url}`);
+        }
+        next();
+    });
+}
+
+app.use('/api/', globalLimiter); // Apply global limiter to all API routes
 
 // Sentry error tracking middleware
 if (config.sentryDsn) {
@@ -59,16 +113,41 @@ if (config.sentryDsn) {
     app.use(Sentry.Handlers.errorHandler());
 }
 
-// Error handler
+// Error handler (must be after all other middleware and routes)
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
+    const isProduction = process.env.NODE_ENV === 'production';
+    const requestId = req.id || Math.random().toString(36).substr(2, 9);
+    
+    // Log full error server-side (with context)
+    console.error('[ERROR]', {
+        requestId,
+        message: err.message,
+        status: err.status || 500,
+        path: req.path,
+        method: req.method,
+        userId: req.user?.id,
+        timestamp: new Date().toISOString(),
+        stack: err.stack
+    });
     
     // Report to Sentry if enabled
     if (config.sentryDsn) {
-        Sentry.captureException(err);
+        Sentry.captureException(err, {
+            tags: { requestId, path: req.path }
+        });
     }
     
-    res.status(500).json({ error: 'Erreur serveur' });
+    // Determine status code
+    const statusCode = err.statusCode || err.status || 500;
+    
+    // Return generic error to user in production
+    // Show details only in development
+    res.status(statusCode).json({
+        error: isProduction 
+            ? 'Une erreur est survenue. Veuillez réessayer.' 
+            : err.message,
+        ...(isProduction ? { requestId } : { stack: err.stack }) // Support ticket reference
+    });
 });
 
 // Start server after DB init

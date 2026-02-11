@@ -9,23 +9,26 @@
     "db:init": "node src/api/db/init.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "sql.js": "^1.10.2",
-    "pg": "^8.11.0",
-    "cookie-parser": "^1.4.6",
+    "@anthropic-ai/sdk": "^0.74.0",
+    "@google/generative-ai": "^0.11.0",
+    "@mistralai/mistralai": "^0.1.0",
+    "@sentry/node": "^7.88.0",
+    "axios": "^1.6.5",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
-    "node-telegram-bot-api": "^0.64.0",
-    "@anthropic-ai/sdk": "^0.74.0",
+    "elevenlabs": "^0.2.0",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.2",
     "nanoid": "^5.0.5",
-    "@sentry/node": "^7.88.0",
+    "node-telegram-bot-api": "^0.64.0",
     "openai": "^4.52.0",
-    "axios": "^1.6.5",
+    "pg": "^8.11.0",
     "puppeteer": "^21.7.0",
-    "@mistralai/mistralai": "^0.1.0",
-    "@google/generative-ai": "^0.11.0",
-    "elevenlabs": "^0.2.0"
+    "sql.js": "^1.10.2"
   }
 }

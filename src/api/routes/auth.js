@@ -1,15 +1,27 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { nanoid } = require('nanoid');
+const rateLimit = require('express-rate-limit');
 const db = require('../db/db');
 const { generateDualTokens, refreshAccessToken, authMiddleware } = require('../middleware/auth');
+const { validateRequest, schemas } = require('../middleware/validation');
+const { log: auditLog } = require('../services/audit-log');
 
 const router = express.Router();
 
+// Strict rate limiter for authentication endpoints
+const authLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10, // 10 attempts per hour
+    message: 'Trop de tentatives d\'authentification, réessayez dans 1 heure',
+    skipSuccessfulRequests: true,
+    keyGenerator: (req) => req.body.email || req.ip
+});
+
 // Register (Dual-Token)
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, validateRequest(schemas.register), async (req, res) => {
     try {
-        const { email, password, name } = req.body;
+        const { email, password, name } = req.validatedBody;
         
         if (!email || !password) {
             return res.status(400).json({ error: 'Email et mot de passe requis' });
@@ -32,6 +44,15 @@ router.post('/register', async (req, res) => {
         const agentId = nanoid();
         db.createAgent(agentId, userId, 'Mon Agent');
         
+        // Log registration
+        auditLog({
+            type: 'user_registered',
+            userId,
+            email: email.toLowerCase(),
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+        
         // Generate dual tokens (access + refresh)
         const tokens = generateDualTokens(userId);
         
@@ -46,7 +67,8 @@ router.post('/register', async (req, res) => {
         res.status(201).json({
             success: true,
             accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken, // Also send in body for mobile apps
+            // NOTE: refreshToken is ONLY in secure HttpOnly cookie now, not in body
+            // This prevents XSS attacks from stealing the refresh token
             expiresIn: tokens.expiresIn,
             user: {
                 id: userId,
@@ -66,9 +88,9 @@ router.post('/register', async (req, res) => {
 });
 
 // Login (Dual-Token)
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, validateRequest(schemas.login), async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password } = req.validatedBody;
         
         if (!email || !password) {
             return res.status(400).json({ error: 'Email et mot de passe requis' });
@@ -77,14 +99,40 @@ router.post('/login', async (req, res) => {
         // Find user
         const user = db.getUserByEmail(email.toLowerCase());
         if (!user) {
+            // Log failed login
+            auditLog({
+                type: 'login_failed',
+                email: email.toLowerCase(),
+                reason: 'user_not_found',
+                ipAddress: req.ip,
+                userAgent: req.get('user-agent')
+            });
             return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
         }
         
         // Check password
         const valid = await bcrypt.compare(password, user.password_hash);
         if (!valid) {
+            // Log failed login
+            auditLog({
+                type: 'login_failed',
+                userId: user.id,
+                email: email.toLowerCase(),
+                reason: 'invalid_password',
+                ipAddress: req.ip,
+                userAgent: req.get('user-agent')
+            });
             return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
         }
+        
+        // Log successful login
+        auditLog({
+            type: 'login_success',
+            userId: user.id,
+            email: email.toLowerCase(),
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
         
         // Generate dual tokens
         const tokens = generateDualTokens(user.id);
@@ -100,7 +148,8 @@ router.post('/login', async (req, res) => {
         res.json({
             success: true,
             accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken, // Also send in body for mobile apps
+            // NOTE: refreshToken is ONLY in secure HttpOnly cookie now, not in body
+            // This prevents XSS attacks from stealing the refresh token
             expiresIn: tokens.expiresIn,
             user: {
                 id: user.id,
@@ -118,10 +167,10 @@ router.post('/login', async (req, res) => {
 });
 
 // Refresh Access Token (NEW)
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', validateRequest(schemas.refresh), async (req, res) => {
     try {
         // Get refresh token from body or cookie
-        const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
+        const refreshToken = req.validatedBody.refreshToken || req.cookies.refreshToken;
         
         if (!refreshToken) {
             return res.status(401).json({ error: 'Refresh token manquant' });
@@ -130,6 +179,14 @@ router.post('/refresh', async (req, res) => {
         // Validate and generate new access token
         const tokens = await refreshAccessToken(refreshToken);
         
+        // Log token refresh
+        auditLog({
+            type: 'token_refreshed',
+            userId: tokens.userId || 'unknown',
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+        
         res.json({
             success: true,
             accessToken: tokens.accessToken,
@@ -137,6 +194,15 @@ router.post('/refresh', async (req, res) => {
         });
     } catch (error) {
         console.error('Refresh error:', error);
+        
+        // Log failed refresh
+        auditLog({
+            type: 'token_refresh_failed',
+            reason: error.message,
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+        
         res.status(401).json({ error: error.message });
     }
 });
@@ -160,6 +226,15 @@ router.post('/logout', authMiddleware, async (req, res) => {
     try {
         // Delete refresh token from database
         await db.deleteRefreshToken(req.user.id);
+        
+        // Log logout
+        auditLog({
+            type: 'logout',
+            userId: req.user.id,
+            email: req.user.email,
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
         
         // Clear cookie
         res.clearCookie('refreshToken');
