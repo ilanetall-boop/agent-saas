@@ -33,7 +33,7 @@
   },
   
   "chat": {
-    "my_agent": "Mon Agent",
+    "my_agent": "Mon Meilleur Agent",
     "type_message": "Écris ton message...",
     "send": "Envoyer",
     "logout": "Déconnexion",
