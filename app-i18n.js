@@ -85,11 +85,15 @@ class i18n {
     }
 }
 
-// Initialize global i18n instance
-const i18nInstance = new i18n();
+// Global i18n instance (initialized on DOMContentLoaded)
+let i18nInstance;
 
-// On page load, load translations
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
+    // Create global i18n instance
+    i18nInstance = new i18n();
+    
+    // Load current language and update DOM
     await i18nInstance.loadLanguage(i18nInstance.currentLanguage);
     updatePageTranslations();
 });
