@@ -532,7 +532,7 @@
 <body>
     <!-- Language Switcher -->
     <div class="language-switcher">
-        <select id="languageSwitcher" onchange="switchLanguage(this.value)">
+        <select id="languageSwitcher">
             <option value="en">English</option>
             <option value="fr">Français</option>
             <option value="es">Español</option>
@@ -556,10 +556,10 @@
                 <div id="loginError" class="error hidden"></div>
                 
                 <div class="oauth-buttons">
-                    <button class="oauth-btn" onclick="loginGoogle()">
+                    <button class="oauth-btn">
                         <span>🔵</span> <span data-i18n="auth.google_login">Google</span>
                     </button>
-                    <button class="oauth-btn" onclick="loginGithub()">
+                    <button class="oauth-btn">
                         <span>⚫</span> <span data-i18n="auth.github_login">GitHub</span>
                     </button>
                 </div>
@@ -574,10 +574,10 @@
                     <label data-i18n="auth.password">Password</label>
                     <input type="password" id="loginPassword" data-i18n="auth.password" placeholder="••••••••">
                 </div>
-                <button class="btn" onclick="login()" data-i18n="auth.sign_in">Sign In</button>
+                <button class="btn" data-i18n="auth.sign_in">Sign In</button>
                 <div class="auth-switch">
                     <span data-i18n="auth.no_account">Don't have an account?</span> 
-                    <a onclick="showRegister()" data-i18n="auth.switch_to_register">Create account</a>
+                    <a data-i18n="auth.switch_to_register">Create account</a>
                 </div>
             </div>
 
@@ -587,10 +587,10 @@
                 <div id="registerError" class="error hidden"></div>
                 
                 <div class="oauth-buttons">
-                    <button class="oauth-btn" onclick="loginGoogle()">
+                    <button class="oauth-btn">
                         <span>🔵</span> <span data-i18n="auth.google_login">Google</span>
                     </button>
-                    <button class="oauth-btn" onclick="loginGithub()">
+                    <button class="oauth-btn">
                         <span>⚫</span> <span data-i18n="auth.github_login">GitHub</span>
                     </button>
                 </div>
@@ -609,10 +609,10 @@
                     <label data-i18n="auth.password">Password</label>
                     <input type="password" id="registerPassword" data-i18n="auth.password" placeholder="••••••••">
                 </div>
-                <button class="btn" onclick="register()" data-i18n="auth.create_agent">Create My Agent</button>
+                <button class="btn" data-i18n="auth.create_agent">Create My Agent</button>
                 <div class="auth-switch">
                     <span data-i18n="auth.have_account">Already have an account?</span> 
-                    <a onclick="showLogin()" data-i18n="auth.switch_to_login">Sign in</a>
+                    <a data-i18n="auth.switch_to_login">Sign in</a>
                 </div>
             </div>
         </div>
@@ -627,8 +627,8 @@
             </h1>
             <div style="display:flex;align-items:center;gap:16px;">
                 <span class="user-info" id="userInfo"></span>
-                <button class="logout" onclick="openTelegramModal()" data-i18n="chat.telegram">📱 Telegram</button>
-                <button class="logout" onclick="logout()" data-i18n="chat.logout">Sign Out</button>
+                <button class="logout" data-i18n="chat.telegram">📱 Telegram</button>
+                <button class="logout" data-i18n="chat.logout">Sign Out</button>
             </div>
         </div>
 
@@ -643,9 +643,9 @@
                     id="messageInput" 
                     data-i18n="chat.type_message"
                     placeholder="Write your message..."
-                    onkeydown="handleKeyDown(event)"
+                   
                 ></textarea>
-                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                <button class="send-btn" id="sendBtn">
                     <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                 </button>
             </div>
@@ -670,7 +670,7 @@
                 <div id="verificationSuccess" style="color:#44ff44;margin:12px 0;display:none;font-size:14px;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-primary" onclick="resendVerificationEmail()" style="width:100%;" data-i18n="verification.resend">Resend Link</button>
+                <button class="btn-primary" style="width:100%;" data-i18n="verification.resend">Resend Link</button>
             </div>
         </div>
     </div>
@@ -680,7 +680,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 data-i18n="telegram.title">📱 Connect Telegram</h2>
-                <button class="modal-close" onclick="closeTelegramModal()">✕</button>
+                <button class="modal-close">✕</button>
             </div>
             <div class="modal-body">
                 <p data-i18n="telegram.instructions">To use your agent on Telegram:</p>
@@ -703,8 +703,8 @@
                 <div id="telegramSuccess" style="color:#44ff44;margin:8px 0;display:none;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeTelegramModal()" data-i18n="telegram.cancel">Cancel</button>
-                <button class="btn-primary" onclick="linkTelegramBot()" data-i18n="telegram.connect_button">🔗 Connect</button>
+                <button class="btn-secondary" data-i18n="telegram.cancel">Cancel</button>
+                <button class="btn-primary" data-i18n="telegram.connect_button">🔗 Connect</button>
             </div>
         </div>
     </div>
@@ -712,5 +712,6 @@
     <!-- i18n Script (external to avoid CSP violation) -->
     <script src="app-i18n.js"></script>
     <script src="app.js"></script>
+    <script src="events.js"></script>
 </body>
 </html>
