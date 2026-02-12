@@ -5,10 +5,13 @@ let token = localStorage.getItem('token');
 let user = null;
 let agent = null;
 
-// Check auth on load
-if (token) {
-    checkAuth();
-}
+// Wrap initialization in DOMContentLoaded to avoid CSP violations
+document.addEventListener('DOMContentLoaded', function() {
+    // Check auth on load
+    if (token) {
+        checkAuth();
+    }
+});
 
 async function checkAuth() {
     try {
