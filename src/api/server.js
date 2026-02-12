@@ -22,8 +22,21 @@ if (config.sentryDsn) {
 
 const app = express();
 
-// Security Headers (Helmet)
-app.use(helmet());
+// Security Headers (Helmet) - Custom CSP to allow external scripts only
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"], // Only allow scripts from same origin (our external files)
+            styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (for existing CSS)
+            imgSrc: ["'self'", "data:", "https:"], // Allow images from same origin, data URIs, and https
+            fontSrc: ["'self'", "data:"], // Allow fonts from same origin and data URIs
+            connectSrc: ["'self'", "https://"], // Allow API calls to https origins
+            frameSrc: ["'self'"], // Restrict frame sources to same origin
+            objectSrc: ["'none'"], // Disable object/embed sources
+        }
+    }
+}));
 
 // Rate Limiters
 const globalLimiter = rateLimit({
