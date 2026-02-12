@@ -14,12 +14,17 @@ async function initDb() {
         throw new Error('DATABASE_URL environment variable not set. PostgreSQL required for production.');
     }
     
+    // SSL config: Render free tier uses self-signed certs, so we need to handle that
+    const sslConfig = process.env.NODE_ENV === 'production'
+        ? {
+            rejectUnauthorized: false, // Render free tier: Allow self-signed certs
+            ca: process.env.RENDER_CA_CERT || undefined
+        }
+        : false; // Development: No SSL needed (local DB)
+    
     pool = new Pool({
         connectionString: DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: true, // ✅ FIXED: Validate server certificate
-            ca: process.env.RENDER_CA_CERT // Optional: Use Render's CA cert if provided
-        },
+        ssl: sslConfig,
         max: 20,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000
