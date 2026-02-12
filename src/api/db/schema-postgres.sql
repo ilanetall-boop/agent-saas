@@ -94,13 +94,12 @@ CREATE TABLE IF NOT EXISTS vaults (
     last_rotated_at TIMESTAMP
 );
 
--- Indexes
+-- Indexes (NOTE: idx_sessions_last_rotated created by migrations.js after column exists)
 CREATE INDEX IF NOT EXISTS idx_agents_user ON agents(user_id);
 CREATE INDEX IF NOT EXISTS idx_memories_agent ON memories(agent_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_conversations_agent ON conversations(agent_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
-CREATE INDEX IF NOT EXISTS idx_sessions_last_rotated ON sessions(last_rotated_at);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_vaults_key_name ON vaults(key_name);
