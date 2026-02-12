@@ -1,0 +1,88 @@
+{
+  "language": "Français",
+  "lang_code": "fr",
+  
+  "auth": {
+    "login_title": "Connexion",
+    "login_subtitle": "Accède à ton agent IA personnel",
+    "register_title": "Créer un compte",
+    "register_subtitle": "Ton agent IA t'attend",
+    "email": "Email",
+    "password": "Mot de passe",
+    "name": "Prénom",
+    "sign_in": "Se connecter",
+    "create_agent": "Créer mon agent",
+    "or_with": "Ou avec email",
+    "have_account": "Déjà un compte ?",
+    "no_account": "Pas encore de compte ?",
+    "switch_to_register": "Créer un compte",
+    "switch_to_login": "Se connecter",
+    "google_login": "Google",
+    "github_login": "GitHub"
+  },
+  
+  "errors": {
+    "fill_all_fields": "Remplis tous les champs",
+    "network_error": "Erreur réseau",
+    "login_failed": "Erreur de connexion",
+    "register_failed": "Erreur d'inscription",
+    "email_exists": "Cet email est déjà utilisé",
+    "invalid_password": "Email ou mot de passe invalide",
+    "chat_error": "Erreur lors du chat",
+    "verification_failed": "Erreur de vérification"
+  },
+  
+  "chat": {
+    "my_agent": "Mon Agent",
+    "type_message": "Écris ton message...",
+    "send": "Envoyer",
+    "logout": "Déconnexion",
+    "unlimited": "✅ Illimité - Pas de limite de messages",
+    "degraded_warning": "⚠️ Réponses lentes après 100 messages/jour (upgrade pour illimité rapide)",
+    "telegram": "📱 Telegram",
+    "connect_telegram": "Connecter Telegram",
+    "status_online": "En ligne"
+  },
+  
+  "telegram": {
+    "title": "📱 Connecter Telegram",
+    "instructions": "Pour utiliser ton agent sur Telegram:",
+    "step1": "Va sur Telegram et cherche @BotFather",
+    "step2": "Envoie /newbot et suis les instructions",
+    "step3": "Tu recevras un token (ex: 123456:ABC-xxx)",
+    "step4": "Colle-le ici et clique Connecter",
+    "token_placeholder": "Colle le token ici...",
+    "connect_button": "🔗 Connecter",
+    "cancel": "Annuler",
+    "success": "✅ Bot connecté! Envoie un message à ton bot sur Telegram.",
+    "error": "Erreur"
+  },
+  
+  "verification": {
+    "title": "📧 Vérifier ton email",
+    "message": "On a envoyé un lien de vérification à:",
+    "instructions": "Clique sur le lien dans l'email pour continuer",
+    "resend": "Renvoyer le lien",
+    "check_email": "Vérifie ton email"
+  },
+  
+  "landing": {
+    "hero_title": "Ton Agent IA Personnel",
+    "hero_subtitle": "Conversations illimitées. Sans limite. Gratuit.",
+    "cta_button": "Commencer",
+    "features_title": "Ce que tu peux faire",
+    "feature1": "Développeur Full-Stack",
+    "feature1_desc": "Écris, revise et déploie du code",
+    "feature2": "Automation Web",
+    "feature2_desc": "Scrape, remplis formulaires, automate",
+    "feature3": "Mémoire Smart",
+    "feature3_desc": "Ton agent se souvient de tout ce qui compte",
+    "feature4": "Multi-Plateforme",
+    "feature4_desc": "Web, Telegram, CLI - tout connecté",
+    "pricing_title": "Tarification Simple",
+    "free_plan": "Gratuit (Phase 1)",
+    "free_desc": "Tout illimité, avec dégradation après 100 messages/jour",
+    "coming_soon": "Bientôt",
+    "footer": "MyBestAgent • Ton IA, Illimitée"
+  }
+}
