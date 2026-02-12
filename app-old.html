@@ -1,14 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="landing.hero_title">MyBestAgent - Your Personal AI</title>
+    <title>Mon Agent IA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        html { direction: ltr; }
-        html[dir="rtl"] { direction: rtl; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -23,35 +20,6 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-
-        /* Language Switcher */
-        .language-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-        }
-        
-        html[dir="rtl"] .language-switcher {
-            right: auto;
-            left: 20px;
-        }
-
-        #languageSwitcher {
-            padding: 8px 12px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        #languageSwitcher:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.3);
         }
 
         /* Auth Forms */
@@ -147,42 +115,6 @@
             font-size: 14px;
         }
 
-        /* OAuth Buttons */
-        .oauth-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .oauth-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .oauth-btn:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        .divider {
-            text-align: center;
-            margin: 16px 0;
-            color: rgba(255,255,255,0.4);
-            font-size: 14px;
-        }
-
         /* Chat Interface */
         .chat-container {
             display: none;
@@ -225,7 +157,6 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            margin: 0 8px;
         }
 
         .chat-header .logout:hover {
@@ -259,10 +190,6 @@
             flex-direction: row-reverse;
         }
 
-        html[dir="rtl"] .message.user {
-            flex-direction: row;
-        }
-
         .message .avatar {
             width: 32px;
             height: 32px;
@@ -285,7 +212,6 @@
             border-radius: 16px;
             font-size: 15px;
             line-height: 1.5;
-            word-wrap: break-word;
         }
 
         .message.user .bubble {
@@ -335,10 +261,6 @@
         .chat-input-wrapper {
             display: flex;
             gap: 12px;
-        }
-
-        html[dir="rtl"] .chat-input-wrapper {
-            flex-direction: row-reverse;
         }
 
         .chat-input {
@@ -472,11 +394,6 @@
             color: rgba(255,255,255,0.7);
         }
 
-        html[dir="rtl"] .modal-body ol {
-            padding-right: 20px;
-            padding-left: 0;
-        }
-
         .modal-body li {
             margin: 8px 0;
         }
@@ -495,10 +412,6 @@
             padding: 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
             justify-content: flex-end;
-        }
-
-        html[dir="rtl"] .modal-footer {
-            justify-content: flex-start;
         }
 
         .btn-primary, .btn-secondary {
@@ -530,89 +443,70 @@
     </style>
 </head>
 <body>
-    <!-- Language Switcher -->
-    <div class="language-switcher">
-        <select id="languageSwitcher" onchange="switchLanguage(this.value)">
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="es">Español</option>
-            <option value="de">Deutsch</option>
-            <option value="it">Italiano</option>
-            <option value="pt">Português</option>
-            <option value="zh">中文</option>
-            <option value="ja">日本語</option>
-            <option value="ru">Русский</option>
-            <option value="ar">العربية</option>
-            <option value="he">עברית</option>
-        </select>
-    </div>
-
     <!-- Auth -->
     <div class="auth-container" id="authContainer">
         <div class="auth-box">
             <div id="loginForm">
-                <h1 data-i18n="auth.login_title">Sign In</h1>
-                <p data-i18n="auth.login_subtitle">Access your personal AI agent</p>
+                <h1>Connexion</h1>
+                <p>Accède à ton agent IA personnel</p>
                 <div id="loginError" class="error hidden"></div>
                 
                 <div class="oauth-buttons">
-                    <button class="oauth-btn" onclick="loginGoogle()">
-                        <span>🔵</span> <span data-i18n="auth.google_login">Google</span>
+                    <button class="oauth-btn google" onclick="loginGoogle()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;cursor:pointer;margin-bottom:12px;font-weight:500;transition:all 0.2s;">
+                        <span>🔵</span> Google
                     </button>
-                    <button class="oauth-btn" onclick="loginGithub()">
-                        <span>⚫</span> <span data-i18n="auth.github_login">GitHub</span>
+                    <button class="oauth-btn github" onclick="loginGithub()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;cursor:pointer;margin-bottom:12px;font-weight:500;transition:all 0.2s;">
+                        <span>⚫</span> GitHub
                     </button>
                 </div>
                 
-                <div class="divider" data-i18n="auth.or_with">Or with email</div>
+                <div style="text-align:center;margin:16px 0;color:rgba(255,255,255,0.4);font-size:14px;">Ou avec email</div>
                 
                 <div class="form-group">
-                    <label data-i18n="auth.email">Email</label>
-                    <input type="email" id="loginEmail" data-i18n="auth.email" placeholder="email@example.com">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="ton@email.com">
                 </div>
                 <div class="form-group">
-                    <label data-i18n="auth.password">Password</label>
-                    <input type="password" id="loginPassword" data-i18n="auth.password" placeholder="••••••••">
+                    <label>Mot de passe</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
                 </div>
-                <button class="btn" onclick="login()" data-i18n="auth.sign_in">Sign In</button>
+                <button class="btn" onclick="login()">Se connecter</button>
                 <div class="auth-switch">
-                    <span data-i18n="auth.no_account">Don't have an account?</span> 
-                    <a onclick="showRegister()" data-i18n="auth.switch_to_register">Create account</a>
+                    Pas encore de compte ? <a onclick="showRegister()">Créer un compte</a>
                 </div>
             </div>
 
             <div id="registerForm" class="hidden">
-                <h1 data-i18n="auth.register_title">Create Account</h1>
-                <p data-i18n="auth.register_subtitle">Your AI agent awaits</p>
+                <h1>Créer un compte</h1>
+                <p>Ton agent IA t'attend</p>
                 <div id="registerError" class="error hidden"></div>
                 
                 <div class="oauth-buttons">
-                    <button class="oauth-btn" onclick="loginGoogle()">
-                        <span>🔵</span> <span data-i18n="auth.google_login">Google</span>
+                    <button class="oauth-btn google" onclick="loginGoogle()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;cursor:pointer;margin-bottom:12px;font-weight:500;transition:all 0.2s;">
+                        <span>🔵</span> Google
                     </button>
-                    <button class="oauth-btn" onclick="loginGithub()">
-                        <span>⚫</span> <span data-i18n="auth.github_login">GitHub</span>
+                    <button class="oauth-btn github" onclick="loginGithub()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;cursor:pointer;margin-bottom:12px;font-weight:500;transition:all 0.2s;">
+                        <span>⚫</span> GitHub
                     </button>
                 </div>
                 
-                <div class="divider" data-i18n="auth.or_with">Or with email</div>
+                <div style="text-align:center;margin:16px 0;color:rgba(255,255,255,0.4);font-size:14px;">Ou créer avec email</div>
                 
                 <div class="form-group">
-                    <label data-i18n="auth.name">First Name</label>
-                    <input type="text" id="registerName" data-i18n="auth.name" placeholder="Your name">
+                    <label>Prénom</label>
+                    <input type="text" id="registerName" placeholder="Ton prénom">
                 </div>
                 <div class="form-group">
-                    <label data-i18n="auth.email">Email</label>
-                    <input type="email" id="registerEmail" data-i18n="auth.email" placeholder="email@example.com">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="ton@email.com">
                 </div>
                 <div class="form-group">
-                    <label data-i18n="auth.password">Password</label>
-                    <input type="password" id="registerPassword" data-i18n="auth.password" placeholder="••••••••">
+                    <label>Mot de passe</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••">
                 </div>
-                <button class="btn" onclick="register()" data-i18n="auth.create_agent">Create My Agent</button>
+                <button class="btn" onclick="register()">Créer mon agent</button>
                 <div class="auth-switch">
-                    <span data-i18n="auth.have_account">Already have an account?</span> 
-                    <a onclick="showLogin()" data-i18n="auth.switch_to_login">Sign in</a>
+                    Déjà un compte ? <a onclick="showLogin()">Se connecter</a>
                 </div>
             </div>
         </div>
@@ -623,12 +517,12 @@
         <div class="chat-header">
             <h1>
                 <span class="status"></span>
-                <span id="agentName" data-i18n="chat.my_agent">My Agent</span>
+                <span id="agentName">Mon Agent</span>
             </h1>
             <div style="display:flex;align-items:center;gap:16px;">
                 <span class="user-info" id="userInfo"></span>
-                <button class="logout" onclick="openTelegramModal()" data-i18n="chat.telegram">📱 Telegram</button>
-                <button class="logout" onclick="logout()" data-i18n="chat.logout">Sign Out</button>
+                <button class="logout" onclick="openTelegramModal()">📱 Telegram</button>
+                <button class="logout" onclick="logout()">Déconnexion</button>
             </div>
         </div>
 
@@ -641,8 +535,7 @@
                 <textarea 
                     class="chat-input" 
                     id="messageInput" 
-                    data-i18n="chat.type_message"
-                    placeholder="Write your message..."
+                    placeholder="Écris ton message..."
                     onkeydown="handleKeyDown(event)"
                 ></textarea>
                 <button class="send-btn" id="sendBtn" onclick="sendMessage()">
@@ -650,8 +543,8 @@
                 </button>
             </div>
             <div class="usage-bar">
-                <span id="usageText" data-i18n="chat.unlimited">✅ Unlimited - No message limits</span>
-                <span id="degradationWarning" style="display:none;color:#ff9800;font-size:12px;margin-top:8px;" data-i18n="chat.degraded_warning">⚠️ Slow responses after 100 messages/day</span>
+                <span id="usageText">✅ Illimité - Pas de limite de messages</span>
+                <span id="degradationWarning" style="display:none;color:#ff9800;font-size:12px;margin-top:8px;">⚠️ Réponses lentes après 100 messages/jour (upgrade pour illimité rapide)</span>
             </div>
         </div>
     </div>
@@ -660,17 +553,17 @@
     <div class="modal" id="verificationModal" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 data-i18n="verification.title">📧 Verify Email</h2>
+                <h2>📧 Vérifier ton email</h2>
             </div>
             <div class="modal-body" style="text-align:center;">
-                <p style="margin:16px 0;color:rgba(255,255,255,0.8);" data-i18n="verification.message">We sent a verification link to:</p>
-                <p style="font-weight:600;color:#fff;margin:8px 0;" id="verificationEmail">email@example.com</p>
-                <p style="margin:16px 0;color:rgba(255,255,255,0.6);font-size:14px;" data-i18n="verification.instructions">Click the link in the email to continue</p>
+                <p style="margin:16px 0;color:rgba(255,255,255,0.8);">On a envoyé un lien de vérification à:</p>
+                <p style="font-weight:600;color:#fff;margin:8px 0;" id="verificationEmail">ton@email.com</p>
+                <p style="margin:16px 0;color:rgba(255,255,255,0.6);font-size:14px;">Clique sur le lien dans l'email pour continuer</p>
                 <div id="verificationError" style="color:#ff4444;margin:12px 0;display:none;font-size:14px;"></div>
                 <div id="verificationSuccess" style="color:#44ff44;margin:12px 0;display:none;font-size:14px;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-primary" onclick="resendVerificationEmail()" style="width:100%;" data-i18n="verification.resend">Resend Link</button>
+                <button class="btn-primary" onclick="resendVerificationEmail()" style="width:100%;">Renvoyer le lien</button>
             </div>
         </div>
     </div>
@@ -679,23 +572,22 @@
     <div class="modal" id="telegramModal" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 data-i18n="telegram.title">📱 Connect Telegram</h2>
+                <h2>📱 Connecter Telegram</h2>
                 <button class="modal-close" onclick="closeTelegramModal()">✕</button>
             </div>
             <div class="modal-body">
-                <p data-i18n="telegram.instructions">To use your agent on Telegram:</p>
+                <p>Pour utiliser ton agent sur Telegram:</p>
                 <ol>
-                    <li><strong data-i18n="telegram.step1">Go to Telegram and search for @BotFather</strong></li>
-                    <li><strong data-i18n="telegram.step2">Send /newbot and follow instructions</strong></li>
-                    <li><span data-i18n="telegram.step3">You'll receive a token (ex: 123456:ABC-xxx)</span></li>
-                    <li><span data-i18n="telegram.step4">Paste it here and click Connect</span></li>
+                    <li><strong>Va sur Telegram</strong> et cherche <code>@BotFather</code></li>
+                    <li>Envoie <code>/newbot</code> et suis les instructions</li>
+                    <li>Tu recevras un <strong>token</strong> (ex: <code>123456:ABC-xxx</code>)</li>
+                    <li>Copie-le ici et clique "Connecter"</li>
                 </ol>
                 <div style="margin:16px 0;">
                     <input 
                         type="text" 
                         id="telegramToken" 
-                        data-i18n="telegram.token_placeholder"
-                        placeholder="Paste token here..." 
+                        placeholder="Colle le token ici..." 
                         style="width:100%;padding:12px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;font-family:monospace;"
                     />
                 </div>
@@ -703,14 +595,11 @@
                 <div id="telegramSuccess" style="color:#44ff44;margin:8px 0;display:none;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeTelegramModal()" data-i18n="telegram.cancel">Cancel</button>
-                <button class="btn-primary" onclick="linkTelegramBot()" data-i18n="telegram.connect_button">🔗 Connect</button>
+                <button class="btn-secondary" onclick="closeTelegramModal()">Annuler</button>
+                <button class="btn-primary" onclick="linkTelegramBot()">🔗 Connecter</button>
             </div>
         </div>
     </div>
-
-    <!-- i18n Script -->
-    <script src="app-i18n.js"></script>
 
     <script>
         const API_URL = window.location.origin + '/api';
@@ -750,7 +639,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     agent = data.agent;
-                    document.getElementById('agentName').textContent = agent.name || i18nInstance.t('chat.my_agent');
+                    document.getElementById('agentName').textContent = agent.name || 'Alex';
                 }
             } catch (e) {
                 console.error('Load agent failed:', e);
@@ -775,14 +664,13 @@
             
             // Welcome message if first time
             if (!agent.onboardingComplete) {
-                const welcomeMsg = i18nInstance.t('chat.my_agent') + i18nInstance.t('auth.register_subtitle');
-                addMessage('assistant', "Hey! I'm your new AI agent. What's your name?");
+                addMessage('assistant', 'Hey ! Moi c\'est Alex, ton nouvel assistant. Et toi, c\'est quoi ton petit nom ?');
             }
         }
 
         function updateUsage() {
             // Phase 1: Unlimited messages
-            document.getElementById('usageText').textContent = i18nInstance.t('chat.unlimited');
+            document.getElementById('usageText').textContent = '✅ Illimité - Pas de limite de messages';
         }
 
         async function login() {
@@ -791,7 +679,7 @@
             const errorEl = document.getElementById('loginError');
 
             if (!email || !password) {
-                errorEl.textContent = i18nInstance.t('errors.fill_all_fields');
+                errorEl.textContent = 'Remplis tous les champs';
                 errorEl.classList.remove('hidden');
                 return;
             }
@@ -805,17 +693,17 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    token = data.accessToken || data.token;
+                    token = data.token;
                     user = data.user;
                     localStorage.setItem('token', token);
                     await loadAgent();
                     showChat();
                 } else {
-                    errorEl.textContent = data.error || i18nInstance.t('errors.login_failed');
+                    errorEl.textContent = data.error || 'Erreur de connexion';
                     errorEl.classList.remove('hidden');
                 }
             } catch (e) {
-                errorEl.textContent = i18nInstance.t('errors.network_error');
+                errorEl.textContent = 'Erreur réseau';
                 errorEl.classList.remove('hidden');
             }
         }
@@ -827,7 +715,7 @@
             const errorEl = document.getElementById('registerError');
 
             if (!email || !password) {
-                errorEl.textContent = i18nInstance.t('errors.fill_all_fields');
+                errorEl.textContent = 'Email et mot de passe requis';
                 errorEl.classList.remove('hidden');
                 return;
             }
@@ -841,25 +729,17 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    token = data.accessToken || data.token;
+                    token = data.token;
                     user = data.user;
                     agent = data.agent;
                     localStorage.setItem('token', token);
-                    
-                    // Show verification modal
-                    showVerificationModal(email);
-                    
-                    // Auto-load chat in 3 seconds (for testing)
-                    setTimeout(() => {
-                        closeVerificationModal();
-                        showChat();
-                    }, 3000);
+                    showChat();
                 } else {
-                    errorEl.textContent = data.error || i18nInstance.t('errors.register_failed');
+                    errorEl.textContent = data.error || 'Erreur d\'inscription';
                     errorEl.classList.remove('hidden');
                 }
             } catch (e) {
-                errorEl.textContent = i18nInstance.t('errors.network_error');
+                errorEl.textContent = 'Erreur réseau';
                 errorEl.classList.remove('hidden');
             }
         }
@@ -879,6 +759,7 @@
             const msgEl = document.createElement('div');
             msgEl.className = `message ${role}`;
             
+            // Simple markdown-ish formatting
             let formatted = content
                 .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
                 .replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">$1</code>')
@@ -928,10 +809,12 @@
 
             if (!message) return;
 
+            // Disable input
             input.disabled = true;
             sendBtn.disabled = true;
             input.value = '';
 
+            // Add user message
             addMessage('user', message);
             addTypingIndicator();
 
@@ -951,27 +834,37 @@
                     const data = await res.json();
                     addMessage('assistant', data.response);
                     
+                    // Update usage
+                    user.messagesUsed = data.usage.messagesUsed;
+                    user.messagesLimit = data.usage.messagesLimit;
+                    updateUsage();
+                    
                     // Show degradation warning if applicable
-                    if (data.usage && data.usage.degraded) {
+                    if (data.usage.degraded) {
                         document.getElementById('degradationWarning').style.display = 'block';
+                    } else {
+                        document.getElementById('degradationWarning').style.display = 'none';
                     }
                 } else {
                     removeTypingIndicator();
                     const data = await res.json();
-                    const errorMsg = data.error || i18nInstance.t('errors.chat_error');
-                    addMessage('assistant', `Error: ${errorMsg}`);
+                    const errorMsg = data.error || 'Une erreur est survenue';
+                    console.error(`[CHAT ERROR] Status ${res.status}: ${errorMsg}`);
+                    addMessage('assistant', `Erreur (${res.status}): ${errorMsg}`);
                 }
             } catch (e) {
                 removeTypingIndicator();
-                addMessage('assistant', `${i18nInstance.t('errors.network_error')}: ${e.message}`);
+                console.error('[NETWORK ERROR]', e);
+                addMessage('assistant', `Erreur réseau: ${e.message || 'Impossible de se connecter'}`);
             }
 
+            // Re-enable input
             input.disabled = false;
             sendBtn.disabled = false;
             input.focus();
         }
 
-        // Telegram Functions
+        // Telegram Modal Functions
         function openTelegramModal() {
             document.getElementById('telegramModal').style.display = 'flex';
             document.getElementById('telegramToken').focus();
@@ -990,11 +883,12 @@
             const errorEl = document.getElementById('telegramError');
             const successEl = document.getElementById('telegramSuccess');
 
+            // Clear messages
             errorEl.style.display = 'none';
             successEl.style.display = 'none';
 
             if (!botToken) {
-                errorEl.textContent = i18nInstance.t('telegram.token_placeholder');
+                errorEl.textContent = 'Veuillez entrer le token du bot';
                 errorEl.style.display = 'block';
                 return;
             }
@@ -1012,23 +906,52 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    successEl.textContent = i18nInstance.t('telegram.success');
+                    successEl.textContent = '✅ Bot connecté! Va envoyer un message à ton bot sur Telegram.';
                     successEl.style.display = 'block';
                     tokenInput.value = '';
                     setTimeout(() => {
                         closeTelegramModal();
                     }, 2000);
                 } else {
-                    errorEl.textContent = data.error || i18nInstance.t('errors.chat_error');
+                    errorEl.textContent = `Erreur: ${data.error || 'Impossible de connecter le bot'}`;
                     errorEl.style.display = 'block';
                 }
             } catch (e) {
-                errorEl.textContent = `${i18nInstance.t('errors.network_error')}: ${e.message}`;
+                errorEl.textContent = `Erreur réseau: ${e.message}`;
                 errorEl.style.display = 'block';
             }
         }
 
-        // Email Verification
+        // Allow Enter key to submit
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.getElementById('telegramModal').style.display !== 'none') {
+                e.preventDefault();
+                linkTelegramBot();
+            }
+        });
+
+        // ========== OAUTH LOGIN ==========
+        function loginGoogle() {
+            // For now, show alert - backend OAuth setup needed
+            const email = prompt('Google OAuth n\'est pas encore configuré. Entre ton email pour tester:');
+            if (email) {
+                document.getElementById('loginEmail').value = email;
+                document.getElementById('loginPassword').value = 'oauth-google-placeholder';
+                // In production: redirect to /auth/google with OAuth flow
+            }
+        }
+
+        function loginGithub() {
+            // For now, show alert - backend OAuth setup needed
+            const email = prompt('GitHub OAuth n\'est pas encore configuré. Entre ton email pour tester:');
+            if (email) {
+                document.getElementById('loginEmail').value = email;
+                document.getElementById('loginPassword').value = 'oauth-github-placeholder';
+                // In production: redirect to /auth/github with OAuth flow
+            }
+        }
+
+        // ========== EMAIL VERIFICATION ==========
         function showVerificationModal(email) {
             document.getElementById('verificationEmail').textContent = email;
             document.getElementById('verificationModal').style.display = 'flex';
@@ -1056,33 +979,62 @@
                 });
 
                 if (res.ok) {
-                    successEl.textContent = '✅ ' + i18nInstance.t('verification.check_email');
+                    successEl.textContent = '✅ Lien renvoyé! Vérifie ton email.';
                     successEl.style.display = 'block';
                 } else {
                     const data = await res.json();
-                    errorEl.textContent = data.error || i18nInstance.t('errors.verification_failed');
+                    errorEl.textContent = data.error || 'Erreur lors du renvoi';
                     errorEl.style.display = 'block';
                 }
             } catch (e) {
-                errorEl.textContent = `${i18nInstance.t('errors.network_error')}: ${e.message}`;
+                errorEl.textContent = `Erreur réseau: ${e.message}`;
                 errorEl.style.display = 'block';
             }
         }
 
-        // OAuth Stubs
-        function loginGoogle() {
-            const email = prompt('Google OAuth not yet configured. Enter your email to test:');
-            if (email) {
-                document.getElementById('loginEmail').value = email;
-                document.getElementById('loginPassword').value = 'oauth-google';
-            }
-        }
+        // Modify register function to show verification modal
+        const originalRegister = register;
+        async function register() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const errorEl = document.getElementById('registerError');
 
-        function loginGithub() {
-            const email = prompt('GitHub OAuth not yet configured. Enter your email to test:');
-            if (email) {
-                document.getElementById('loginEmail').value = email;
-                document.getElementById('loginPassword').value = 'oauth-github';
+            if (!email || !password) {
+                errorEl.textContent = 'Email et mot de passe requis';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, name })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    token = data.token;
+                    user = data.user;
+                    agent = data.agent;
+                    localStorage.setItem('token', token);
+                    
+                    // Show verification modal instead of loading chat
+                    showVerificationModal(email);
+                    
+                    // Auto-load chat in 3 seconds if already verified (for testing)
+                    setTimeout(() => {
+                        closeVerificationModal();
+                        showChat();
+                    }, 3000);
+                } else {
+                    errorEl.textContent = data.error || 'Erreur d\'inscription';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (e) {
+                errorEl.textContent = 'Erreur réseau';
+                errorEl.classList.remove('hidden');
             }
         }
     </script>
