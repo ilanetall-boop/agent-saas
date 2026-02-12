@@ -31,7 +31,7 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (for existing CSS)
             imgSrc: ["'self'", "data:", "https:"], // Allow images from same origin, data URIs, and https
             fontSrc: ["'self'", "data:"], // Allow fonts from same origin and data URIs
-            connectSrc: ["'self'", "https://"], // Allow API calls to https origins
+            connectSrc: ["'self'", "https:"], // Allow API calls to https origins (fixed: was 'https://' which is invalid)
             frameSrc: ["'self'"], // Restrict frame sources to same origin
             objectSrc: ["'none'"], // Disable object/embed sources
         }
