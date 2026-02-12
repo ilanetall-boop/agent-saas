@@ -1,7 +1,7 @@
 -- PostgreSQL Schema for Agent-SaaS
 -- Convert from SQLite to PostgreSQL
 
--- Users table
+-- Users table (with email verification columns)
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
@@ -60,13 +60,13 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
 );
 
--- Sessions table (for JWT refresh)
+-- Sessions table (for JWT refresh and token rotation)
 CREATE TABLE IF NOT EXISTS sessions (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
-    last_rotated_at TIMESTAMP,
+    last_rotated_at TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -100,35 +100,7 @@ CREATE INDEX IF NOT EXISTS idx_memories_agent ON memories(agent_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_conversations_agent ON conversations(agent_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_last_rotated ON sessions(last_rotated_at);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_vaults_key_name ON vaults(key_name);
-
--- Conditional migrations: Add missing columns if they don't exist
-DO $$
-BEGIN
-    -- Add email_verified column if missing
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name='users' AND column_name='email_verified'
-    ) THEN
-        ALTER TABLE users ADD COLUMN email_verified INTEGER DEFAULT 0;
-    END IF;
-
-    -- Add email_verification_token column if missing
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name='users' AND column_name='email_verification_token'
-    ) THEN
-        ALTER TABLE users ADD COLUMN email_verification_token TEXT;
-    END IF;
-
-    -- Add last_rotated_at column if missing
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name='sessions' AND column_name='last_rotated_at'
-    ) THEN
-        ALTER TABLE sessions ADD COLUMN last_rotated_at TIMESTAMP;
-        CREATE INDEX idx_sessions_last_rotated ON sessions(last_rotated_at);
-    END IF;
-END $$;

@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { encryptToken, decryptToken } = require('../services/token-encryption');
 const { encryptUserFields, decryptUserFields } = require('../services/field-encryption');
+const { runMigrations } = require('./migrations');
 
 let pool = null;
 
@@ -35,7 +36,7 @@ async function initDb() {
         const client = await pool.connect();
         console.log('PostgreSQL connection successful');
         
-        // Create schema
+        // Create base schema
         const schema = fs.readFileSync(path.join(__dirname, 'schema-postgres.sql'), 'utf8');
         
         // Split schema into individual statements and execute each
@@ -48,6 +49,9 @@ async function initDb() {
         
         console.log('Database schema initialized');
         client.release();
+        
+        // Run migrations (handles backward compatibility)
+        await runMigrations(pool);
     } catch (error) {
         console.error('Database initialization error:', error);
         throw error;
