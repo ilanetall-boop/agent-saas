@@ -321,4 +321,140 @@ router.get('/rotation-status', authMiddleware, async (req, res) => {
     }
 });
 
+// ========== EMAIL VERIFICATION (Phase 1) ==========
+
+// Send verification email
+router.post('/send-verification', authMiddleware, async (req, res) => {
+    try {
+        const user = await db.getUserById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        // Check if already verified
+        if (user.email_verified) {
+            return res.json({ success: true, message: 'Email already verified' });
+        }
+        
+        // Generate verification token
+        const verificationToken = nanoid(32);
+        await db.setEmailVerificationToken(req.user.id, verificationToken);
+        
+        // TODO: Send email with verification link
+        // For now, return token for testing
+        const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify?token=${verificationToken}`;
+        
+        console.log(`[EMAIL] Verification link for ${user.email}: ${verificationLink}`);
+        
+        res.json({
+            success: true,
+            message: 'Verification email sent',
+            // For testing only - remove in production
+            testLink: verificationLink
+        });
+    } catch (error) {
+        console.error('Send verification error:', error);
+        res.status(500).json({ error: 'Failed to send verification email' });
+    }
+});
+
+// Resend verification email
+router.post('/resend-verification', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: 'Email required' });
+        }
+        
+        const user = await db.getUserByEmail(email.toLowerCase());
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        // Check if already verified
+        if (user.email_verified) {
+            return res.json({ success: true, message: 'Email already verified' });
+        }
+        
+        // Generate new verification token
+        const verificationToken = nanoid(32);
+        await db.setEmailVerificationToken(user.id, verificationToken);
+        
+        // TODO: Send email with verification link
+        const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify?token=${verificationToken}`;
+        
+        console.log(`[EMAIL] Verification link for ${user.email}: ${verificationLink}`);
+        
+        res.json({
+            success: true,
+            message: 'Verification email sent',
+            // For testing only - remove in production
+            testLink: verificationLink
+        });
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        res.status(500).json({ error: 'Failed to resend verification email' });
+    }
+});
+
+// Verify email with token
+router.post('/verify-email', async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({ error: 'Verification token required' });
+        }
+        
+        const verified = await db.verifyEmail(token);
+        if (!verified) {
+            return res.status(400).json({ error: 'Invalid or expired verification token' });
+        }
+        
+        res.json({
+            success: true,
+            message: 'Email verified successfully'
+        });
+    } catch (error) {
+        console.error('Verify email error:', error);
+        res.status(500).json({ error: 'Failed to verify email' });
+    }
+});
+
+// ========== OAUTH STUBS (Phase 1 - Placeholder) ==========
+
+// Google OAuth login (placeholder)
+router.post('/google', async (req, res) => {
+    try {
+        const { idToken } = req.body;
+        
+        // TODO: Verify Google ID token
+        // For now, return placeholder response
+        res.status(501).json({
+            error: 'Google OAuth not yet configured',
+            message: 'Use email/password login for now'
+        });
+    } catch (error) {
+        console.error('Google auth error:', error);
+        res.status(500).json({ error: 'Google auth failed' });
+    }
+});
+
+// GitHub OAuth login (placeholder)
+router.post('/github', async (req, res) => {
+    try {
+        const { code } = req.body;
+        
+        // TODO: Exchange code for GitHub token
+        // TODO: Get user info from GitHub
+        // For now, return placeholder response
+        res.status(501).json({
+            error: 'GitHub OAuth not yet configured',
+            message: 'Use email/password login for now'
+        });
+    } catch (error) {
+        console.error('GitHub auth error:', error);
+        res.status(500).json({ error: 'GitHub auth failed' });
+    }
+});
+
 module.exports = router;

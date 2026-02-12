@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT,
     plan TEXT DEFAULT 'free',
     messages_used INTEGER DEFAULT 0,
-    messages_limit INTEGER DEFAULT 50,
+    messages_limit INTEGER DEFAULT 999999999,
+    email_verified INTEGER DEFAULT 0,
+    email_verification_token TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

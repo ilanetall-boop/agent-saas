@@ -284,6 +284,27 @@ const dbOps = {
             [userId]
         );
         return result?.last_rotated_at;
+    },
+    
+    // Email verification
+    setEmailVerificationToken: async (userId, token) => {
+        await run(
+            'UPDATE users SET email_verification_token = $1 WHERE id = $2',
+            [token, userId]
+        );
+    },
+    
+    verifyEmail: async (token) => {
+        const result = await run(
+            'UPDATE users SET email_verified = 1, email_verification_token = NULL WHERE email_verification_token = $1',
+            [token]
+        );
+        return result.rowCount > 0;
+    },
+    
+    isEmailVerified: async (userId) => {
+        const user = await get('SELECT email_verified FROM users WHERE id = $1', [userId]);
+        return user?.email_verified === 1;
     }
 };
 

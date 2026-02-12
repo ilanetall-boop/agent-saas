@@ -18,9 +18,9 @@ module.exports = {
     // Sentry (optional, for error tracking)
     sentryDsn: process.env.SENTRY_DSN,
     
-    // Plans
+    // Plans (Phase 1: Everyone is "free" with UNLIMITED messages)
     plans: {
-        free: { messagesLimit: 50, features: ['search', 'reminders'] },
+        free: { messagesLimit: 999999999, features: ['all'] }, // Phase 1: Unlimited
         perso: { messagesLimit: 2000, features: ['all'] },
         pro: { messagesLimit: 10000, features: ['all', 'code', 'api'] }
     },
