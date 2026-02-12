@@ -544,6 +544,7 @@
             </div>
             <div class="usage-bar">
                 <span id="usageText">✅ Illimité - Pas de limite de messages</span>
+                <span id="degradationWarning" style="display:none;color:#ff9800;font-size:12px;margin-top:8px;">⚠️ Réponses lentes après 100 messages/jour (upgrade pour illimité rapide)</span>
             </div>
         </div>
     </div>
@@ -837,6 +838,13 @@
                     user.messagesUsed = data.usage.messagesUsed;
                     user.messagesLimit = data.usage.messagesLimit;
                     updateUsage();
+                    
+                    // Show degradation warning if applicable
+                    if (data.usage.degraded) {
+                        document.getElementById('degradationWarning').style.display = 'block';
+                    } else {
+                        document.getElementById('degradationWarning').style.display = 'none';
+                    }
                 } else {
                     removeTypingIndicator();
                     const data = await res.json();

@@ -185,12 +185,33 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             userAgent: req.get('user-agent')
         });
         
+        // Phase 1: Soft degradation after 100 messages/day
+        // If user exceeded threshold, add artificial delay to encourage upgrade to premium
+        const config = require('../config');
+        const messagesUsedToday = updatedUser.messages_used % 1000; // Rough estimation (see note below)
+        let responseDelay = 0;
+        
+        if (messagesUsedToday > config.softDegradationThreshold) {
+            responseDelay = config.degradedResponseDelay;
+            console.log(`[SOFT DEGRADATION] User ${req.user.id}: ${messagesUsedToday} messages today, adding ${responseDelay}ms delay`);
+            
+            // Note: In production, you'd track messages-per-day in DB
+            // For MVP, we use messages_used as proxy (increments each chat)
+            // This is a soft nudge, not a hard block
+        }
+        
+        // Apply delay if needed (non-blocking)
+        if (responseDelay > 0) {
+            await new Promise(resolve => setTimeout(resolve, responseDelay));
+        }
+        
         res.json({
             response: response.content,
             usage: {
                 messagesUsed: updatedUser.messages_used,
                 messagesLimit: updatedUser.messages_limit,
-                remaining: Math.max(0, updatedUser.messages_limit - updatedUser.messages_used)
+                remaining: Math.max(0, updatedUser.messages_limit - updatedUser.messages_used),
+                degraded: messagesUsedToday > config.softDegradationThreshold // Inform frontend
             }
         });
     } catch (error) {

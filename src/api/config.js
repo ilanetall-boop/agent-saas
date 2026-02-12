@@ -7,7 +7,11 @@ module.exports = {
     
     // Anthropic
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-    defaultModel: 'claude-3-5-haiku-20241022',
+    defaultModel: 'claude-3-5-haiku-20241022', // Cheapest: ~$0.0008 per 1M tokens
+    
+    // Phase 1: Soft degradation thresholds
+    softDegradationThreshold: 100, // After 100 messages/day
+    degradedResponseDelay: 10000, // 10 seconds delay for degraded responses (vs 2s normal)
     
     // OpenAI (Whisper for transcription, TTS for voice responses)
     openaiApiKey: process.env.OPENAI_API_KEY,
