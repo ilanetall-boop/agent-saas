@@ -61,6 +61,7 @@ function showChat() {
     document.getElementById('authContainer').style.display = 'none';
     document.getElementById('chatContainer').style.display = 'flex';
     document.getElementById('userInfo').textContent = user.email;
+    updateTierBadge();
     updateUsage();
     
     // Welcome message if first time
@@ -69,9 +70,43 @@ function showChat() {
     }
 }
 
+function updateTierBadge() {
+    const tierBadge = document.getElementById('tierBadge');
+    const tier = user.tier || 'starter';
+    
+    tierBadge.className = `tier-badge ${tier.toLowerCase()}`;
+    tierBadge.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
+    
+    // Show upgrade banner for free users
+    if (tier === 'starter' && !document.getElementById('upgradeBanner')) {
+        const chatHeader = document.querySelector('.chat-header');
+        const banner = document.createElement('div');
+        banner.id = 'upgradeBanner';
+        banner.className = 'upgrade-banner';
+        banner.innerHTML = `
+            <span>🚀 ${i18nInstance.t('chat.upgrade_message') || 'Upgrade to Pro for unlimited messages and all AI models'}</span>
+            <a href="/#pricing">${i18nInstance.t('chat.upgrade_button') || 'Go Pro →'}</a>
+        `;
+        chatHeader.parentNode.insertBefore(banner, chatHeader.nextSibling);
+    }
+}
+
 function updateUsage() {
-    // Phase 1: Unlimited messages
-    document.getElementById('usageText').textContent = i18nInstance.t('chat.unlimited');
+    const tier = user.tier || 'starter';
+    const usageText = document.getElementById('usageText');
+    
+    if (tier === 'pro') {
+        usageText.textContent = '✅ Pro - ' + (i18nInstance.t('chat.unlimited') || 'Unlimited messages');
+    } else {
+        const messagesUsed = user.messagesUsed || 0;
+        const limit = 30;
+        usageText.textContent = `📊 ${messagesUsed}/${limit} ` + (i18nInstance.t('chat.messages_today') || 'messages today');
+        
+        // Show warning if approaching limit
+        if (messagesUsed >= limit * 0.8) {
+            usageText.innerHTML += ` <span style="color:#ff9800;">⚠️</span>`;
+        }
+    }
 }
 
 async function login() {

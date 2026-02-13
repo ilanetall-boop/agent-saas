@@ -92,5 +92,8 @@
   "footer_terms": "Terms",
   "footer_privacy": "Privacy",
   "footer_tagline": "The AI that turns \"I can't\" into \"I just did.\"",
-  "footer_copyright": "© 2026 My Best Agent. All rights reserved."
+  "footer_copyright": "© 2026 My Best Agent. All rights reserved.",
+  "chat_messages_today": "messages today",
+  "chat_upgrade_message": "Upgrade to Pro for unlimited messages and all AI models",
+  "chat_upgrade_button": "Go Pro →"
 }

@@ -92,5 +92,8 @@
   "footer_terms": "Conditions",
   "footer_privacy": "Confidentialité",
   "footer_tagline": "L'IA qui transforme \"je ne peux pas\" en \"je viens de le faire\".",
-  "footer_copyright": "© 2026 My Best Agent. Tous droits réservés."
+  "footer_copyright": "© 2026 My Best Agent. Tous droits réservés.",
+  "chat_messages_today": "messages aujourd'hui",
+  "chat_upgrade_message": "Passe Pro pour des messages illimités et tous les modèles IA",
+  "chat_upgrade_button": "Passer Pro →"
 }
