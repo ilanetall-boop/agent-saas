@@ -1152,68 +1152,59 @@
     <!-- i18n Script -->
     <script>
     (function() {
-        const SUPPORTED_LANGS = ['en', 'fr', 'es', 'de', 'it', 'pt', 'zh', 'ja', 'ru', 'ar', 'he'];
-        const RTL_LANGS = ['ar', 'he'];
+        var LANGS = ['en', 'fr', 'es', 'de', 'it', 'pt', 'zh', 'ja', 'ru', 'ar', 'he'];
+        var RTL = ['ar', 'he'];
         
-        function detectLang() {
-            const stored = localStorage.getItem('lang');
-            if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
-            const browser = (navigator.language || 'en').split('-')[0];
-            return SUPPORTED_LANGS.includes(browser) ? browser : 'en';
+        // Get current language
+        var stored = localStorage.getItem('lang');
+        var browser = (navigator.language || 'en').split('-')[0];
+        var lang = (stored && LANGS.indexOf(stored) !== -1) ? stored : 
+                   (LANGS.indexOf(browser) !== -1 ? browser : 'en');
+        
+        // Set RTL if needed
+        if (RTL.indexOf(lang) !== -1) {
+            document.documentElement.dir = 'rtl';
         }
-
-        let currentLang = detectLang();
-        let translations = {};
-
-        async function loadTranslations() {
-            try {
-                const res = await fetch('/i18n/' + currentLang + '.json');
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                translations = await res.json();
-                applyTranslations();
-            } catch (err) {
-                console.warn('i18n load failed for ' + currentLang + ':', err);
-                if (currentLang !== 'en') {
-                    currentLang = 'en';
-                    loadTranslations();
-                }
+        document.documentElement.lang = lang;
+        
+        // Load and apply translations
+        function applyLang(data) {
+            var els = document.querySelectorAll('[data-i18n]');
+            for (var i = 0; i < els.length; i++) {
+                var key = els[i].getAttribute('data-i18n');
+                if (data[key]) els[i].textContent = data[key];
             }
         }
-
-        function applyTranslations() {
-            document.querySelectorAll('[data-i18n]').forEach(function(el) {
-                const key = el.getAttribute('data-i18n');
-                if (translations[key]) {
-                    el.textContent = translations[key];
-                }
-            });
-            
-            document.documentElement.lang = currentLang;
-            document.documentElement.dir = RTL_LANGS.includes(currentLang) ? 'rtl' : 'ltr';
-            
-            const selector = document.getElementById('langSelector');
-            if (selector) {
-                selector.value = currentLang;
+        
+        // Fetch translations
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/i18n/' + lang + '.json', true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    applyLang(data);
+                } catch(e) { console.error('i18n parse error', e); }
+            }
+        };
+        xhr.send();
+        
+        // Setup language selector when DOM ready
+        function setup() {
+            var sel = document.getElementById('langSelector');
+            if (sel) {
+                sel.value = lang;
+                sel.onchange = function() {
+                    localStorage.setItem('lang', sel.value);
+                    window.location.reload();
+                };
             }
         }
-
-        function init() {
-            const selector = document.getElementById('langSelector');
-            if (selector) {
-                selector.value = currentLang;
-                selector.addEventListener('change', function(e) {
-                    currentLang = e.target.value;
-                    localStorage.setItem('lang', currentLang);
-                    loadTranslations();
-                });
-            }
-            loadTranslations();
-        }
-
+        
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+            document.addEventListener('DOMContentLoaded', setup);
         } else {
-            init();
+            setup();
         }
     })();
     </script>
