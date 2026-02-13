@@ -619,6 +619,23 @@
             margin: 0 auto;
         }
 
+        .pricing-grid.pricing-4 {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 1200px;
+            gap: 24px;
+        }
+
+        .pricing-grid.pricing-4 .price-card {
+            padding: 32px 24px;
+        }
+
+        .pricing-note {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 24px;
+        }
+
         .price-card {
             background: var(--bg);
             border: 1px solid var(--border);
@@ -822,6 +839,7 @@
             .hero-visual { order: -1; }
             .steps-grid { grid-template-columns: repeat(2, 1fr); }
             .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .pricing-grid.pricing-4 { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 40px; }
         }
 
@@ -835,6 +853,7 @@
             .steps-grid { grid-template-columns: 1fr; }
             .features-grid { grid-template-columns: 1fr; }
             .pricing-grid { grid-template-columns: 1fr; }
+            .pricing-grid.pricing-4 { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; text-align: center; }
             .footer-brand { max-width: 100%; }
         }
@@ -1143,49 +1162,47 @@
                 <p class="section-subtitle" data-i18n="section_pricing_subtitle">Start free. Upgrade when you need more power.</p>
             </div>
 
-            <div class="pricing-grid">
+            <div class="pricing-grid pricing-4">
+                <!-- Free -->
                 <div class="price-card">
-                    <div class="price-tier" data-i18n="pricing_starter_title">Starter</div>
+                    <div class="price-tier" data-i18n="pricing_free_title">Free</div>
                     <div class="price-amount">€0</div>
-                    <div class="price-period" data-i18n="pricing_starter_period">Free forever</div>
+                    <div class="price-period" data-i18n="pricing_free_period">To discover</div>
                     <ul class="price-features">
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_starter_f1">30 messages per day</span>
+                            <span data-i18n="pricing_free_f1">Basic access</span>
                         </li>
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_starter_f2">Standard AI models</span>
+                            <span data-i18n="pricing_free_f2">Standard AI</span>
                         </li>
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_starter_f3">Web access</span>
+                            <span data-i18n="pricing_free_f3">Web only</span>
                         </li>
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_starter_f4">Basic automations</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_starter_f5">Community support</span>
+                            <span data-i18n="pricing_free_f4">Community support</span>
                         </li>
                     </ul>
                     <a href="/app.html" class="btn btn-secondary" data-i18n="btn_start_free">Start free</a>
                 </div>
 
+                <!-- Pro -->
                 <div class="price-card featured">
                     <span class="price-badge" data-i18n="pricing_popular">Most popular</span>
                     <div class="price-tier" data-i18n="pricing_pro_title">Pro</div>
                     <div class="price-amount">€19<span style="font-size:16px;font-weight:500;color:var(--text-muted)">/mo</span></div>
-                    <div class="price-period" data-i18n="pricing_pro_period">Unlimited power</div>
+                    <div class="price-period" data-i18n="pricing_pro_period">For creators</div>
                     <ul class="price-features">
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f1">Unlimited messages</span>
+                            <span data-i18n="pricing_pro_f1">Extended usage*</span>
                         </li>
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f2">All AI models (GPT-4, Claude, etc.)</span>
+                            <span data-i18n="pricing_pro_f2">All AI models</span>
                         </li>
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1193,16 +1210,65 @@
                         </li>
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f4">Advanced automations</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f5">Priority support</span>
+                            <span data-i18n="pricing_pro_f4">Priority support</span>
                         </li>
                     </ul>
                     <a href="/app.html?plan=pro" class="btn btn-primary" data-i18n="btn_go_pro">Go Pro</a>
                 </div>
+
+                <!-- Business -->
+                <div class="price-card">
+                    <div class="price-tier" data-i18n="pricing_business_title">Business</div>
+                    <div class="price-amount">€49<span style="font-size:16px;font-weight:500;color:var(--text-muted)">/mo</span></div>
+                    <div class="price-period" data-i18n="pricing_business_period">For teams</div>
+                    <ul class="price-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_business_f1">High priority access</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_business_f2">5 team members</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_business_f3">API access</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_business_f4">Dedicated support</span>
+                        </li>
+                    </ul>
+                    <a href="/app.html?plan=business" class="btn btn-secondary" data-i18n="btn_choose">Choose</a>
+                </div>
+
+                <!-- VIP -->
+                <div class="price-card">
+                    <div class="price-tier" data-i18n="pricing_vip_title">VIP</div>
+                    <div class="price-amount" data-i18n="pricing_vip_price">Custom</div>
+                    <div class="price-period" data-i18n="pricing_vip_period">For enterprises</div>
+                    <ul class="price-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_vip_f1">Guaranteed priority</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_vip_f2">Unlimited team</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_vip_f3">Custom SLA</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span data-i18n="pricing_vip_f4">White-label option</span>
+                        </li>
+                    </ul>
+                    <a href="mailto:contact@mybestagent.io" class="btn btn-secondary" data-i18n="btn_contact">Contact us</a>
+                </div>
             </div>
+            <p class="pricing-note" data-i18n="pricing_fair_use">* Fair use policy — no hard limits, smart throttling for heavy usage</p>
         </div>
     </section>
 
