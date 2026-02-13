@@ -1,14 +1,30 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const config = require('../config');
+const aiRouter = require('../ai-router');
 
 const anthropic = new Anthropic({
     apiKey: config.anthropicApiKey
 });
 
 /**
- * Generate a response from Claude
+ * Generate a response - uses AI Router for smart model selection
+ * 
+ * @param {Object} options
+ * @param {string} options.systemPrompt - System prompt
+ * @param {Array} options.messages - Conversation history
+ * @param {Object} options.memory - User memory/context
+ * @param {string} options.model - Force specific model (optional)
+ * @param {string} options.userTier - User tier: 'free', 'pro', 'business', 'vip' (default: 'free')
+ * @param {boolean} options.useRouter - Use AI router for model selection (default: true)
  */
-async function generateResponse({ systemPrompt, messages, memory = {}, model = config.defaultModel }) {
+async function generateResponse({ 
+    systemPrompt, 
+    messages, 
+    memory = {}, 
+    model = null,
+    userTier = 'free',
+    useRouter = true 
+}) {
     // Build context from memory
     let memoryContext = '';
     if (Object.keys(memory).length > 0) {
@@ -19,11 +35,34 @@ async function generateResponse({ systemPrompt, messages, memory = {}, model = c
     }
 
     const fullSystemPrompt = systemPrompt + memoryContext;
+    
+    // Get the last user message for routing analysis
+    const lastMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
 
     try {
+        // Use AI Router for smart model selection
+        if (useRouter && !model) {
+            const routerResult = await aiRouter.route(lastMessage, messages.slice(0, -1), {
+                userTier,
+                systemPrompt: fullSystemPrompt
+            });
+            
+            console.log(`[AI Router] Model: ${routerResult.model} | Complexity: ${routerResult.routing.complexity} | Tier: ${userTier}`);
+            
+            return {
+                success: true,
+                content: routerResult.content,
+                usage: routerResult.usage,
+                routing: routerResult.routing,
+                model: routerResult.model,
+                provider: routerResult.provider
+            };
+        }
+        
+        // Fallback: Direct Claude call (legacy behavior)
         const response = await anthropic.messages.create({
-            model,
-            max_tokens: 500, // Limité pour des réponses courtes
+            model: model || config.defaultModel,
+            max_tokens: 500,
             system: fullSystemPrompt,
             messages: messages.map(m => ({
                 role: m.role === 'user' ? 'user' : 'assistant',
@@ -34,10 +73,40 @@ async function generateResponse({ systemPrompt, messages, memory = {}, model = c
         return {
             success: true,
             content: response.content[0].text,
-            usage: response.usage
+            usage: response.usage,
+            model: model || config.defaultModel,
+            provider: 'anthropic'
         };
     } catch (error) {
-        console.error('Claude API error:', error);
+        console.error('AI generation error:', error);
+        
+        // If router fails, try direct Claude as fallback
+        if (useRouter && !model) {
+            console.log('[AI Router] Fallback to direct Claude due to error');
+            try {
+                const fallbackResponse = await anthropic.messages.create({
+                    model: config.defaultModel,
+                    max_tokens: 500,
+                    system: fullSystemPrompt,
+                    messages: messages.map(m => ({
+                        role: m.role === 'user' ? 'user' : 'assistant',
+                        content: m.content
+                    }))
+                });
+                
+                return {
+                    success: true,
+                    content: fallbackResponse.content[0].text,
+                    usage: fallbackResponse.usage,
+                    model: config.defaultModel,
+                    provider: 'anthropic',
+                    fallback: true
+                };
+            } catch (fallbackError) {
+                console.error('Fallback Claude error:', fallbackError);
+            }
+        }
+        
         return {
             success: false,
             error: error.message

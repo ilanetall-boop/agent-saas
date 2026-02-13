@@ -19,6 +19,15 @@ async function runMigrations(pool) {
         // Migration 4: Create index if not exists (must be after column exists)
         await createIndexIfNotExists(pool, 'sessions', 'idx_sessions_last_rotated', 'last_rotated_at');
         
+        // Migration 5: Add tier column for pricing tiers (free/pro/business/vip)
+        await addColumnIfNotExists(pool, 'users', 'tier', "VARCHAR(20) DEFAULT 'free'");
+        
+        // Migration 6: Add messages_today for daily tracking (fair use policy)
+        await addColumnIfNotExists(pool, 'users', 'messages_today', 'INTEGER DEFAULT 0');
+        
+        // Migration 7: Add last_message_date for daily reset
+        await addColumnIfNotExists(pool, 'users', 'last_message_date', 'DATE');
+        
         console.log('✅ Migrations completed successfully');
     } catch (error) {
         console.error('❌ Migration error:', error);

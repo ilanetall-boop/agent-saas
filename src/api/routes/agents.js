@@ -127,7 +127,10 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name);
         }
         
-        // Generate response with smart error recovery
+        // Determine user tier for AI routing
+        const userTier = req.user.tier || 'free';
+        
+        // Generate response with smart error recovery and AI routing
         let response;
         let errorRecovery = null;
         let recoveryAttempt = 1;
@@ -136,7 +139,9 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             return generateResponse({
                 systemPrompt,
                 messages: [...history, { role: 'user', content: message }],
-                memory: memoryMap
+                memory: memoryMap,
+                userTier, // Pass tier for smart model selection
+                useRouter: true // Enable AI router
             });
         }
         
@@ -212,6 +217,13 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
                 messagesLimit: updatedUser.messages_limit,
                 remaining: Math.max(0, updatedUser.messages_limit - updatedUser.messages_used),
                 degraded: messagesUsedToday > config.softDegradationThreshold // Inform frontend
+            },
+            // AI routing info (for transparency)
+            ai: {
+                model: response.model || 'claude-3-5-haiku-20241022',
+                provider: response.provider || 'anthropic',
+                complexity: response.routing?.complexity || 'unknown',
+                tier: userTier
             }
         });
     } catch (error) {
