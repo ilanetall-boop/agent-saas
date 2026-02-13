@@ -198,7 +198,7 @@ function logout() {
     document.getElementById('chatContainer').style.display = 'none';
 }
 
-function addMessage(role, content) {
+function addMessage(role, content, aiInfo = null) {
     const messagesEl = document.getElementById('chatMessages');
     const msgEl = document.createElement('div');
     msgEl.className = `message ${role}`;
@@ -209,13 +209,48 @@ function addMessage(role, content) {
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
 
+    // Model indicator for assistant messages
+    let modelIndicator = '';
+    if (role === 'assistant' && aiInfo && aiInfo.model) {
+        const modelName = formatModelName(aiInfo.model);
+        const complexityEmoji = getComplexityEmoji(aiInfo.complexity);
+        modelIndicator = `<div class="model-indicator">${complexityEmoji} ${modelName}</div>`;
+    }
+
     msgEl.innerHTML = `
         <div class="avatar">${role === 'user' ? '👤' : '⚡'}</div>
-        <div class="bubble">${formatted}</div>
+        <div class="bubble-wrapper">
+            <div class="bubble">${formatted}</div>
+            ${modelIndicator}
+        </div>
     `;
     
     messagesEl.appendChild(msgEl);
     messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+// Format model name for display
+function formatModelName(model) {
+    const modelNames = {
+        'mistral-small-latest': 'Mistral',
+        'claude-3-5-haiku-20241022': 'Haiku',
+        'claude-3-5-sonnet-20241022': 'Sonnet',
+        'claude-opus-4-5': 'Opus',
+        'gpt-3.5-turbo': 'GPT-3.5',
+        'gpt-4-turbo-preview': 'GPT-4'
+    };
+    return modelNames[model] || model.split('-').slice(0, 2).join(' ');
+}
+
+// Get emoji for complexity level
+function getComplexityEmoji(complexity) {
+    const emojis = {
+        'simple': '💬',
+        'code': '💻',
+        'analysis': '📊',
+        'complex': '🧠'
+    };
+    return emojis[complexity] || '⚡';
 }
 
 function addTypingIndicator() {
@@ -273,7 +308,8 @@ async function sendMessage() {
 
         if (res.ok) {
             const data = await res.json();
-            addMessage('assistant', data.response);
+            // Pass AI routing info to show model used
+            addMessage('assistant', data.response, data.ai || null);
             
             // Show degradation warning if applicable
             if (data.usage && data.usage.degraded) {

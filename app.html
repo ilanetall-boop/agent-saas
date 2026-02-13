@@ -435,19 +435,21 @@
             color: white;
         }
         
+        /* Bubble wrapper for messages with model indicator */
+        .bubble-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
         /* Model indicator */
         .model-indicator {
             font-size: 11px;
             color: rgba(255,255,255,0.4);
-            margin-top: 4px;
+            margin-top: 6px;
             display: flex;
             align-items: center;
             gap: 4px;
-        }
-        
-        .model-indicator::before {
-            content: '⚡';
-            font-size: 10px;
+            padding-left: 4px;
         }
 
         /* Upgrade banner */
