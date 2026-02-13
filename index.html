@@ -1,14 +1,24 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Agent - Intelligence Artificielle Personnelle</title>
+    <title data-i18n="page_title">My Best Agent - Personal AI Intelligence</title>
+    <meta name="description" content="Your personal AI agent. Code, automate, decide and execute. Available everywhere, all the time.">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html[dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        html[dir="rtl"] * {
+            text-align: right;
         }
 
         body {
@@ -18,7 +28,6 @@
             line-height: 1.6;
         }
 
-        /* Neutral accent colors */
         :root {
             --primary: #2563eb;
             --primary-dark: #1e40af;
@@ -63,6 +72,7 @@
             display: flex;
             gap: 40px;
             list-style: none;
+            align-items: center;
         }
 
         nav a {
@@ -74,6 +84,20 @@
 
         nav a:hover {
             color: var(--primary);
+        }
+
+        .language-selector {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .language-selector:hover {
+            border-color: var(--primary);
         }
 
         /* Hero Section */
@@ -189,6 +213,10 @@
             justify-content: flex-end;
         }
 
+        html[dir="rtl"] .message.user {
+            justify-content: flex-start;
+        }
+
         .message-avatar {
             width: 40px;
             height: 40px;
@@ -260,7 +288,7 @@
             background: var(--primary-dark);
         }
 
-        /* How It Works */
+        /* Section Styles */
         .how-it-works {
             padding: 100px 20px;
             background: #fff;
@@ -368,70 +396,6 @@
             color: var(--text-light);
             font-size: 14px;
             line-height: 1.7;
-        }
-
-        /* Testimonials */
-        .testimonials {
-            padding: 100px 20px;
-            background: #fff;
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .testimonial-card {
-            background: var(--light-bg);
-            padding: 32px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .testimonial-content {
-            color: var(--text-dark);
-            margin-bottom: 24px;
-            font-size: 15px;
-            line-height: 1.8;
-            font-style: italic;
-        }
-
-        .testimonial-author {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .author-info h4 {
-            color: var(--text-dark);
-            margin-bottom: 4px;
-        }
-
-        .author-role {
-            color: var(--text-light);
-            font-size: 13px;
-        }
-
-        .rating {
-            color: #f59e0b;
-            font-size: 14px;
-            margin-bottom: 12px;
         }
 
         /* Pricing */
@@ -586,12 +550,26 @@
     <!-- Navigation -->
     <nav>
         <div class="container">
-            <a href="/" class="logo">Your Agent</a>
+            <a href="/" class="logo" data-i18n="brand_name">My Best Agent</a>
             <ul>
-                <li><a href="#how">Comment ça marche</a></li>
-                <li><a href="#features">Fonctionnalités</a></li>
-                <li><a href="#testimonials">Témoignages</a></li>
-                <li><a href="#pricing">Tarifs</a></li>
+                <li><a href="#how" data-i18n="nav_how">How it works</a></li>
+                <li><a href="#features" data-i18n="nav_features">Features</a></li>
+                <li><a href="#pricing" data-i18n="nav_pricing">Pricing</a></li>
+                <li>
+                    <select class="language-selector" id="languageSelector">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Português</option>
+                        <option value="zh">中文</option>
+                        <option value="ja">日本語</option>
+                        <option value="ru">Русский</option>
+                        <option value="ar">العربية</option>
+                        <option value="he">עברית</option>
+                    </select>
+                </li>
             </ul>
         </div>
     </nav>
@@ -599,36 +577,36 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>Votre <span class="highlight">agent IA personnel</span></h1>
-            <p>Un assistant intelligent qui travaille pour vous. Code, automatise, décide et exécute. Disponible partout, tout le temps.</p>
+            <h1><span data-i18n="hero_title_1">Your</span> <span class="highlight" data-i18n="hero_title_2">personal AI agent</span></h1>
+            <p data-i18n="hero_subtitle">An intelligent assistant that works for you. Code, automate, decide and execute. Available everywhere, all the time.</p>
 
             <div class="cta-buttons">
-                <a href="/app.html" class="btn btn-primary">Commencer gratuitement</a>
-                <button class="btn btn-secondary" onclick="scrollToSection('how')">Découvrir</button>
+                <a href="/app.html" class="btn btn-primary" data-i18n="btn_start_free">Start free</a>
+                <button class="btn btn-secondary" onclick="scrollToSection('how')" data-i18n="btn_discover">Discover</button>
             </div>
 
             <div class="demo-section">
                 <div class="demo-container">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message user">
-                            <div class="message-bubble">Crée une landing page pour mon coaching business</div>
-                            <div class="message-avatar">Vous</div>
+                            <div class="message-bubble" data-i18n="demo_msg_1">Create a landing page for my coaching business</div>
+                            <div class="message-avatar">You</div>
                         </div>
                         <div class="message">
-                            <div class="message-avatar">IA</div>
-                            <div class="message-bubble">Bien sûr. Vous préférez quel style ? Minimaliste, corporate, ou créatif ?</div>
+                            <div class="message-avatar">AI</div>
+                            <div class="message-bubble" data-i18n="demo_msg_2">Sure. What style do you prefer? Minimalist, corporate, or creative?</div>
                         </div>
                         <div class="message user">
-                            <div class="message-bubble">Minimaliste, noir et or</div>
-                            <div class="message-avatar">Vous</div>
+                            <div class="message-bubble" data-i18n="demo_msg_3">Minimalist, black and gold</div>
+                            <div class="message-avatar">You</div>
                         </div>
                         <div class="message">
-                            <div class="message-avatar">IA</div>
-                            <div class="message-bubble">Parfait. Je code ça en 5 minutes. Je mets aussi un formulaire de contact ?</div>
+                            <div class="message-avatar">AI</div>
+                            <div class="message-bubble" data-i18n="demo_msg_4">Perfect. I'll code that in 5 minutes. Should I add a contact form?</div>
                         </div>
                     </div>
                     <div class="chat-input">
-                        <input type="text" placeholder="Parlez à votre agent..." id="userInput" onkeypress="handleDemo(event)">
+                        <input type="text" placeholder="Talk to your agent..." id="userInput" data-i18n="chat_placeholder" onkeypress="handleDemo(event)">
                         <button onclick="handleDemo()">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                 <path d="M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 L4.13399899,1.16346273 C3.34915502,0.9 2.40734225,1.00636533 1.77946707,1.4776575 C0.994623095,2.10604706 0.837654326,3.0486314 1.15159189,3.99701575 L3.03521743,10.4379088 C3.03521743,10.5950061 3.34915502,10.7521035 3.50612381,10.7521035 L16.6915026,11.5375905 C16.6915026,11.5375905 17.1624089,11.5375905 17.1624089,12.0088826 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"/>
@@ -643,184 +621,78 @@
     <!-- How It Works -->
     <section class="how-it-works" id="how">
         <div class="container">
-            <h2 class="section-title">Comment ça marche</h2>
-            <p class="section-subtitle">Quatre étapes simples pour avoir votre propre agent IA</p>
+            <h2 class="section-title" data-i18n="section_how_title">How it works</h2>
+            <p class="section-subtitle" data-i18n="section_how_subtitle">Four simple steps to have your own AI agent</p>
 
             <div class="steps-grid">
                 <div class="step">
                     <div class="step-number">1</div>
-                    <h3>Créez votre agent</h3>
-                    <p>Inscrivez-vous en quelques secondes. Nommez votre agent et choisissez ses capacités. Aucun code requis.</p>
+                    <h3 data-i18n="step_1_title">Create your agent</h3>
+                    <p data-i18n="step_1_desc">Sign up in seconds. Name your agent and choose its capabilities. No code required.</p>
                 </div>
 
                 <div class="step">
                     <div class="step-number">2</div>
-                    <h3>Connectez vos outils</h3>
-                    <p>Reliez Telegram, WhatsApp, email ou d'autres services. Votre agent saura où vous trouver et comment agir.</p>
+                    <h3 data-i18n="step_2_title">Connect your tools</h3>
+                    <p data-i18n="step_2_desc">Link Telegram, WhatsApp, email or other services. Your agent will know where to find you and how to act.</p>
                 </div>
 
                 <div class="step">
                     <div class="step-number">3</div>
-                    <h3>Donnez vos ordres</h3>
-                    <p>Envoyez des messages simples. "Crée une landing page", "Envoie cet email", "Analyse ce fichier". L'agent comprend et agit.</p>
+                    <h3 data-i18n="step_3_title">Give orders</h3>
+                    <p data-i18n="step_3_desc">Send simple messages. "Create a landing page", "Send this email", "Analyze this file". The agent understands and acts.</p>
                 </div>
 
                 <div class="step">
                     <div class="step-number">4</div>
-                    <h3>Laissez-le travailler</h3>
-                    <p>Votre agent apprend votre contexte, vos préférences, votre style. Il devient plus efficace chaque jour.</p>
+                    <h3 data-i18n="step_4_title">Let it work</h3>
+                    <p data-i18n="step_4_desc">Your agent learns your context, your preferences, your style. It becomes more efficient every day.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Features -->
-    <section class="features">
+    <section class="features" id="features">
         <div class="container">
-            <h2 class="section-title">Puissant et fiable</h2>
-            <p class="section-subtitle">Tout ce dont vous avez besoin pour déléguer intelligemment</p>
+            <h2 class="section-title" data-i18n="section_features_title">Powerful and reliable</h2>
+            <p class="section-subtitle" data-i18n="section_features_subtitle">Everything you need to delegate intelligently</p>
 
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 2C9 1.44772 9.44772 1 10 1H14C14.5523 1 15 1.44772 15 2V3H19C20.6569 3 22 4.34315 22 6V20C22 21.6569 20.6569 23 19 23H5C3.34315 23 2 21.6569 2 20V6C2 4.34315 3.34315 3 5 3H9V2ZM9 5H5C4.44772 5 4 5.44772 4 6V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V6C20 5.44772 19.5523 5 19 5H15V6C15 6.55228 14.5523 7 14 7H10C9.44772 7 9 6.55228 9 6V5ZM9 10H15V12H9V10ZM9 14H15V16H9V14Z"/>
-                        </svg>
-                    </div>
-                    <h3>Automatise vos tâches</h3>
-                    <p>Économisez des heures chaque semaine en automatisant vos tâches répétitives. Votre agent gère le travail sans intervention.</p>
+                    <div class="feature-icon">🤖</div>
+                    <h3 data-i18n="feature_fullstack_title">Full-stack automation</h3>
+                    <p data-i18n="feature_fullstack_desc">Code, deploy, scrape, automate. Your agent creates real projects, not just text.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                        </svg>
-                    </div>
-                    <h3>Comprend votre contexte</h3>
-                    <p>Votre agent mémorise vos préférences, votre style, votre historique. Plus il vous connaît, plus il est utile.</p>
+                    <div class="feature-icon">🧠</div>
+                    <h3 data-i18n="feature_context_title">Understands your context</h3>
+                    <p data-i18n="feature_context_desc">Your agent remembers your preferences, your style, your history. The more it knows you, the more useful it is.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                    <h3>Exécute vraiment</h3>
-                    <p>Pas juste du texte. Votre agent crée, envoie, publie, télécharge. Il fait vraiment le travail.</p>
+                    <div class="feature-icon">✅</div>
+                    <h3 data-i18n="feature_execute_title">Executes really</h3>
+                    <p data-i18n="feature_execute_desc">Not just text. Your agent creates, sends, publishes, downloads. It really does the work.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 1C6.48 1 2 5.48 2 11s4.48 10 10 10 10-4.48 10-10S17.52 1 12 1zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                        </svg>
-                    </div>
-                    <h3>Toujours disponible</h3>
-                    <p>24/7 sur Telegram, WhatsApp, email ou votre app. Votre agent ne dort jamais et répond toujours au premier appel.</p>
+                    <div class="feature-icon">🔗</div>
+                    <h3 data-i18n="feature_everywhere_title">Available everywhere</h3>
+                    <p data-i18n="feature_everywhere_desc">24/7 on Telegram, WhatsApp, email or your app. Your agent never sleeps and always responds first call.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                        </svg>
-                    </div>
-                    <h3>Sécurisé et privé</h3>
-                    <p>Vos données restent confidentielles. Chiffrement de bout en bout. Aucun partage tiers. Suppression à tout moment.</p>
+                    <div class="feature-icon">🔐</div>
+                    <h3 data-i18n="feature_secure_title">Secure and private</h3>
+                    <p data-i18n="feature_secure_desc">Your data stays confidential. End-to-end encryption. No third-party sharing. Delete anytime.</p>
                 </div>
 
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
-                        </svg>
-                    </div>
-                    <h3>Améliorations continues</h3>
-                    <p>Nouvelles fonctionnalités chaque mois. Votre agent devient plus puissant, plus intelligents, plus capable.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="testimonials" id="testimonials">
-        <div class="container">
-            <h2 class="section-title">Ce que disent nos utilisateurs</h2>
-            <p class="section-subtitle">Des entrepreneurs et professionnels qui ont transformé leur productivité</p>
-
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="rating">★★★★★</div>
-                    <p class="testimonial-content">"J'ai gagné 15 heures par semaine. Mon agent gère mes emails, crée mes contenus, trie les leads. C'est comme avoir un assistant personnel qui ne coûte rien et ne dort jamais."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">MR</div>
-                        <div class="author-info">
-                            <h4>Marie Robert</h4>
-                            <p class="author-role">Fondatrice, agence digitale</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <div class="rating">★★★★★</div>
-                    <p class="testimonial-content">"Avant, les tâches administratives me prenaient 30% de mon temps. Maintenant mon agent les gère. Je peux me concentrer sur la vraie valeur, sur la stratégie."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">LD</div>
-                        <div class="author-info">
-                            <h4>Lucas Dupont</h4>
-                            <p class="author-role">Consultant, startup coach</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <div class="rating">★★★★★</div>
-                    <p class="testimonial-content">"Les templates prédéfinis m'ont économisé des jours de développement. L'agent crée du code de qualité production. On peut vraiment compter dessus."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">TP</div>
-                        <div class="author-info">
-                            <h4>Thomas Prost</h4>
-                            <p class="author-role">Tech lead, scale-up SaaS</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <div class="rating">★★★★★</div>
-                    <p class="testimonial-content">"Interface simple, pas besoin de configuration complexe. J'ai commencé aujourd'hui, mon agent me rapporte déjà du temps demain. Ça marche vraiment."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">SB</div>
-                        <div class="author-info">
-                            <h4>Sophie Blanc</h4>
-                            <p class="author-role">Freelance créative</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <div class="rating">★★★★★</div>
-                    <p class="testimonial-content">"J'étais sceptique au début, mais voir mon agent apprendre mes habitudes et anticiper mes besoins... C'est magique. Ça change vraiment le jeu."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">JM</div>
-                        <div class="author-info">
-                            <h4>Jean Martin</h4>
-                            <p class="author-role">Manager commercial</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <div class="rating">★★★★★</div>
-                    <p class="testimonial-content">"Le support client est réactif. Ils m'ont aidé à configurer des automatisations personnalisées. C'est un vrai partenaire, pas juste un logiciel."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">VC</div>
-                        <div class="author-info">
-                            <h4>Valérie Cerf</h4>
-                            <p class="author-role">Propriétaire, agence marketing</p>
-                        </div>
-                    </div>
+                    <div class="feature-icon">🚀</div>
+                    <h3 data-i18n="feature_improve_title">Continuous improvement</h3>
+                    <p data-i18n="feature_improve_desc">New features every month. Your agent becomes more powerful, smarter, more capable.</p>
                 </div>
             </div>
         </div>
@@ -829,49 +701,36 @@
     <!-- Pricing -->
     <section class="pricing" id="pricing">
         <div class="container">
-            <h2 class="section-title">Tarifs simples et transparents</h2>
-            <p class="section-subtitle">Commencez gratuitement. Montez en version selon vos besoins.</p>
+            <h2 class="section-title" data-i18n="section_pricing_title">Free during Phase 1</h2>
+            <p class="section-subtitle" data-i18n="section_pricing_subtitle">Unlimited messages, zero charges. We're building community.</p>
 
             <div class="pricing-grid">
-                <div class="price-card">
-                    <h3>Gratuit</h3>
-                    <div class="price-amount">0€</div>
-                    <div class="price-period">Pour toujours</div>
-                    <ul class="price-features">
-                        <li>50 interactions par mois</li>
-                        <li>Rappels et recherche web</li>
-                        <li>Un seul canal (Telegram)</li>
-                        <li>Support email</li>
-                    </ul>
-                    <a href="/app.html" class="btn btn-secondary">Commencer</a>
-                </div>
-
                 <div class="price-card featured">
-                    <h3>Personnel</h3>
-                    <div class="price-amount">29€</div>
-                    <div class="price-period">par mois</div>
+                    <h3 data-i18n="pricing_phase1_title">Phase 1 (Free)</h3>
+                    <div class="price-amount">$0</div>
+                    <div class="price-period" data-i18n="pricing_phase1_period">Forever</div>
                     <ul class="price-features">
-                        <li>2 000 interactions par mois</li>
-                        <li>Toutes les automatisations</li>
-                        <li>Mémoire illimitée</li>
-                        <li>Multi-canal (Telegram, WhatsApp, Email)</li>
-                        <li>Support prioritaire</li>
+                        <li data-i18n="pricing_feature_unlimited">✓ Unlimited messages</li>
+                        <li data-i18n="pricing_feature_fullstack">✓ Full-stack automation</li>
+                        <li data-i18n="pricing_feature_memory">✓ Unlimited memory</li>
+                        <li data-i18n="pricing_feature_multichannel">✓ Multi-channel (Telegram, WhatsApp, Email)</li>
+                        <li data-i18n="pricing_feature_support">✓ Community support</li>
                     </ul>
-                    <a href="/app.html" class="btn btn-primary">Commencer maintenant</a>
+                    <a href="/app.html" class="btn btn-primary" data-i18n="btn_start_now">Start now</a>
                 </div>
 
                 <div class="price-card">
-                    <h3>Professionnel</h3>
-                    <div class="price-amount">99€</div>
-                    <div class="price-period">par mois</div>
+                    <h3 data-i18n="pricing_phase2_title">Phase 2 (Coming)</h3>
+                    <div class="price-amount">€29<span style="font-size: 1.2rem;">/mo</span></div>
+                    <div class="price-period" data-i18n="pricing_phase2_period">Professional</div>
                     <ul class="price-features">
-                        <li>10 000 interactions par mois</li>
-                        <li>Exécution de code personnalisé</li>
-                        <li>Intégrations API illimitées</li>
-                        <li>Assistants multiples</li>
-                        <li>Support 24/7</li>
+                        <li data-i18n="pricing_feature_p2_desktop">✓ Desktop app (Windows, Mac, Linux)</li>
+                        <li data-i18n="pricing_feature_p2_mobile">✓ Mobile sync (iOS, Android)</li>
+                        <li data-i18n="pricing_feature_p2_cloud">✓ Cloud backup</li>
+                        <li data-i18n="pricing_feature_p2_multiag">✓ Multiple agents</li>
+                        <li data-i18n="pricing_feature_p2_priority">✓ Priority support</li>
                     </ul>
-                    <a href="/app.html" class="btn btn-secondary">Commencer</a>
+                    <a href="#" class="btn btn-secondary" data-i18n="btn_coming_soon">Coming soon</a>
                 </div>
             </div>
         </div>
@@ -882,53 +741,129 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>Produit</h4>
+                    <h4 data-i18n="footer_product">Product</h4>
                     <ul>
-                        <li><a href="#features">Fonctionnalités</a></li>
-                        <li><a href="#pricing">Tarifs</a></li>
-                        <li><a href="#how">Comment ça marche</a></li>
-                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#features" data-i18n="footer_features">Features</a></li>
+                        <li><a href="#pricing" data-i18n="footer_pricing">Pricing</a></li>
+                        <li><a href="#how" data-i18n="footer_how">How it works</a></li>
+                        <li><a href="#" data-i18n="footer_docs">Documentation</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-section">
-                    <h4>Entreprise</h4>
+                    <h4 data-i18n="footer_company">Company</h4>
                     <ul>
-                        <li><a href="#">À propos</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Carrières</a></li>
-                        <li><a href="#">Presse</a></li>
+                        <li><a href="#" data-i18n="footer_about">About</a></li>
+                        <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+                        <li><a href="#" data-i18n="footer_careers">Careers</a></li>
+                        <li><a href="#" data-i18n="footer_press">Press</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-section">
-                    <h4>Ressources</h4>
+                    <h4 data-i18n="footer_resources">Resources</h4>
                     <ul>
-                        <li><a href="#">Guide de démarrage</a></li>
-                        <li><a href="#">Tutoriels vidéo</a></li>
-                        <li><a href="#">API Docs</a></li>
-                        <li><a href="#">Communauté</a></li>
+                        <li><a href="#" data-i18n="footer_guide">Getting started</a></li>
+                        <li><a href="#" data-i18n="footer_tutorials">Video tutorials</a></li>
+                        <li><a href="#" data-i18n="footer_api">API Docs</a></li>
+                        <li><a href="#" data-i18n="footer_community">Community</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-section">
-                    <h4>Légal & Support</h4>
+                    <h4 data-i18n="footer_legal">Legal & Support</h4>
                     <ul>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Conditions d'utilisation</a></li>
-                        <li><a href="#">Politique de confidentialité</a></li>
-                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#" data-i18n="footer_contact">Contact</a></li>
+                        <li><a href="#" data-i18n="footer_terms">Terms of use</a></li>
+                        <li><a href="#" data-i18n="footer_privacy">Privacy policy</a></li>
+                        <li><a href="#" data-i18n="footer_legal_notice">Legal notice</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>© 2026 Your Agent. Tous droits réservés. Votre agent personnel IA, toujours actif.</p>
+                <p data-i18n="footer_copyright">© 2026 My Best Agent. All rights reserved. Your personal AI agent, always active.</p>
             </div>
         </div>
     </footer>
 
-    <!-- External script to avoid CSP inline script violation -->
-    <script src="index.js"></script>
+    <!-- i18n Initialization -->
+    <script>
+        // Language data - will be loaded from JSON files
+        let i18nData = {};
+
+        // Current language
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        // RTL languages
+        const rtlLanguages = ['ar', 'he'];
+
+        // Initialize
+        async function initI18n() {
+            // Load language file
+            try {
+                const response = await fetch(`/i18n/${currentLanguage}.json`);
+                i18nData = await response.json();
+                applyTranslations();
+                updateLanguageSelector();
+                setDocumentLanguage();
+            } catch (error) {
+                console.error('Failed to load language:', error);
+                // Fallback to English
+                currentLanguage = 'en';
+                const response = await fetch(`/i18n/en.json`);
+                i18nData = await response.json();
+                applyTranslations();
+            }
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18nData[key]) {
+                    el.textContent = i18nData[key];
+                }
+            });
+        }
+
+        function updateLanguageSelector() {
+            const selector = document.getElementById('languageSelector');
+            if (selector) {
+                selector.value = currentLanguage;
+            }
+        }
+
+        function setDocumentLanguage() {
+            document.documentElement.lang = currentLanguage;
+            document.documentElement.dir = rtlLanguages.includes(currentLanguage) ? 'rtl' : 'ltr';
+        }
+
+        // Language selector change
+        document.addEventListener('DOMContentLoaded', () => {
+            initI18n();
+            
+            const selector = document.getElementById('languageSelector');
+            if (selector) {
+                selector.addEventListener('change', (e) => {
+                    currentLanguage = e.target.value;
+                    localStorage.setItem('language', currentLanguage);
+                    window.location.reload();
+                });
+            }
+        });
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleDemo() {
+            // Demo handler
+            const input = document.getElementById('userInput');
+            if (input && input.value.trim()) {
+                console.log('Demo message:', input.value);
+                input.value = '';
+            }
+        }
+    </script>
 </body>
 </html>
