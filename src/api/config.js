@@ -7,7 +7,7 @@ module.exports = {
     
     // Anthropic
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-    defaultModel: 'claude-3-5-haiku-20241022', // Cheapest: ~$0.0008 per 1M tokens
+    defaultModel: 'claude-opus-4-5', // Upgraded to Opus 4.5 for better capabilities
     
     // Phase 1: Soft degradation thresholds
     softDegradationThreshold: 100, // After 100 messages/day

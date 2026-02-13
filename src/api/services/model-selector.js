@@ -11,21 +11,21 @@ const { generateImageWithStableDiffusion } = require('./stable-diffusion');
 
 // Stratégie de sélection
 const MODEL_STRATEGY = {
-    // Écriture de texte simple (pas cher)
-    'email': { model: 'haiku', provider: 'claude' },
-    'summarize': { model: 'haiku', provider: 'claude' },
-    'translate': { model: 'mistral', provider: 'mistral' }, // Mistral = moins cher
-    'simple_analysis': { model: 'haiku', provider: 'claude' },
+    // Écriture de texte simple → Opus (meilleur)
+    'email': { model: 'claude-opus-4-5', provider: 'claude' },
+    'summarize': { model: 'claude-opus-4-5', provider: 'claude' },
+    'translate': { model: 'mistral', provider: 'mistral' }, // Mistral pour traduction rapide
+    'simple_analysis': { model: 'claude-opus-4-5', provider: 'claude' },
     
-    // Écriture de code (smart)
-    'code_generation': { model: 'sonnet', provider: 'claude' },
-    'code_review': { model: 'sonnet', provider: 'claude' },
-    'refactor': { model: 'sonnet', provider: 'claude' },
+    // Écriture de code (Opus excellent)
+    'code_generation': { model: 'claude-opus-4-5', provider: 'claude' },
+    'code_review': { model: 'claude-opus-4-5', provider: 'claude' },
+    'refactor': { model: 'claude-opus-4-5', provider: 'claude' },
     
     // Analyse longue (documents, recherche)
-    'long_analysis': { model: 'gemini', provider: 'gemini' }, // Gemini bon pour contexte long
-    'document_analysis': { model: 'gemini', provider: 'gemini' },
-    'research': { model: 'claude', provider: 'claude' },
+    'long_analysis': { model: 'claude-opus-4-5', provider: 'claude' },
+    'document_analysis': { model: 'claude-opus-4-5', provider: 'claude' },
+    'research': { model: 'claude-opus-4-5', provider: 'claude' },
     
     // Génération d'images
     'image_generation': { model: 'dall-e-3', provider: 'openai' }, // Best quality
@@ -37,7 +37,7 @@ const MODEL_STRATEGY = {
     'tts': { model: 'elevenlabs', provider: 'elevenlabs' }, // Most human-like
     
     // Default
-    'default': { model: 'haiku', provider: 'claude' }
+    'default': { model: 'claude-opus-4-5', provider: 'claude' }
 };
 
 async function selectAndGenerate(taskType, prompt, context = {}) {
@@ -68,7 +68,7 @@ async function selectAndGenerate(taskType, prompt, context = {}) {
             
             default:
                 console.warn(`⚠️ Provider inconnu: ${strategy.provider}`);
-                return await generateWithClaude(prompt, context, 'haiku');
+                return await generateWithClaude(prompt, context, 'claude-opus-4-5');
         }
     } catch (error) {
         console.error(`❌ Erreur sélection modèle:`, error);
