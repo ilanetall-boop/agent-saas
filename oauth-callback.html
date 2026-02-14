@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authenticating... - My Best Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <h1 id="title">Authenticating...</h1>
+        <p id="message">Please wait while we complete your login.</p>
+        
+        <div class="error" id="error"></div>
+        
+        <button class="button" id="retryButton" onclick="window.location.href='/'">Back to Login</button>
+    </div>
+
+    <script>
+        async function handleOAuthCallback() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            const error = params.get('error');
+            const provider = window.location.pathname.split('/')[1]; // oauth_google or oauth_github
+            
+            // Determine provider
+            let oauthProvider = 'google';
+            if (provider.includes('github') || window.location.search.includes('github')) {
+                oauthProvider = 'github';
+            }
+            
+            if (error) {
+                showError(`${oauthProvider} login cancelled or denied.`);
+                return;
+            }
+            
+            if (!code) {
+                showError('No authentication code received. Please try again.');
+                return;
+            }
+            
+            try {
+                // Exchange code for JWT token
+                const endpoint = `/api/oauth/${oauthProvider}/callback`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.accessToken) {
+                    // Save token and redirect to dashboard
+                    localStorage.setItem('accessToken', data.accessToken);
+                    if (data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                    }
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/app.html';
+                    }, 500);
+                } else {
+                    showError(data.error || 'Authentication failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('OAuth callback error:', error);
+                showError('Connection error. Please check your internet and try again.');
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('title').textContent = 'Authentication Failed';
+            document.getElementById('message').textContent = 'An error occurred during login.';
+            
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            
+            document.getElementById('retryButton').style.display = 'block';
+        }
+        
+        // Handle callback when page loads
+        window.addEventListener('load', handleOAuthCallback);
+    </script>
+</body>
+</html>
