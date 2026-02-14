@@ -1748,18 +1748,9 @@
         });
     </script>
 
+    <!-- i18n Script (external to comply with CSP) - MUST LOAD FIRST -->
+    <script src="/app-i18n.js"></script>
     <!-- Auth Modal Functions (external to comply with CSP) -->
     <script src="/auth-modal.js"></script>
-    <!-- i18n Script (external to comply with CSP) -->
-    <script src="/app-i18n.js"></script>
-    <!-- Language switcher event listener -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const langSelector = document.getElementById('langSelector');
-            if (langSelector && typeof switchLanguage !== 'undefined') {
-                langSelector.addEventListener('change', (e) => switchLanguage(e.target.value));
-            }
-        });
-    </script>
 </body>
 </html>

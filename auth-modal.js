@@ -5,6 +5,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
     
+    // Language Switcher
+    const langSelector = document.getElementById('langSelector');
+    if (langSelector && typeof switchLanguage !== 'undefined') {
+        langSelector.addEventListener('change', (e) => {
+            switchLanguage(e.target.value);
+        });
+    }
+    
+    // "Start free" buttons - Show signup modal
+    document.querySelectorAll('#topStartBtn, #heroStartBtn, .startBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegister();
+        });
+    });
+    
     // Show/hide auth modal
     window.showLogin = function() {
         if (loginForm) {
