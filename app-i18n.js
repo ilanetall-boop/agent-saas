@@ -15,7 +15,9 @@ class i18n {
     
     detectBrowserLanguage() {
         // Try to detect from browser language
-        const browserLang = navigator.language || navigator.userLanguage;
+        const browserLang = navigator.language || navigator.userLanguage || 'en';
+        if (!browserLang) return 'en';
+        
         const baseLang = browserLang.split('-')[0];
         
         if (this.supportedLanguages.includes(baseLang)) {

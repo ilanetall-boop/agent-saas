@@ -21,6 +21,49 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Form submissions
+    const loginFormEl = document.getElementById('loginFormElement');
+    if (loginFormEl) {
+        loginFormEl.addEventListener('submit', handleLogin);
+    }
+    
+    const signupFormEl = document.getElementById('signupFormElement');
+    if (signupFormEl) {
+        signupFormEl.addEventListener('submit', handleSignup);
+    }
+    
+    // OAuth buttons
+    const loginGoogleBtn = document.getElementById('loginGoogleBtn');
+    if (loginGoogleBtn) {
+        loginGoogleBtn.addEventListener('click', loginWithGoogle);
+    }
+    
+    const loginGitHubBtn = document.getElementById('loginGitHubBtn');
+    if (loginGitHubBtn) {
+        loginGitHubBtn.addEventListener('click', loginWithGitHub);
+    }
+    
+    const signupGoogleBtn = document.getElementById('signupGoogleBtn');
+    if (signupGoogleBtn) {
+        signupGoogleBtn.addEventListener('click', loginWithGoogle);
+    }
+    
+    const signupGitHubBtn = document.getElementById('signupGitHubBtn');
+    if (signupGitHubBtn) {
+        signupGitHubBtn.addEventListener('click', loginWithGitHub);
+    }
+    
+    // Modal switches
+    const switchToSignupLink = document.getElementById('switchToSignupLink');
+    if (switchToSignupLink) {
+        switchToSignupLink.addEventListener('click', switchToSignup);
+    }
+    
+    const switchToLoginLink = document.getElementById('switchToLoginLink');
+    if (switchToLoginLink) {
+        switchToLoginLink.addEventListener('click', switchToLogin);
+    }
+    
     // Show/hide auth modal
     window.showLogin = function() {
         if (loginForm) {
@@ -59,13 +102,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ email, password })
             });
             
+            const data = await response.json();
             if (response.ok) {
-                const data = await response.json();
                 localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
                 window.location.href = '/app.html';
             } else {
-                const error = await response.json();
-                alert('Erreur: ' + (error.error || 'Connexion échouée'));
+                alert('Erreur: ' + (data.error || 'Connexion échouée'));
             }
         } catch (error) {
             alert('Erreur réseau: ' + error.message);
@@ -85,12 +128,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ name, email, password })
             });
             
+            const data = await response.json();
             if (response.ok) {
-                alert('Compte créé! Vérifiez votre email.');
-                showLogin();
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                window.location.href = '/app.html';
             } else {
-                const error = await response.json();
-                alert('Erreur: ' + (error.error || 'Création de compte échouée'));
+                alert('Erreur: ' + (data.error || 'Création de compte échouée'));
             }
         } catch (error) {
             alert('Erreur réseau: ' + error.message);
@@ -98,19 +142,35 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // OAuth handlers
-    window.loginWithGoogle = function() {
-        window.location.href = '/api/oauth/google/auth';
+    window.loginWithGoogle = async function() {
+        try {
+            const response = await fetch('/api/oauth/google/auth');
+            const data = await response.json();
+            if (data.url) {
+                window.location.href = data.url;
+            }
+        } catch (error) {
+            alert('Erreur: ' + (error.message || 'Google login échoué'));
+        }
     };
     
     window.signupWithGoogle = function() {
-        window.location.href = '/api/oauth/google/auth';
+        loginWithGoogle();
     };
     
-    window.loginWithGitHub = function() {
-        window.location.href = '/api/oauth/github/auth';
+    window.loginWithGitHub = async function() {
+        try {
+            const response = await fetch('/api/oauth/github/auth');
+            const data = await response.json();
+            if (data.url) {
+                window.location.href = data.url;
+            }
+        } catch (error) {
+            alert('Erreur: ' + (error.message || 'GitHub login échoué'));
+        }
     };
     
     window.signupWithGitHub = function() {
-        window.location.href = '/api/oauth/github/auth';
+        loginWithGitHub();
     };
 });
