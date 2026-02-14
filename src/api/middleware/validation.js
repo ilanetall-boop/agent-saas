@@ -67,6 +67,12 @@ const schemas = {
         'string.min': 'Message non vide requis',
         'string.max': 'Message maximum 10000 caractères',
         'any.required': 'Message requis'
+      }),
+    language: Joi.string()
+      .valid('en', 'fr', 'es', 'de', 'it', 'pt', 'zh', 'ja', 'ru', 'ar', 'he')
+      .optional()
+      .messages({
+        'any.only': 'Langue invalide'
       })
   }).unknown(false),
 
