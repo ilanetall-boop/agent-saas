@@ -6,6 +6,7 @@ const { generateDualTokens, refreshAccessToken, authMiddleware } = require('../m
 const { validateRequest, schemas } = require('../middleware/validation');
 const { log: auditLog } = require('../services/audit-log');
 const { verifyRefreshToken, shouldRotate, rotateToken, getRotationStatus } = require('../services/jwt-rotation');
+const { sendVerificationEmail, sendWelcomeEmail } = require('../services/email');
 
 const router = express.Router();
 
@@ -38,13 +39,19 @@ router.post('/register', validateRequest(schemas.register), async (req, res) => 
         const agentId = nanoid();
         await db.createAgent(agentId, userId, 'Mon Agent');
         
+        // Generate verification token and send verification email
+        const verificationToken = nanoid(32);
+        await db.setEmailVerificationToken(userId, verificationToken);
+        const emailResult = await sendVerificationEmail(email.toLowerCase(), verificationToken);
+        
         // Log registration
         auditLog({
             type: 'user_registered',
             userId,
             email: email.toLowerCase(),
             ipAddress: req.ip,
-            userAgent: req.get('user-agent')
+            userAgent: req.get('user-agent'),
+            emailSent: emailResult.success
         });
         
         // Generate dual tokens (access + refresh)
@@ -68,12 +75,16 @@ router.post('/register', validateRequest(schemas.register), async (req, res) => 
                 id: userId,
                 email,
                 name,
-                plan: 'free'
+                plan: 'free',
+                emailVerified: false
             },
             agent: {
                 id: agentId,
                 name: 'Mon Agent'
-            }
+            },
+            message: emailResult.success 
+                ? 'Account created. Verification email sent.' 
+                : 'Account created. Check your email to verify your address.'
         });
     } catch (error) {
         console.error('Register error:', error);
@@ -340,17 +351,28 @@ router.post('/send-verification', authMiddleware, async (req, res) => {
         const verificationToken = nanoid(32);
         await db.setEmailVerificationToken(req.user.id, verificationToken);
         
-        // TODO: Send email with verification link
-        // For now, return token for testing
-        const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify?token=${verificationToken}`;
+        // Send verification email
+        const emailResult = await sendVerificationEmail(user.email, verificationToken);
         
-        console.log(`[EMAIL] Verification link for ${user.email}: ${verificationLink}`);
+        if (!emailResult.success) {
+            console.error(`[EMAIL] Failed to send verification email to ${user.email}:`, emailResult.error);
+            // Don't fail the request, just notify that email couldn't be sent
+            return res.status(500).json({ 
+                error: 'Failed to send verification email',
+                message: 'Please check your email configuration'
+            });
+        }
+        
+        auditLog({
+            type: 'verification_email_sent',
+            userId: req.user.id,
+            email: user.email,
+            ipAddress: req.ip
+        });
         
         res.json({
             success: true,
-            message: 'Verification email sent',
-            // For testing only - remove in production
-            testLink: verificationLink
+            message: 'Verification email sent successfully'
         });
     } catch (error) {
         console.error('Send verification error:', error);
@@ -380,16 +402,27 @@ router.post('/resend-verification', async (req, res) => {
         const verificationToken = nanoid(32);
         await db.setEmailVerificationToken(user.id, verificationToken);
         
-        // TODO: Send email with verification link
-        const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify?token=${verificationToken}`;
+        // Send verification email
+        const emailResult = await sendVerificationEmail(user.email, verificationToken);
         
-        console.log(`[EMAIL] Verification link for ${user.email}: ${verificationLink}`);
+        if (!emailResult.success) {
+            console.error(`[EMAIL] Failed to resend verification email to ${user.email}:`, emailResult.error);
+            return res.status(500).json({ 
+                error: 'Failed to send verification email',
+                message: 'Please check your email configuration'
+            });
+        }
+        
+        auditLog({
+            type: 'verification_email_resent',
+            userId: user.id,
+            email: user.email,
+            ipAddress: req.ip
+        });
         
         res.json({
             success: true,
-            message: 'Verification email sent',
-            // For testing only - remove in production
-            testLink: verificationLink
+            message: 'Verification email sent successfully'
         });
     } catch (error) {
         console.error('Resend verification error:', error);
