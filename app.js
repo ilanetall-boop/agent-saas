@@ -1,7 +1,7 @@
 // MyBestAgent App - External script (avoids CSP inline script violation)
 
 const API_URL = window.location.origin + '/api';
-let token = localStorage.getItem('token');
+let token = localStorage.getItem('accessToken') || localStorage.getItem('token'); // Support both names for backward compatibility
 let user = null;
 let agent = null;
 
@@ -10,25 +10,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check auth on load
     if (token) {
         checkAuth();
+    } else {
+        // No token, show login
+        window.location.href = '/index.html';
     }
 });
 
 async function checkAuth() {
     try {
-        const res = await fetch(`${API_URL}/auth/me`, {
+        const res = await fetch(`${API_URL}/auth/verify-token`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
             const data = await res.json();
             user = data.user;
+            document.getElementById('userInfo').textContent = user.name || user.email;
             await loadAgent();
             showChat();
         } else {
+            localStorage.removeItem('accessToken');
             localStorage.removeItem('token');
             token = null;
+            window.location.href = '/index.html';
         }
     } catch (e) {
         console.error('Auth check failed:', e);
+        window.location.href = '/index.html';
     }
 }
 
@@ -131,7 +138,8 @@ async function login() {
         if (res.ok) {
             token = data.accessToken || data.token;
             user = data.user;
-            localStorage.setItem('token', token);
+            localStorage.setItem('accessToken', token);
+            localStorage.setItem('token', token); // Backward compatibility
             await loadAgent();
             showChat();
         } else {
@@ -168,7 +176,8 @@ async function register() {
             token = data.accessToken || data.token;
             user = data.user;
             agent = data.agent;
-            localStorage.setItem('token', token);
+            localStorage.setItem('accessToken', token);
+            localStorage.setItem('token', token); // Backward compatibility
             
             // Show verification modal
             showVerificationModal(email);
@@ -190,12 +199,14 @@ async function register() {
 
 function logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
     token = null;
     user = null;
     agent = null;
     document.getElementById('chatMessages').innerHTML = '';
     document.getElementById('authContainer').style.display = 'flex';
     document.getElementById('chatContainer').style.display = 'none';
+    window.location.href = '/index.html';
 }
 
 function addMessage(role, content, aiInfo = null) {
