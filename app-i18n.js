@@ -9,8 +9,10 @@ class i18n {
         
         // Validate language
         if (!this.supportedLanguages.includes(this.currentLanguage)) {
+            console.warn('⚠️ i18n: Invalid language in localStorage:', this.currentLanguage, '→ fallback to en');
             this.currentLanguage = 'en';
         }
+        console.log('🌍 i18n: Constructor - using language:', this.currentLanguage);
     }
     
     detectBrowserLanguage() {
@@ -29,6 +31,7 @@ class i18n {
     
     async loadLanguage(lang) {
         if (this.translations[lang]) {
+            console.log(`✅ i18n: Language ${lang} already cached`);
             this.currentLanguage = lang;
             localStorage.setItem('language', lang);
             return this.translations[lang];
@@ -36,16 +39,26 @@ class i18n {
         
         try {
             // Load JSON translation file
-            const response = await fetch(`/i18n/${lang}.json`);
+            const url = `/i18n/${lang}.json`;
+            console.log(`🌍 i18n: Fetching translations from ${url}`);
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const data = await response.json();
+            console.log(`✅ i18n: Successfully loaded ${lang}.json with ${Object.keys(data).length} keys`);
+            
             this.translations[lang] = data;
             this.currentLanguage = lang;
             localStorage.setItem('language', lang);
             return data;
         } catch (error) {
-            console.error(`Failed to load language ${lang}:`, error);
+            console.error(`❌ i18n: Failed to load language ${lang}:`, error.message);
             // Fallback to English
             if (lang !== 'en') {
+                console.log(`🌍 i18n: Falling back to English...`);
                 return this.loadLanguage('en');
             }
             return {};
@@ -95,9 +108,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Create global i18n instance
     i18nInstance = new i18n();
     
+    console.log('🌍 i18n: Detected language =', i18nInstance.currentLanguage);
+    console.log('🌍 i18n: localStorage.language =', localStorage.getItem('language'));
+    
+    // DEBUG: Force French if nothing is set
+    if (!localStorage.getItem('language')) {
+        console.log('🌍 i18n: No language in localStorage, setting to fr');
+        localStorage.setItem('language', 'fr');
+        i18nInstance.currentLanguage = 'fr';
+    }
+    
     // Load current language and update DOM
-    await i18nInstance.loadLanguage(i18nInstance.currentLanguage);
+    try {
+        const loaded = await i18nInstance.loadLanguage(i18nInstance.currentLanguage);
+        console.log('🌍 i18n: Loaded translations for', i18nInstance.currentLanguage, '=', Object.keys(loaded).length, 'keys');
+        console.log('🌍 i18n: Sample translations =', loaded.brand_name, loaded.hero_title_1);
+    } catch (e) {
+        console.error('🌍 i18n: Error loading language:', e);
+    }
+    
     updatePageTranslations();
+    console.log('🌍 i18n: Updated page translations');
 });
 
 // Function to update all text elements with translations
@@ -106,9 +137,11 @@ function updatePageTranslations() {
         const key = element.getAttribute('data-i18n');
         const translation = i18nInstance.t(key);
         
-        if (element.tagName === 'INPUT' && element.type === 'text' || element.type === 'email' || element.type === 'password') {
+        // Handle input placeholders
+        if (element.tagName === 'INPUT' && (element.type === 'text' || element.type === 'email' || element.type === 'password')) {
             element.placeholder = translation;
         } else {
+            // Set text for all other elements
             element.textContent = translation;
         }
     });
