@@ -126,8 +126,8 @@ window.switchToLogin = function(event) {
 
 // ===== ATTACH EVENT LISTENERS (after all functions are defined) =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Modal close button
-    const closeBtn = document.querySelector('.modal-close');
+    // Modal close button (by ID to avoid conflicts)
+    const closeBtn = document.getElementById('authModalClose');
     if (closeBtn) {
         closeBtn.addEventListener('click', window.closeModal);
     }
