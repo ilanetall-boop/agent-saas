@@ -125,7 +125,12 @@ async function switchLanguage(langCode) {
     updatePageTranslations();
 }
 
-// Export for use in other scripts
+// Make globally accessible (for browser + module exports)
+window.switchLanguage = switchLanguage;
+window.updatePageTranslations = updatePageTranslations;
+window.i18nInstance = i18nInstance;
+
+// Export for use in other scripts (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { i18nInstance, updatePageTranslations, switchLanguage };
 }
