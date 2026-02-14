@@ -40,7 +40,10 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Chat with agent
 router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, res) => {
     try {
-        let { message } = req.validatedBody;
+        let { message, language } = req.validatedBody;
+        
+        console.log(`\n💬 [CHAT] User: ${req.user.email}, Language: ${language || 'default'}`);
+        console.log(`   Message: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`);
         
         // Sanitize message to prevent XSS
         message = sanitizeMessage(message);
@@ -48,6 +51,7 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         // Refresh user data to get latest message count
         const freshUser = await db.getUserById(req.user.id);
         if (!freshUser) {
+            console.error('❌ User not found');
             return res.status(401).json({ error: 'Utilisateur non trouvé' });
         }
         
@@ -210,6 +214,10 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             await new Promise(resolve => setTimeout(resolve, responseDelay));
         }
         
+        console.log(`✅ [CHAT RESPONSE] Model: ${response.model || 'haiku'}, Tier: ${userTier}`);
+        console.log(`   Response: "${response.content.substring(0, 100)}${response.content.length > 100 ? '...' : ''}"`);
+        console.log(`   Usage: ${updatedUser.messages_used}/${updatedUser.messages_limit} messages\n`);
+        
         res.json({
             response: response.content,
             usage: {
@@ -227,8 +235,8 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             }
         });
     } catch (error) {
-        console.error(`[CHAT ERROR] User: ${req.user?.id}, Message: "${req.body?.message?.substring(0, 50)}", Error:`, error.message);
-        console.error('Stack:', error.stack);
+        console.error(`\n❌ [CHAT ERROR] User: ${req.user?.email}, Error: ${error.message}`);
+        console.error('Stack:', error.stack.substring(0, 200));
         
         // Log chat error
         auditLog({
