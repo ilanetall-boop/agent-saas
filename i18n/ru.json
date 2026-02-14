@@ -122,6 +122,8 @@
     "switch_to_register": "Создать аккаунт",
     "switch_to_login": "Войти",
     "continue_google": "Продолжить с Google",
-    "continue_github": "Продолжить с GitHub"
+    "continue_github": "Продолжить с GitHub",
+    "name_placeholder": "Ваше полное имя",
+    "email_placeholder": "ваш@email.com"
   }
 }

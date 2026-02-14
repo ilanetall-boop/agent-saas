@@ -122,6 +122,8 @@
     "switch_to_register": "إنشاء حساب",
     "switch_to_login": "تسجيل الدخول",
     "continue_google": "الاستمرار مع Google",
-    "continue_github": "الاستمرار مع GitHub"
+    "continue_github": "الاستمرار مع GitHub",
+    "name_placeholder": "اسمك الكامل",
+    "email_placeholder": "بريدك@email.com"
   }
 }

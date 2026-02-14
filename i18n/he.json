@@ -122,6 +122,8 @@
     "switch_to_register": "צור חשבון",
     "switch_to_login": "התחברות",
     "continue_google": "המשך עם Google",
-    "continue_github": "המשך עם GitHub"
+    "continue_github": "המשך עם GitHub",
+    "name_placeholder": "שמך המלא",
+    "email_placeholder": "שלך@email.com"
   }
 }

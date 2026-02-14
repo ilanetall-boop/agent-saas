@@ -122,6 +122,8 @@
     "switch_to_register": "Crear cuenta",
     "switch_to_login": "Iniciar sesión",
     "continue_google": "Continuar con Google",
-    "continue_github": "Continuar con GitHub"
+    "continue_github": "Continuar con GitHub",
+    "name_placeholder": "Tu nombre completo",
+    "email_placeholder": "tu@email.com"
   }
 }

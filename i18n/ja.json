@@ -122,6 +122,8 @@
     "switch_to_register": "アカウント作成",
     "switch_to_login": "ログイン",
     "continue_google": "Google で続行",
-    "continue_github": "GitHub で続行"
+    "continue_github": "GitHub で続行",
+    "name_placeholder": "あなたの氏名",
+    "email_placeholder": "あなたの@email.com"
   }
 }
