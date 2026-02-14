@@ -453,6 +453,34 @@ router.post('/verify-email', async (req, res) => {
     }
 });
 
+// Verify access token (check if token is valid and get user info)
+router.get('/verify-token', authMiddleware, async (req, res) => {
+    try {
+        // authMiddleware already verified the token and attached userId
+        const userId = req.userId;
+        
+        // Fetch user from database
+        const user = await db.getUserById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                emailVerified: user.email_verified,
+                plan: user.plan || 'free'
+            }
+        });
+    } catch (error) {
+        console.error('Verify token error:', error);
+        res.status(401).json({ error: 'Token verification failed' });
+    }
+});
+
 // ========== OAUTH STUBS (Phase 1 - Placeholder) ==========
 
 // Google OAuth login (placeholder)

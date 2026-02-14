@@ -18,23 +18,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function checkAuth() {
     try {
+        console.log('🔐 checkAuth: token =', token ? token.substring(0, 20) + '...' : 'null');
+        console.log('📡 checkAuth: fetching', `${API_URL}/auth/verify-token`);
+        
         const res = await fetch(`${API_URL}/auth/verify-token`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        
+        console.log('📡 checkAuth: response status =', res.status);
+        
         if (res.ok) {
             const data = await res.json();
+            console.log('✅ checkAuth: token verified, user =', data.user.email);
             user = data.user;
             document.getElementById('userInfo').textContent = user.name || user.email;
             await loadAgent();
             showChat();
         } else {
+            console.error('❌ checkAuth: token invalid, status =', res.status);
+            const errorData = await res.json();
+            console.error('❌ checkAuth: error =', errorData);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('token');
             token = null;
             window.location.href = '/index.html';
         }
     } catch (e) {
-        console.error('Auth check failed:', e);
+        console.error('❌ checkAuth: exception =', e.message);
         window.location.href = '/index.html';
     }
 }
