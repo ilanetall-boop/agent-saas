@@ -33,7 +33,9 @@ router.post('/register', validateRequest(schemas.register), async (req, res) => 
         
         // Create user
         const userId = nanoid();
+        console.log('👤 register: Creating user with userId =', userId, 'email =', email.toLowerCase());
         await db.createUser(userId, email.toLowerCase(), passwordHash, name || null);
+        console.log('✅ register: User created successfully');
         
         // Create default agent for user
         const agentId = nanoid();
@@ -458,13 +460,18 @@ router.get('/verify-token', authMiddleware, async (req, res) => {
     try {
         // authMiddleware already verified the token and attached userId
         const userId = req.userId;
+        console.log('🔐 verify-token: userId from token =', userId);
         
         // Fetch user from database
         const user = await db.getUserById(userId);
+        console.log('🔐 verify-token: user from db =', user ? 'found' : 'not found');
+        
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            console.error('❌ verify-token: User not found for userId:', userId);
+            return res.status(404).json({ error: 'User not found', userId, note: 'Check DB connection' });
         }
         
+        console.log('✅ verify-token: returning user:', user.email);
         res.json({
             success: true,
             user: {
@@ -476,8 +483,8 @@ router.get('/verify-token', authMiddleware, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Verify token error:', error);
-        res.status(401).json({ error: 'Token verification failed' });
+        console.error('❌ verify-token: exception =', error.message);
+        res.status(401).json({ error: 'Token verification failed', message: error.message });
     }
 });
 
