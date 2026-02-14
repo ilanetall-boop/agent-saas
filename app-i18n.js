@@ -3,9 +3,9 @@
 
 class i18n {
     constructor() {
+        this.supportedLanguages = ['en', 'fr', 'es', 'de', 'it', 'pt', 'zh', 'ja', 'ru', 'ar', 'he'];
         this.currentLanguage = localStorage.getItem('language') || this.detectBrowserLanguage();
         this.translations = {};
-        this.supportedLanguages = ['en', 'fr', 'es', 'de', 'it', 'pt', 'zh', 'ja', 'ru', 'ar', 'he'];
         
         // Validate language
         if (!this.supportedLanguages.includes(this.currentLanguage)) {
@@ -15,12 +15,12 @@ class i18n {
     
     detectBrowserLanguage() {
         // Try to detect from browser language
-        const browserLang = navigator.language || navigator.userLanguage || 'en';
+        const browserLang = (typeof navigator !== 'undefined') ? (navigator.language || navigator.userLanguage || 'en') : 'en';
         if (!browserLang) return 'en';
         
         const baseLang = browserLang.split('-')[0];
         
-        if (this.supportedLanguages.includes(baseLang)) {
+        if (this.supportedLanguages && this.supportedLanguages.includes(baseLang)) {
             return baseLang;
         }
         
