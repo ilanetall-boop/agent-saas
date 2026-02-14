@@ -112,7 +112,7 @@
     "modal_register_title": "アカウントを作成",
     "email": "メール",
     "password": "パスワード",
-    "password_min": "最小12文字",
+    "password_min": "最小12文字。含む：大文字、数字、特殊文字",
     "name": "フルネーム",
     "sign_in": "ログイン",
     "create_account": "アカウント作成",

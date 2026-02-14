@@ -112,7 +112,7 @@
     "modal_register_title": "Crear tu cuenta",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "password_min": "Al menos 12 caracteres",
+    "password_min": "Mínimo 12 caracteres. Incluir: Mayúscula, número, carácter especial",
     "name": "Nombre completo",
     "sign_in": "Iniciar sesión",
     "create_account": "Crear cuenta",

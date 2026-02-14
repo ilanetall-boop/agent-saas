@@ -116,7 +116,7 @@
     "email": "Email",
     "email_placeholder": "votre@email.com",
     "password": "Mot de passe",
-    "password_min": "Au minimum 12 caractères",
+    "password_min": "Au minimum 12 caractères. Inclure: Majuscule, chiffre, caractère spécial",
     "name": "Nom complet",
     "name_placeholder": "Votre nom complet",
     "sign_in": "Se connecter",

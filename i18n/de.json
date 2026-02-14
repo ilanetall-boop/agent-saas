@@ -112,7 +112,7 @@
     "modal_register_title": "Erstelle dein Konto",
     "email": "E-Mail",
     "password": "Passwort",
-    "password_min": "Mindestens 12 Zeichen",
+    "password_min": "Mindestens 12 Zeichen. Enthalten: Großbuchstabe, Zahl, Sonderzeichen",
     "name": "Vollständiger Name",
     "sign_in": "Anmelden",
     "create_account": "Konto erstellen",

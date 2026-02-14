@@ -112,7 +112,7 @@
     "modal_register_title": "创建您的账户",
     "email": "电子邮件",
     "password": "密码",
-    "password_min": "至少 12 个字符",
+    "password_min": "最少12个字符。包含：大写字母、数字、特殊字符",
     "name": "全名",
     "sign_in": "登录",
     "create_account": "创建账户",

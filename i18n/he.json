@@ -112,7 +112,7 @@
     "modal_register_title": "צור את החשבון שלך",
     "email": "דוא״ל",
     "password": "סיסמה",
-    "password_min": "לפחות 12 תווים",
+    "password_min": "לפחות 12 תווים. כולל: אות גדולה, מספר, תו מיוחד",
     "name": "שם מלא",
     "sign_in": "התחברות",
     "create_account": "צור חשבון",
