@@ -3,10 +3,18 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Language Switcher
-    const languageSwitcher = document.getElementById('languageSwitcher');
+    const languageSwitcher = document.getElementById('langSelector');
     if (languageSwitcher) {
         languageSwitcher.addEventListener('change', (e) => switchLanguage(e.target.value));
     }
+    
+    // "Start free" buttons - Show signup modal instead of redirecting to /app.html
+    document.querySelectorAll('#topStartBtn, #heroStartBtn, .startBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegister();
+        });
+    });
     
     // Login Form
     const loginBtn = document.querySelector('button[data-i18n="auth.sign_in"]');
