@@ -43,6 +43,18 @@ async function runMigrations(pool) {
         // Migration 12: Add subscription renewal date
         await addColumnIfNotExists(pool, 'users', 'subscription_renews_at', 'TIMESTAMP');
         
+        // Migration 13: Add Google OAuth ID
+        await addColumnIfNotExists(pool, 'users', 'google_id', 'TEXT');
+        
+        // Migration 14: Add GitHub OAuth ID
+        await addColumnIfNotExists(pool, 'users', 'github_id', 'TEXT');
+        
+        // Migration 15: Add GitHub username
+        await addColumnIfNotExists(pool, 'users', 'github_username', 'TEXT');
+        
+        // Migration 16: Add avatar URL
+        await addColumnIfNotExists(pool, 'users', 'avatar_url', 'TEXT');
+        
         console.log('✅ Migrations completed successfully');
     } catch (error) {
         console.error('❌ Migration error:', error);
