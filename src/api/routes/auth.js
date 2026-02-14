@@ -456,19 +456,37 @@ router.post('/verify-email', async (req, res) => {
 });
 
 // Verify access token (check if token is valid and get user info)
-router.get('/verify-token', authMiddleware, async (req, res) => {
+// NOTE: Bypass authMiddleware to avoid double-checking user existence
+router.get('/verify-token', async (req, res) => {
     try {
-        // authMiddleware already verified the token and attached userId
-        const userId = req.userId;
-        console.log('🔐 verify-token: userId from token =', userId);
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'Token manquant' });
+        }
+        
+        const token = authHeader.split(' ')[1];
+        console.log('🔐 verify-token: token =', token.substring(0, 30) + '...');
+        
+        // Verify JWT token
+        let decoded;
+        try {
+            decoded = require('jsonwebtoken').verify(token, require('../config').jwtSecret);
+            console.log('✅ verify-token: token verified, userId =', decoded.userId);
+        } catch (error) {
+            console.error('❌ verify-token: token verification failed:', error.message);
+            return res.status(401).json({ error: 'Token invalide ou expiré' });
+        }
+        
+        const userId = decoded.userId;
         
         // Fetch user from database
+        console.log('🔐 verify-token: fetching user with userId =', userId);
         const user = await db.getUserById(userId);
-        console.log('🔐 verify-token: user from db =', user ? 'found' : 'not found');
+        console.log('🔐 verify-token: getUserById returned:', user ? `found ${user.email}` : 'null');
         
         if (!user) {
             console.error('❌ verify-token: User not found for userId:', userId);
-            return res.status(404).json({ error: 'User not found', userId, note: 'Check DB connection' });
+            return res.status(404).json({ error: 'User not found', userId });
         }
         
         console.log('✅ verify-token: returning user:', user.email);
@@ -483,8 +501,8 @@ router.get('/verify-token', authMiddleware, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ verify-token: exception =', error.message);
-        res.status(401).json({ error: 'Token verification failed', message: error.message });
+        console.error('❌ verify-token: exception =', error.message, error.stack);
+        res.status(500).json({ error: 'Token verification failed', message: error.message });
     }
 });
 
