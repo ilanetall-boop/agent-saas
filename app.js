@@ -306,14 +306,13 @@ async function sendMessage() {
     addTypingIndicator();
 
     try {
-        const language = localStorage.getItem('language') || 'en';
         const res = await fetch(`${API_URL}/agent/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ message, language })
+            body: JSON.stringify({ message })
         });
 
         removeTypingIndicator();

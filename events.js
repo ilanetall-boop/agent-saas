@@ -3,7 +3,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Language Switcher
-    const languageSwitcher = document.getElementById('langSelector');
+    const languageSwitcher = document.getElementById('languageSwitcher');
     if (languageSwitcher) {
         languageSwitcher.addEventListener('change', (e) => switchLanguage(e.target.value));
     }
