@@ -124,6 +124,17 @@ window.switchToLogin = function(event) {
     window.showLogin();
 };
 
+// ===== PASSWORD VISIBILITY TOGGLE =====
+window.togglePasswordVisibility = function(inputId) {
+    const input = document.getElementById(inputId);
+    const btn = event.target.closest('.password-toggle');
+    if (!input || !btn) return;
+    
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+};
+
 // ===== ATTACH EVENT LISTENERS (after all functions are defined) =====
 document.addEventListener('DOMContentLoaded', function() {
     // Modal close button (by ID to avoid conflicts)
@@ -141,6 +152,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Password visibility toggles
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const inputId = btn.getAttribute('data-toggle-for');
+            window.togglePasswordVisibility(inputId);
+        });
+    });
     
     // Language Switcher
     const langSelector = document.getElementById('langSelector');

@@ -1348,7 +1348,10 @@
                     </div>
                     <div class="form-group">
                         <label for="loginPassword" data-i18n="auth.password">Password</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                        <div class="password-input-wrapper">
+                            <input type="password" id="loginPassword" required placeholder="••••••••">
+                            <button type="button" class="password-toggle" data-toggle-for="loginPassword">👁️</button>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-large" data-i18n="auth.sign_in">Log in</button>
                 </form>
@@ -1388,7 +1391,10 @@
                     </div>
                     <div class="form-group">
                         <label for="signupPassword" data-i18n="auth.password">Password</label>
-                        <input type="password" id="signupPassword" required placeholder="••••••••" minlength="12">
+                        <div class="password-input-wrapper">
+                            <input type="password" id="signupPassword" required placeholder="••••••••" minlength="12">
+                            <button type="button" class="password-toggle" data-toggle-for="signupPassword">👁️</button>
+                        </div>
                         <small data-i18n="auth.password_min">At least 12 characters</small>
                     </div>
                     <button type="submit" class="btn btn-primary btn-large" data-i18n="auth.create_account">Create account</button>
@@ -1431,23 +1437,42 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal[style*="display: flex"] {
+            opacity: 1;
         }
 
         .modal-content {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
             padding: 40px;
             max-width: 420px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-close {
@@ -1459,55 +1484,93 @@
             font-size: 28px;
             cursor: pointer;
             color: var(--text-muted);
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
         }
 
         .modal-close:hover {
+            background: var(--bg-muted);
             color: var(--text);
         }
 
         .auth-form h2 {
             font-size: 24px;
-            margin-bottom: 24px;
+            font-weight: 700;
+            margin-bottom: 28px;
             color: var(--text);
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text);
             font-size: 14px;
         }
 
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
         .form-group input {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            padding: 12px 14px;
+            padding-right: 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
+            transition: all 0.2s ease;
+            background: var(--bg-subtle);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
         }
 
         .form-group input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.1);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 91, 255, 0.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 18px;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
         }
 
         .form-group small {
             display: block;
-            margin-top: 4px;
+            margin-top: 6px;
             color: var(--text-muted);
             font-size: 12px;
         }
 
         .divider {
             text-align: center;
-            margin: 24px 0;
+            margin: 28px 0;
             color: var(--text-muted);
             font-size: 13px;
             position: relative;
@@ -1544,10 +1607,12 @@
         .auth-link a {
             color: var(--primary);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            transition: opacity 0.2s ease;
         }
 
         .auth-link a:hover {
+            opacity: 0.8;
             text-decoration: underline;
         }
 
@@ -1555,10 +1620,17 @@
             background: #fee2e2;
             color: #991b1b;
             border: 1px solid #fecaca;
-            padding: 12px;
+            padding: 12px 14px;
             border-radius: 8px;
             margin-bottom: 16px;
             font-size: 13px;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         .auth-loading {
@@ -1586,6 +1658,13 @@
             justify-content: center;
             gap: 8px;
             margin-bottom: 12px;
+            padding: 12px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .oauth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .oauth-logo {
@@ -1598,11 +1677,17 @@
         @media (max-width: 600px) {
             .modal-content {
                 padding: 24px;
+                border-radius: 16px;
+                margin: 16px;
             }
 
             .auth-form h2 {
                 font-size: 20px;
                 margin-bottom: 20px;
+            }
+
+            .modal-content {
+                max-height: calc(100vh - 32px);
             }
         }
     </style>
