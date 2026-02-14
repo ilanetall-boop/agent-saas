@@ -3,18 +3,30 @@
 
 // ===== MODAL SHOW/HIDE =====
 window.showLogin = function() {
+    const modal = document.getElementById('authModal');
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
+    if (modal) modal.style.display = 'flex';
     if (loginForm) loginForm.style.display = 'block';
     if (signupForm) signupForm.style.display = 'none';
 };
 
 window.showRegister = function() {
+    const modal = document.getElementById('authModal');
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
+    if (modal) modal.style.display = 'flex';
     if (loginForm) loginForm.style.display = 'none';
     if (signupForm) signupForm.style.display = 'block';
 };
+
+window.closeModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.style.display = 'none';
+};
+
+// Backward compatibility
+window.closeAuthModal = window.closeModal;
 
 // ===== FORM HANDLERS =====
 window.handleLogin = async function(event) {
@@ -114,6 +126,22 @@ window.switchToLogin = function(event) {
 
 // ===== ATTACH EVENT LISTENERS (after all functions are defined) =====
 document.addEventListener('DOMContentLoaded', function() {
+    // Modal close button
+    const closeBtn = document.querySelector('.modal-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', window.closeModal);
+    }
+    
+    // Close modal when clicking outside (on overlay)
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                window.closeModal();
+            }
+        });
+    }
+    
     // Language Switcher
     const langSelector = document.getElementById('langSelector');
     if (langSelector && typeof switchLanguage !== 'undefined') {
