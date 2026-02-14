@@ -106,6 +106,7 @@ app.use((req, res, next) => {
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/agent', require('./routes/agents'));
+app.use('/api/payments', require('./routes/payments'));
 app.use('/api/telegram', require('./routes/telegram'));
 
 // Health check

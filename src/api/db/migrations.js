@@ -28,6 +28,21 @@ async function runMigrations(pool) {
         // Migration 7: Add last_message_date for daily reset
         await addColumnIfNotExists(pool, 'users', 'last_message_date', 'DATE');
         
+        // Migration 8: Add subscription_tier column (free/pro/enterprise/vip)
+        await addColumnIfNotExists(pool, 'users', 'subscription_tier', "VARCHAR(20) DEFAULT 'free'");
+        
+        // Migration 9: Add Stripe customer ID for billing
+        await addColumnIfNotExists(pool, 'users', 'stripe_customer_id', 'TEXT');
+        
+        // Migration 10: Add Stripe subscription ID for tracking active subscriptions
+        await addColumnIfNotExists(pool, 'users', 'stripe_subscription_id', 'TEXT');
+        
+        // Migration 11: Add subscription start date
+        await addColumnIfNotExists(pool, 'users', 'subscription_started_at', 'TIMESTAMP');
+        
+        // Migration 12: Add subscription renewal date
+        await addColumnIfNotExists(pool, 'users', 'subscription_renews_at', 'TIMESTAMP');
+        
         console.log('✅ Migrations completed successfully');
     } catch (error) {
         console.error('❌ Migration error:', error);

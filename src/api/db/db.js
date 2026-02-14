@@ -114,6 +114,25 @@ const dbOps = {
         );
     },
     
+    updateUser: async (id, updates) => {
+        // Build dynamic UPDATE query from updates object
+        const fields = [];
+        const values = [];
+        let paramCount = 1;
+        
+        for (const [key, value] of Object.entries(updates)) {
+            fields.push(`${key} = $${paramCount}`);
+            values.push(value);
+            paramCount++;
+        }
+        
+        if (fields.length === 0) return; // No updates
+        
+        values.push(id);
+        const query = `UPDATE users SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramCount}`;
+        await run(query, values);
+    },
+    
     // Agents
     createAgent: async (id, userId, name) => {
         await run(
