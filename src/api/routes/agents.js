@@ -40,7 +40,8 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Chat with agent
 router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, res) => {
     try {
-        let { message } = req.validatedBody;
+        let { message, language } = req.validatedBody;
+        language = language || 'en'; // Fallback to English
         
         // Sanitize message to prevent XSS
         message = sanitizeMessage(message);
@@ -116,7 +117,7 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             await db.setMemory(nanoid(), agent.id, 'onboarding_step', String(nextStep));
             
             // Use the NEXT step's prompt for the response
-            systemPrompt = getOnboardingPrompt(nextStep, memoryMap);
+            systemPrompt = getOnboardingPrompt(nextStep, memoryMap, language);
             
             // Mark complete after step 4
             if (nextStep >= 5) {
@@ -124,7 +125,7 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             }
         } else {
             // Normal chat
-            systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name);
+            systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name, language);
         }
         
         // Determine user tier for AI routing
