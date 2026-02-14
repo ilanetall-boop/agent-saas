@@ -60,6 +60,8 @@ window.handleSignup = async function(event) {
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
     
+    console.log('📝 Signup attempt:', { email, name });
+    
     try {
         const response = await fetch('/api/auth/register', {
             method: 'POST',
@@ -67,15 +69,25 @@ window.handleSignup = async function(event) {
             body: JSON.stringify({ name, email, password })
         });
         
+        console.log('🔄 Register response status:', response.status);
+        
         const data = await response.json();
+        console.log('📦 Register response data:', data);
+        
         if (response.ok) {
+            console.log('✅ Registration successful, storing token and redirecting...');
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('user', JSON.stringify(data.user));
-            window.location.href = '/app.html';
+            console.log('✅ Token stored, redirecting to /app.html');
+            setTimeout(() => {
+                window.location.href = '/app.html';
+            }, 500);
         } else {
+            console.error('❌ Registration failed:', data.error);
             alert('Erreur: ' + (data.error || 'Création de compte échouée'));
         }
     } catch (error) {
+        console.error('❌ Network error:', error);
         alert('Erreur réseau: ' + error.message);
     }
 };
