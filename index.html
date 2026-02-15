@@ -134,6 +134,7 @@
             align-items: center;
             justify-content: space-between;
             height: 64px;
+            flex-wrap: nowrap;
         }
 
         .logo {
@@ -161,8 +162,10 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 24px;
             list-style: none;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .nav-links a {
@@ -171,6 +174,7 @@
             color: var(--text-secondary);
             text-decoration: none;
             transition: color 0.2s;
+            white-space: nowrap;
         }
 
         .nav-links a:hover { color: var(--text); }
@@ -178,7 +182,9 @@
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .lang-select {
