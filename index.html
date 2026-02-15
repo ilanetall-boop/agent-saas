@@ -1,113 +1,48 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="page_title">My Best Agent - Personal AI Intelligence</title>
-    <meta name="description" content="Your personal AI agent. Code, automate, decide and execute. Available on web, Telegram, WhatsApp. Free during Phase 1.">
+    <title>My Best Agent - Create Anything, Instantly</title>
+    <meta name="description" content="Create images, videos, code, and more. Just ask. No limits. Free.">
+    <meta name="theme-color" content="#06B6D4">
     
-    <!-- Favicon (SVG with PNG fallback as data URI) -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB2klEQVR4Ae2XA4wdQRjHf7t7r21bPdu2bdu2bdu2baNW27LRs23b3f3yJZNk783LnijJl2Qy8//NzM5sAP/bP4AWoBPoBXoBHUBzoLIvCXUBg4DVwHHgIXALOAXsB5YDU4A+QC3AD3w5pwWYIxAH9ATygblAZyAV5fRMoCqwFNgJ7AYicP6sI7ZfQAPQFKgB+CHfPwpoDGwGNgK3cfwvC+DZAN6JgEEcExJPAb0EboHj/4YA8YBuYKHAKnAEuA7c+a8F2A9MdPxvCPCMi2cq0F/gFtj0rwuQHZgC+vwfCbAWdPzPF2CMS2YwsITGF+X/JAH2AC8FjgDPgKs4D9tqBRCB834ogKdcNDeBG8B94Jknt5pPgVYC88BUIC+wE9iM4+B/K0D8BNYKqC+5JOALToBz7sLfBYgF5AwMBLpz/s0EehVAfWC7wAJgNY7/iwQ4I6DCQB+gAFDAJVIB6Aw6fgaUB8b/FwG8CqA2aKO9CHQDQYB/Gf8WwFMBsgqgudgNOv73CPBQALcEWADMAE77kwBWgJkCjcV1oL2PBLC7AC4IcMldgH3ACGCSL+bAcgH8ZKP9WIA7Aj3cPfxXgLquuW8LsFTgCnAS+O8+h/8XxS//nFM9kCoAAAAASUVORK5CYII=">
-    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFkklEQVR4Ae3dA5AkSxCG4Z5d27atc23btm3btm3btm3bts3Nqcr0xET0zPb2VmTEf9FZXf/8U1NTMwT8N3/gtUAn0At0Ag0AZQBUdAngH9AL9Ab9QH8wAAwCg8EQMBQMA8PBCDASjAKjwRgwFowD48EEMBFM+rcFmAymgKlgGpgOZoCZYBaYDeaAuWAemA8WgIVgEVgMloClYBlYDlaAlWAVWA3WgLVgHVgPNoANoA7UAQ1AA9AANIJNYDPYAraC7WA72AF2gl1gN9gD9oJ9YD84AA6CQ+AwOAKOgmPgODgBToJT4DQ4A86Cc+A8uAAugkvgMrgCroJr4Dq4AW6C2+AOuAvug/vgAXgIHoHH4Al4Cp6B5+AFeAleged/O8Br8Aa8Be/Ae/ABfASfwGfwBXwF38B38AP8BL/Ab/AH/AUE/jd/4DVAJ9AJNACUAVDRJf7AawDdQG/QD/QHA8AgMBgMAUPBMDAcjAAjwSgwGowBY8E4MB5MABPBJDD53xZgMpgCpoJpYDqYAWaCWWA2mAPmgnlgPlgAFoJFYDFYApaC5WAFWAlWgdVgDVgL1oH1YAPYAOqABqABaAAbwSawGWwBW8F2sB3sADvBLrAb7AF7wT6wHxwAB8EhcBgcAUfBMXAcnAAnwSlwGpwBZ8E5cB5cABfBJXAZXAFXwTVwHdwAN8FtcAfcBffBffAAPASPwGPwBDwFz8Bz8AK8BK/Aa/AGvAXvwHvwAXwEn8Bn8AV8Bd/Ad/AD/AS/wG/wB/wF/wn8b/7Aa4BOoBNoACgDoKJL/IHXAN1Ab9AP9AcDwCAwGAwBQ8EwMByMACPBKDAajAFjwTgwHkwAE8EkMPnfFmAymAKmgmlgOpgBZoJZYDaYA+aCeWA+WAAWgkVgMVgCloLlYAVYCVaB1WANWAvWgfVgA9gA6oAGoAFoABvBJrAZbAFbwXawHewAO8EusBvsAXvBPrAfHAAHwSFwGBwBR8ExcBycACfBKXAanAFnwTlwHlwAF8ElcBlcAVfBNXAd3AA3wW1wB9wF98F98AA8BI/AY/AEPAXPwHPwArwEr8Br8Aa8Be/Ae/ABfASfwGfwBXwF38B38AP8BL/Ab/AH/AUE/jd/4DVAJ9AJNACUAVDRJf7AawDdQG/QD/QHA8AgMBgMAUPBMDAcjAAjwSgwGowBY8E4MB5MABPBJDD53xZgMpgCpoJpYDqYAWaCWWA2mAPmgnlgPlgAFoJFYDFYApaC5WAFWAlWgdVgDVgL1oH1YAPYAOqABqABaAAbwSawGWwBW8F2sB3sADvBLrAb7AF7wT6wHxwAB8EhcBgcAUfBMXAcnAAnwSlwGpwBZ8E5cB5cABfBJXAZXAFXwTVwHdwAN8FtcAfcBffBffAAPASPwGPwBDwFz8Bz8AK8BK/Aa/AGvAXvwHvwAXwEn8Bn8AV8Bd/Ad/AD/AS/wG/wB/wF/wn8b/7Aa4BOoBNoACgDoKJL/IHXALqB3qAf6A8GgEFgMBgChoJhYDgYAUaCUWA0GAPGgnFgPJgAJoJJYPK/LcBkMAVMBdPAdDADzASzwGwwB8wF88B8sAAsBIvAYrAELAXLwQqwEqwCq8EasBas+1cFWA82gA2gDmgAGoAGsBFsApvBFrAVbAfbwQ6wE+wCu8EesBfsA/vBAXAQHAKHwRFwFBwDx8EJcBKcAqfBGXAWnAPnwQVwEVwCl8EVcBVcA9fBDXAT3AZ3wF1wH9wHD8BD8Ag8Bk/AU/AMPAcvwEvwCrwGb8Bb8A68Bx/AR/AJfAZfwFfwDXwHP8BP8Av8Bn/AXxLwv/kDrwE6gU6gAaAMgIou8QdeA+gGeoN+oD8YAAaBwWAIGAqGgeFgBBgJRoHRYAwYC8aB8WACmAgmgcn/tgCTwRQwFUwD08EMMBPMArPBHDAXzAPzwQKwECwCi8ESsBQsByvASrAKrAZrwFqwDqwHG8AGUAc0AA3gHwoY9dR+EwWwAAAAAElFTkSuQmCC">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mybestagent.io/">
-    <meta property="og:title" content="My Best Agent - Your Personal AI Agent">
-    <meta property="og:description" content="An intelligent assistant that works for you. Code, automate, decide and execute. Free & unlimited during Phase 1.">
-    <meta property="og:image" content="https://mybestagent.io/og-image.svg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="My Best Agent">
-    <meta property="og:locale" content="en_US">
-    
-    <!-- Twitter Cards -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://mybestagent.io/">
-    <meta name="twitter:title" content="My Best Agent - Your Personal AI Agent">
-    <meta name="twitter:description" content="An intelligent assistant that works for you. Code, automate, decide and execute. Free & unlimited.">
-    <meta name="twitter:image" content="https://mybestagent.io/og-image.svg">
-    
-    <!-- Additional SEO -->
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="My Best Agent">
-    <meta name="theme-color" content="#635bff">
-    <link rel="canonical" href="https://mybestagent.io/">
-    
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "My Best Agent",
-        "applicationCategory": "ProductivityApplication",
-        "operatingSystem": "Web, Telegram, WhatsApp",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD",
-            "description": "Free during Phase 1"
-        },
-        "description": "Your personal AI agent. Code, automate, decide and execute. Available everywhere, all the time.",
-        "url": "https://mybestagent.io",
-        "author": {
-            "@type": "Organization",
-            "name": "My Best Agent"
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "ratingCount": "127"
-        }
-    }
-    </script>
-    
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        *, *::before, *::after {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         :root {
-            --primary: #635bff;
-            --primary-light: #7c75ff;
-            --primary-dark: #4f46e5;
-            --accent: #00d4ff;
-            --success: #10b981;
-            --bg: #ffffff;
-            --bg-subtle: #f8fafc;
-            --bg-muted: #f1f5f9;
-            --text: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --border-light: #f1f5f9;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --primary: #06B6D4;
+            --primary-dark: #0891B2;
+            --accent: #F59E0B;
+            --success: #10B981;
+            --bg: #FFFFFF;
+            --bg-subtle: #F8FAFC;
+            --bg-dark: #1E293B;
+            --text: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
-            --radius: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
         }
 
-        html { scroll-behavior: smooth; }
-        html[dir="rtl"] { direction: rtl; }
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
@@ -123,10 +58,10 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
         }
 
         .nav-inner {
@@ -138,724 +73,286 @@
 
         .logo {
             font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
+            font-weight: 800;
+            color: var(--primary);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
+            letter-spacing: -0.02em;
         }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-icon svg { width: 18px; height: 18px; }
 
         .nav-links {
             display: flex;
-            align-items: center;
             gap: 32px;
             list-style: none;
         }
 
         .nav-links a {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
             transition: color 0.2s;
         }
 
-        .nav-links a:hover { color: var(--text); }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .nav-links a:hover {
+            color: var(--primary);
         }
 
-        .lang-select {
-            appearance: none;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
+        .btn-cta {
+            background: linear-gradient(135deg, var(--primary) 0%, #0891B2 100%);
+            color: white;
+            padding: 10px 24px;
             border-radius: 8px;
-            padding: 8px 32px 8px 12px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-            cursor: pointer;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            transition: all 0.2s;
-        }
-
-        .lang-select:hover { border-color: var(--primary); }
-        .lang-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,91,255,0.1); }
-
-        /* === BUTTONS === */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            font-size: 14px;
+            text-decoration: none;
             font-weight: 600;
-            border-radius: 8px;
+            font-size: 14px;
             border: none;
             cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
-        }
-
-        .btn-secondary {
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-subtle);
-            border-color: var(--text-muted);
-        }
-
-        .btn-large {
-            padding: 16px 32px;
-            font-size: 15px;
-            border-radius: 10px;
-        }
-
-        .btn svg { width: 16px; height: 16px; }
 
         /* === HERO === */
         .hero {
-            padding: 140px 0 100px;
-            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 1400px;
-            height: 100%;
-            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,91,255,0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-grid {
+            padding-top: 80px;
+            padding-bottom: 80px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 80px;
+            gap: 64px;
             align-items: center;
+            min-height: 100vh;
         }
 
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-
-        .badge-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .hero h1 {
-            font-size: clamp(40px, 5vw, 56px);
+        .hero-content h1 {
+            font-size: 3.5rem;
             font-weight: 800;
             line-height: 1.1;
-            letter-spacing: -0.02em;
             margin-bottom: 24px;
-        }
-
-        .hero h1 span {
-            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 50%, var(--accent) 100%);
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .hero-subtitle {
-            font-size: 18px;
-            line-height: 1.7;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            max-width: 480px;
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            line-height: 1.6;
         }
 
-        .hero-buttons {
+        .hero-input {
             display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .hero-input input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .hero-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .hero-input button {
+            padding: 16px 32px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hero-input button:hover {
+            background: var(--primary-dark);
         }
 
         .hero-visual {
-            position: relative;
-        }
-
-        .hero-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-xl);
-            padding: 32px;
-            position: relative;
-        }
-
-        .hero-card::before {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            border-radius: var(--radius-xl);
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(99,91,255,0.2) 0%, transparent 50%);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            -webkit-mask-composite: xor;
-            pointer-events: none;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .card-avatar {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .card-avatar svg { width: 24px; height: 24px; }
-
-        .card-title {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .card-status {
-            font-size: 13px;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .chat-messages {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .chat-msg {
-            max-width: 85%;
-            padding: 14px 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--bg-subtle) 100%);
             border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .chat-msg.user {
-            background: var(--primary);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-msg.agent {
-            background: var(--bg-muted);
-            color: var(--text);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 14px 18px;
-            background: var(--bg-muted);
-            border-radius: 16px;
-            width: fit-content;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: var(--text-muted);
-            border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-4px); }
-        }
-
-        /* === TRUST BAR === */
-        .trust-bar {
-            padding: 80px 0;
-            background: var(--bg);
-            border-top: 1px solid var(--border-light);
-        }
-
-        .trust-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 40px;
-        }
-
-        .trust-item {
-            text-align: center;
-        }
-
-        .trust-number {
-            font-size: 40px;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.02em;
-        }
-
-        .trust-label {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* === SECTIONS === */
-        .section {
-            padding: 100px 0;
-        }
-
-        .section-alt {
-            background: var(--bg-subtle);
-        }
-
-        .section-header {
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto 64px;
-        }
-
-        .section-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: clamp(32px, 4vw, 44px);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 16px;
-        }
-
-        .section-subtitle {
-            font-size: 17px;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        /* === HOW IT WORKS === */
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-        }
-
-        .step-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 32px 28px;
-            transition: all 0.3s;
+            height: 500px;
             position: relative;
+            overflow: hidden;
         }
 
-        .step-card:hover {
+        .hero-visual::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-visual-text {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: 800;
+        }
+
+        /* === ACTIONS === */
+        .actions {
+            padding: 80px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .action-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-card:hover {
             border-color: var(--primary);
             box-shadow: var(--shadow-lg);
             transform: translateY(-4px);
         }
 
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .step-card h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .step-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* === FEATURES === */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            transition: all 0.3s;
-        }
-
-        .feature-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, rgba(99,91,255,0.1) 0%, rgba(99,91,255,0.05) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .feature-icon svg {
-            width: 24px;
-            height: 24px;
-            stroke: var(--primary);
-        }
-
-        .feature-card h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* === PRICING === */
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 32px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .pricing-grid.pricing-4 {
-            grid-template-columns: repeat(4, 1fr);
-            max-width: 1200px;
-            gap: 24px;
-        }
-
-        .pricing-grid.pricing-4 .price-card {
-            padding: 32px 24px;
-        }
-
-        .pricing-note {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 24px;
-        }
-
-        .price-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-xl);
-            padding: 40px;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .price-card.featured {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 1px var(--primary), var(--shadow-xl);
-        }
-
-        .price-card.featured::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-        }
-
-        .price-badge {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: white;
-            padding: 4px 16px;
-            border-radius: 100px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .price-tier {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-        }
-
-        .price-amount {
-            font-size: 48px;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.02em;
-        }
-
-        .price-period {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-
-        .price-features {
-            list-style: none;
-            margin-bottom: 32px;
-        }
-
-        .price-features li {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px 0;
-            font-size: 14px;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .price-features li:last-child { border-bottom: none; }
-
-        .price-features svg {
-            width: 20px;
-            height: 20px;
-            stroke: var(--success);
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .price-card .btn { width: 100%; }
-
-        /* === CTA === */
-        .cta {
-            padding: 100px 0;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.5;
-        }
-
-        .cta-content {
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta h2 {
-            font-size: clamp(32px, 4vw, 44px);
-            font-weight: 800;
-            color: white;
-            letter-spacing: -0.02em;
+        .action-icon {
+            font-size: 3rem;
             margin-bottom: 16px;
         }
 
-        .cta p {
-            font-size: 18px;
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 32px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+        .action-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .cta .btn {
-            background: white;
-            color: var(--primary);
-        }
-
-        .cta .btn:hover {
-            background: var(--bg-subtle);
+        .action-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
         /* === FOOTER === */
         footer {
-            background: var(--text);
-            color: var(--text-muted);
-            padding: 80px 0 40px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr repeat(4, 1fr);
-            gap: 60px;
-            margin-bottom: 60px;
-        }
-
-        .footer-brand {
-            max-width: 260px;
-        }
-
-        .footer-brand .logo {
+            background: var(--bg-dark);
             color: white;
-            margin-bottom: 16px;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 80px;
         }
 
-        .footer-brand p {
-            font-size: 14px;
-            color: #94a3b8;
-            line-height: 1.7;
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
         .footer-col h4 {
-            font-size: 13px;
-            font-weight: 600;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
         }
 
-        .footer-col ul { list-style: none; }
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 12px;
+        }
 
         .footer-col a {
-            display: block;
-            font-size: 14px;
-            color: #94a3b8;
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
-            padding: 6px 0;
+            font-size: 0.9rem;
             transition: color 0.2s;
         }
 
-        .footer-col a:hover { color: white; }
+        .footer-col a:hover {
+            color: white;
+        }
 
         .footer-bottom {
-            border-top: 1px solid #334155;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 32px;
             text-align: center;
-            font-size: 13px;
-            color: #64748b;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         /* === RESPONSIVE === */
-        @media (max-width: 1024px) {
-            .hero-grid { grid-template-columns: 1fr; gap: 60px; }
-            .hero-visual { order: -1; }
-            .steps-grid { grid-template-columns: repeat(2, 1fr); }
-            .features-grid { grid-template-columns: repeat(2, 1fr); }
-            .pricing-grid.pricing-4 { grid-template-columns: repeat(2, 1fr); }
-            .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 40px; }
-        }
-
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero { padding: 120px 0 80px; }
-            .hero h1 { font-size: 36px; }
-            .hero-buttons { flex-direction: column; }
-            .hero-buttons .btn { width: 100%; }
-            .trust-grid { grid-template-columns: repeat(2, 1fr); }
-            .steps-grid { grid-template-columns: 1fr; }
-            .features-grid { grid-template-columns: 1fr; }
-            .pricing-grid { grid-template-columns: 1fr; }
-            .pricing-grid.pricing-4 { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; text-align: center; }
-            .footer-brand { max-width: 100%; }
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding-top: 40px;
+                padding-bottom: 40px;
+                min-height: auto;
+            }
+
+            .hero-content h1 {
+                font-size: 2.25rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .hero-visual {
+                height: 300px;
+                min-height: 300px;
+            }
+
+            .hero-visual-text {
+                font-size: 2rem;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-input {
+                flex-direction: column;
+            }
+
+            .hero-input input,
+            .hero-input button {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -864,880 +361,139 @@
     <nav>
         <div class="container nav-inner">
             <a href="/" class="logo">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                        <path d="M2 17l10 5 10-5"/>
-                        <path d="M2 12l10 5 10-5"/>
-                    </svg>
-                </div>
-                <span data-i18n="brand_name">My Best Agent</span>
+                🎯 My Best Agent
             </a>
-
-            <ul class="nav-links">
-                <li><a href="#how" data-i18n="nav_how">How it works</a></li>
-                <li><a href="#features" data-i18n="nav_features">Features</a></li>
-                <li><a href="#pricing" data-i18n="nav_pricing">Pricing</a></li>
-            </ul>
-
-            <div class="nav-actions">
-                <select class="lang-select" id="langSelector">
-                    <option value="en">English</option>
-                    <option value="fr">Français</option>
-                    <option value="es">Español</option>
-                    <option value="de">Deutsch</option>
-                    <option value="it">Italiano</option>
-                    <option value="pt">Português</option>
-                    <option value="zh">中文</option>
-                    <option value="ja">日本語</option>
-                    <option value="ru">Русский</option>
-                    <option value="ar">العربية</option>
-                    <option value="he">עברית</option>
-                </select>
-                <a href="#" id="topStartBtn" class="btn btn-primary" data-i18n="btn_start_free">Start free</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="/success-stories.html">Success Stories</a>
+                <a href="#contact">Contact</a>
             </div>
+            <button class="btn-cta">Start Creating</button>
         </div>
     </nav>
 
-    <!-- Hero -->
+    <!-- Hero Section -->
     <section class="hero">
-        <div class="container hero-grid">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <span class="badge-dot"></span>
-                    <span>Phase 1 — Free & Unlimited</span>
-                </div>
-                <h1><span data-i18n="hero_title_1">What if you had</span> <span data-i18n="hero_title_2">no limits?</span></h1>
-                <p class="hero-subtitle" data-i18n="hero_subtitle">The things you thought were impossible? You're about to do them. Create, automate, execute — your AI agent turns your ideas into reality. No code. No expertise. Just you and infinite possibilities.</p>
-                <div class="hero-buttons">
-                    <a href="#" id="heroStartBtn" class="btn btn-primary btn-large">
-                        <span data-i18n="btn_start_free">Start free</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </a>
-                    <a href="#how" class="btn btn-secondary btn-large" data-i18n="btn_discover">Learn more</a>
-                </div>
-            </div>
-
-            <div class="hero-visual">
-                <div class="hero-card">
-                    <div class="card-header">
-                        <div class="card-avatar">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                <path d="M2 17l10 5 10-5"/>
-                                <path d="M2 12l10 5 10-5"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="card-title">My Best Agent</div>
-                            <div class="card-status">
-                                <span class="badge-dot"></span>
-                                Online
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat-messages">
-                        <div class="chat-msg user" data-i18n="demo_msg_1">I want to launch my own business but I don't know how to code</div>
-                        <div class="chat-msg agent" data-i18n="demo_msg_2">You don't need to. Tell me your idea and I'll build it. Website, emails, automation — I handle all of it.</div>
-                        <div class="chat-msg user" data-i18n="demo_msg_3">I never thought I could do this</div>
-                        <div class="chat-msg agent" data-i18n="demo_msg_4">That's exactly why I exist. Let's start. What do you want to create?</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Trust Bar -->
-    <section class="trust-bar">
-        <div class="container">
-            <div class="trust-grid">
-                <div class="trust-item">
-                    <div class="trust-number">11</div>
-                    <div class="trust-label" data-i18n="trust_languages">Languages</div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-number">$0</div>
-                    <div class="trust-label" data-i18n="trust_phase1">Phase 1</div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-number">∞</div>
-                    <div class="trust-label" data-i18n="trust_unlimited">Unlimited</div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-number">24/7</div>
-                    <div class="trust-label" data-i18n="trust_always">Always on</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Use Cases -->
-    <section class="section" id="usecases">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-label">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                    <span data-i18n="usecases_label">Real Examples</span>
-                </div>
-                <h2 class="section-title" data-i18n="usecases_title">Things you never thought you could do</h2>
-                <p class="section-subtitle" data-i18n="usecases_subtitle">Until now, these required skills, time, or money you didn't have. Not anymore.</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="usecase_email_title">"Check my emails"</h3>
-                    <p data-i18n="usecase_email_desc">Reads your inbox, summarizes urgent messages, drafts replies, and sends them on your behalf. You approve, it executes.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="usecase_website_title">"Build me a website"</h3>
-                    <p data-i18n="usecase_website_desc">Designs, codes, and deploys a complete website. Landing pages, portfolios, online stores — in minutes, not weeks.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="usecase_data_title">"Analyze this spreadsheet"</h3>
-                    <p data-i18n="usecase_data_desc">Opens your files, extracts data, creates charts, spots trends. Turns raw data into actionable insights.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18H3"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="usecase_social_title">"Post on my socials"</h3>
-                    <p data-i18n="usecase_social_desc">Writes content, schedules posts, responds to comments. Manages your social presence while you sleep.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="usecase_messaging_title">"Message my team"</h3>
-                    <p data-i18n="usecase_messaging_desc">Sends WhatsApp, Telegram, or email messages for you. Scheduled reminders, status updates, follow-ups — all automated.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="usecase_research_title">"Research this topic"</h3>
-                    <p data-i18n="usecase_research_desc">Searches the web, reads articles, compiles reports. Delivers a summary with sources — hours of work in minutes.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="section section-alt" id="how">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-label">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    <span>Getting Started</span>
-                </div>
-                <h2 class="section-title" data-i18n="section_how_title">How it works</h2>
-                <p class="section-subtitle" data-i18n="section_how_subtitle">Four simple steps to have your own AI agent</p>
-            </div>
-
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <h3 data-i18n="step_1_title">Create your agent</h3>
-                    <p data-i18n="step_1_desc">Sign up in seconds. Name your agent and choose its capabilities. No code required.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <h3 data-i18n="step_2_title">Connect your tools</h3>
-                    <p data-i18n="step_2_desc">Link Telegram, WhatsApp, email or other services. Your agent will know where to find you.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <h3 data-i18n="step_3_title">Give orders</h3>
-                    <p data-i18n="step_3_desc">Send simple messages. "Create a landing page", "Analyze this file". The agent understands and acts.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <h3 data-i18n="step_4_title">Let it work</h3>
-                    <p data-i18n="step_4_desc">Your agent learns your context, your preferences, your style. It becomes more efficient every day.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features -->
-    <section class="section" id="features">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-label">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
-                    <span>Capabilities</span>
-                </div>
-                <h2 class="section-title" data-i18n="section_features_title">Powerful and reliable</h2>
-                <p class="section-subtitle" data-i18n="section_features_subtitle">Everything you need to delegate intelligently</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="feature_fullstack_title">Full-stack automation</h3>
-                    <p data-i18n="feature_fullstack_desc">Code, deploy, scrape, automate. Your agent creates real projects, not just text.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="feature_context_title">Understands your context</h3>
-                    <p data-i18n="feature_context_desc">Your agent remembers your preferences, your style, your history. The more it knows you, the more useful it is.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="feature_execute_title">Executes really</h3>
-                    <p data-i18n="feature_execute_desc">Not just text. Your agent creates, sends, publishes, downloads. It really does the work.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="feature_everywhere_title">Available everywhere</h3>
-                    <p data-i18n="feature_everywhere_desc">24/7 on Telegram, WhatsApp, email or your app. Your agent never sleeps.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="feature_secure_title">Secure and private</h3>
-                    <p data-i18n="feature_secure_desc">Your data stays confidential. End-to-end encryption. No third-party sharing.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                        </svg>
-                    </div>
-                    <h3 data-i18n="feature_improve_title">Continuous improvement</h3>
-                    <p data-i18n="feature_improve_desc">New features every month. Your agent becomes more powerful, smarter, more capable.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing -->
-    <section class="section section-alt" id="pricing">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-label">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    <span data-i18n="pricing_label">Pricing</span>
-                </div>
-                <h2 class="section-title" data-i18n="section_pricing_title">Simple, transparent pricing</h2>
-                <p class="section-subtitle" data-i18n="section_pricing_subtitle">Start free. Upgrade when you need more power.</p>
-            </div>
-
-            <div class="pricing-grid pricing-4">
-                <!-- Free -->
-                <div class="price-card">
-                    <div class="price-tier" data-i18n="pricing_free_title">Free</div>
-                    <div class="price-amount">€0</div>
-                    <div class="price-period" data-i18n="pricing_free_period">To discover</div>
-                    <ul class="price-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_free_f1">Basic access</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_free_f2">Standard AI</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_free_f3">Web only</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_free_f4">Community support</span>
-                        </li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary startBtn" data-i18n="btn_start_free">Start free</a>
-                </div>
-
-                <!-- Pro -->
-                <div class="price-card featured">
-                    <span class="price-badge" data-i18n="pricing_popular">Most popular</span>
-                    <div class="price-tier" data-i18n="pricing_pro_title">Pro</div>
-                    <div class="price-amount">€19<span style="font-size:16px;font-weight:500;color:var(--text-muted)">/mo</span></div>
-                    <div class="price-period" data-i18n="pricing_pro_period">For creators</div>
-                    <ul class="price-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f1">Extended usage*</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f2">All AI models</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f3">Web + Telegram + WhatsApp</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_pro_f4">Priority support</span>
-                        </li>
-                    </ul>
-                    <a href="/app.html?plan=pro" class="btn btn-primary" data-i18n="btn_go_pro">Go Pro</a>
-                </div>
-
-                <!-- Business -->
-                <div class="price-card">
-                    <div class="price-tier" data-i18n="pricing_business_title">Business</div>
-                    <div class="price-amount">€49<span style="font-size:16px;font-weight:500;color:var(--text-muted)">/mo</span></div>
-                    <div class="price-period" data-i18n="pricing_business_period">For teams</div>
-                    <ul class="price-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_business_f1">High priority access</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_business_f2">5 team members</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_business_f3">API access</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_business_f4">Dedicated support</span>
-                        </li>
-                    </ul>
-                    <a href="/app.html?plan=business" class="btn btn-secondary" data-i18n="btn_choose">Choose</a>
-                </div>
-
-                <!-- VIP -->
-                <div class="price-card">
-                    <div class="price-tier" data-i18n="pricing_vip_title">VIP</div>
-                    <div class="price-amount" data-i18n="pricing_vip_price">Custom</div>
-                    <div class="price-period" data-i18n="pricing_vip_period">For enterprises</div>
-                    <ul class="price-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_vip_f1">Guaranteed priority</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_vip_f2">Unlimited team</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_vip_f3">Custom SLA</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span data-i18n="pricing_vip_f4">White-label option</span>
-                        </li>
-                    </ul>
-                    <a href="mailto:contact@mybestagent.io" class="btn btn-secondary" data-i18n="btn_contact">Contact us</a>
-                </div>
-            </div>
-            <p class="pricing-note" data-i18n="pricing_fair_use">* Fair use policy — no hard limits, smart throttling for heavy usage</p>
-        </div>
-    </section>
-
-    <!-- Success Stories Preview -->
-    <section style="padding: 80px 0; background: linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%);">
-        <div class="container">
-            <h2 class="section-title" style="text-align: center; margin-bottom: 60px;">Real Results from Real Users</h2>
+        <div class="hero-content">
+            <h1>Create Anything, Instantly</h1>
+            <p>Images, videos, code, content. Just ask. No limits. No learning curve.</p>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px;">
-                <div style="background: white; padding: 30px; border-radius: 16px; border: 1px solid var(--border); transition: all 0.3s;">
-                    <div style="font-size: 40px; margin-bottom: 15px;">🎨</div>
-                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Alice's Portfolio</h3>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 15px;">Freelance designer built professional portfolio in 5 minutes</p>
-                    <a href="/case-study-alice.html" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 14px;">Read story →</a>
-                </div>
-
-                <div style="background: white; padding: 30px; border-radius: 16px; border: 1px solid var(--border); transition: all 0.3s;">
-                    <div style="font-size: 40px; margin-bottom: 15px;">🍽️</div>
-                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Jean's Contact Form</h3>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 15px;">Restaurant owner automates customer inquiries. 500€ saved.</p>
-                    <a href="/case-study-jean.html" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 14px;">Read story →</a>
-                </div>
-
-                <div style="background: white; padding: 30px; border-radius: 16px; border: 1px solid var(--border); transition: all 0.3s;">
-                    <div style="font-size: 40px; margin-bottom: 15px;">🧮</div>
-                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Maria's Calculator</h3>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 15px;">Student builds first JS app with working code. Portfolio ready.</p>
-                    <a href="/case-study-maria.html" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 14px;">Read story →</a>
-                </div>
+            <div class="hero-input">
+                <input type="text" placeholder="What do you want to create?">
+                <button>Create</button>
             </div>
 
-            <div style="text-align: center;">
-                <a href="/success-stories.html" class="btn btn-large" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none;">See All 8 Success Stories →</a>
-            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                ✨ Free during Phase 1 • Works on Web, Desktop & Messaging
+            </p>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hero-visual-text">✨</div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="cta">
-        <div class="container cta-content">
-            <h2 data-i18n="cta_title">A month from now, you'll wonder how you lived without this</h2>
-            <p data-i18n="cta_subtitle">The people who said "I could never do that" are now doing it. Your turn.</p>
-            <a href="#" class="btn btn-large startBtn" data-i18n="cta_button">Start for free — no limits</a>
+    <!-- Quick Actions -->
+    <section class="container">
+        <div style="text-align: center; margin-bottom: 48px;">
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 16px;">What's Your Next Move?</h2>
+            <p style="font-size: 1.1rem; color: var(--text-muted);">Create in seconds, not hours</p>
+        </div>
+
+        <div class="actions">
+            <div class="action-card">
+                <div class="action-icon">🖼️</div>
+                <h3>Make Images</h3>
+                <p>Generate stunning visuals from your imagination</p>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">🎬</div>
+                <h3>Make Videos</h3>
+                <p>Create compelling videos with AI</p>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">💻</div>
+                <h3>Make Code</h3>
+                <p>Build apps and websites without coding knowledge</p>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">💬</div>
+                <h3>Just Chat</h3>
+                <p>Ask anything. Get instant, helpful answers</p>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="/" class="logo">
-                        <div class="logo-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                <path d="M2 17l10 5 10-5"/>
-                                <path d="M2 12l10 5 10-5"/>
-                            </svg>
-                        </div>
-                        <span data-i18n="brand_name">My Best Agent</span>
-                    </a>
-                    <p data-i18n="footer_tagline">Your personal AI agent that actually works. Code, automate, and execute—everywhere.</p>
-                </div>
-
+            <div class="footer-content">
                 <div class="footer-col">
-                    <h4 data-i18n="footer_product">Product</h4>
+                    <h4>Product</h4>
                     <ul>
-                        <li><a href="#features" data-i18n="footer_features">Features</a></li>
-                        <li><a href="#pricing" data-i18n="footer_pricing">Pricing</a></li>
-                        <li><a href="#how" data-i18n="footer_how">How it works</a></li>
-                        <li><a href="/app.html" data-i18n="footer_app">Launch App</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4 data-i18n="footer_connect">Connect</h4>
-                    <ul>
-                        <li><a href="mailto:hello@mybestagent.io" data-i18n="footer_contact">Contact</a></li>
-                        <li><a href="https://t.me/mybestagent" target="_blank" rel="noopener">Telegram</a></li>
-                        <li><a href="https://twitter.com/mybestagent" target="_blank" rel="noopener">Twitter</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Learn</h4>
-                    <ul>
-                        <li><a href="/blog.html">Blog</a></li>
+                        <li><a href="#features">Features</a></li>
                         <li><a href="/success-stories.html">Success Stories</a></li>
-                        <li><a href="/case-study-alice.html">Case Studies</a></li>
+                        <li><a href="/app.html">Web App</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
-                    <h4 data-i18n="footer_legal">Legal</h4>
+                    <h4>Connect</h4>
                     <ul>
-                        <li><a href="/terms.html" data-i18n="footer_terms">Terms</a></li>
-                        <li><a href="/privacy.html" data-i18n="footer_privacy">Privacy</a></li>
+                        <li><a href="https://t.me/mybestagent">Telegram</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#">Discord</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Status</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p data-i18n="footer_copyright">© 2026 My Best Agent. All rights reserved.</p>
+                <p>&copy; 2026 My Best Agent. Create. Share. Done.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Auth Modals -->
-    <div id="authModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <button class="modal-close" id="authModalClose">&times;</button>
-            
-            <!-- Login Form -->
-            <div id="loginForm" class="auth-form">
-                <h2 data-i18n="auth.modal_login_title">Log in to My Best Agent</h2>
-                <form id="loginFormElement">
-                    <div class="form-group">
-                        <label for="loginEmail" data-i18n="auth.email">Email</label>
-                        <input type="email" id="loginEmail" required data-i18n="auth.email_placeholder" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword" data-i18n="auth.password">Password</label>
-                        <div class="password-input-wrapper">
-                            <input type="password" id="loginPassword" required placeholder="••••••••">
-                            <button type="button" class="password-toggle" data-toggle-for="loginPassword">👁️</button>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-large" data-i18n="auth.sign_in">Log in</button>
-                </form>
-                
-                <div class="divider" data-i18n="auth.or_text">or</div>
-                
-                <button id="loginGoogleBtn" class="btn btn-secondary btn-large oauth-btn">
-                    <svg class="oauth-logo" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block;margin-right:8px;">
-                        <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#4285F4" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    <span data-i18n="auth.continue_google">Continue with Google</span>
-                </button>
-                <button id="loginGitHubBtn" class="btn btn-secondary btn-large oauth-btn">
-                    <svg class="oauth-logo" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block;margin-right:8px;fill:currentColor;">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span data-i18n="auth.continue_github">Continue with GitHub</span>
-                </button>
-                
-                <p class="auth-link"><span data-i18n="auth.no_account">Don't have an account?</span> <a href="#" id="switchToSignupLink" data-i18n="auth.switch_to_register">Sign up</a></p>
-            </div>
-            
-            <!-- Signup Form -->
-            <div id="signupForm" class="auth-form" style="display: none;">
-                <h2 data-i18n="auth.modal_register_title">Create your account</h2>
-                <form id="signupFormElement">
-                    <div class="form-group">
-                        <label for="signupName" data-i18n="auth.name">Full Name</label>
-                        <input type="text" id="signupName" required data-i18n="auth.name_placeholder" placeholder="Your full name">
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail" data-i18n="auth.email">Email</label>
-                        <input type="email" id="signupEmail" required data-i18n="auth.email_placeholder" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword" data-i18n="auth.password">Password</label>
-                        <div class="password-input-wrapper">
-                            <input type="password" id="signupPassword" required placeholder="••••••••" minlength="12">
-                            <button type="button" class="password-toggle" data-toggle-for="signupPassword">👁️</button>
-                        </div>
-                        <small data-i18n="auth.password_min">At least 12 characters</small>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-large" data-i18n="auth.create_account">Create account</button>
-                </form>
-                
-                <div class="divider" data-i18n="auth.or_text">or</div>
-                
-                <button id="signupGoogleBtn" class="btn btn-secondary btn-large oauth-btn">
-                    <svg class="oauth-logo" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block;margin-right:8px;">
-                        <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#4285F4" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    <span data-i18n="auth.continue_google">Continue with Google</span>
-                </button>
-                <button id="signupGitHubBtn" class="btn btn-secondary btn-large oauth-btn">
-                    <svg class="oauth-logo" viewBox="0 0 24 24" width="18" height="18" style="display:inline-block;margin-right:8px;fill:currentColor;">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span data-i18n="auth.continue_github">Continue with GitHub</span>
-                </button>
-                
-                <p class="auth-link"><span data-i18n="auth.have_account">Already have an account?</span> <a href="#" id="switchToLoginLink" data-i18n="auth.switch_to_login">Log in</a></p>
-            </div>
-            
-            <div id="authError" class="auth-error" style="display: none;"></div>
-            <div id="authLoading" class="auth-loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Processing...</p>
-            </div>
-        </div>
-    </div>
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
 
-    <!-- Modal Styles -->
-    <style>
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+        // Action card interaction
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const action = this.querySelector('h3').textContent;
+                alert(`Opening: ${action}`);
+                // Will redirect to app later
+            });
+        });
 
-        .modal[style*="display: flex"] {
-            opacity: 1;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 420px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
+        // Hero input
+        document.querySelector('.hero-input button').addEventListener('click', function() {
+            const input = document.querySelector('.hero-input input');
+            if (input.value.trim()) {
+                alert(`Creating: ${input.value}`);
+                // Will redirect to app with query param later
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 4px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--bg-muted);
-            color: var(--text);
-        }
-
-        .auth-form h2 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 28px;
-            color: var(--text);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text);
-            font-size: 14px;
-        }
-
-        .password-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 14px;
-            padding-right: 40px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            background: var(--bg-subtle);
-        }
-
-        .form-group input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(99, 91, 255, 0.1);
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 12px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 18px;
-            transition: color 0.2s ease;
-        }
-
-        .password-toggle:hover {
-            color: var(--primary);
-        }
-
-        .form-group small {
-            display: block;
-            margin-top: 6px;
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-
-        .divider {
-            text-align: center;
-            margin: 28px 0;
-            color: var(--text-muted);
-            font-size: 13px;
-            position: relative;
-        }
-
-        .divider::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--border);
-            z-index: 0;
-        }
-
-        .divider {
-            background: white;
-            position: relative;
-            z-index: 1;
-            padding: 0 8px;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .auth-link {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .auth-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: opacity 0.2s ease;
-        }
-
-        .auth-link a:hover {
-            opacity: 0.8;
-            text-decoration: underline;
-        }
-
-        .auth-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            padding: 12px 14px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            animation: shake 0.3s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .auth-loading {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .oauth-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding: 12px 16px;
-            transition: all 0.2s ease;
-        }
-
-        .oauth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .oauth-logo {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @media (max-width: 600px) {
-            .modal-content {
-                padding: 24px;
-                border-radius: 16px;
-                margin: 16px;
-            }
-
-            .auth-form h2 {
-                font-size: 20px;
-                margin-bottom: 20px;
-            }
-
-            .modal-content {
-                max-height: calc(100vh - 32px);
-            }
-        }
-    </style>
-
-    <!-- i18n Script (external to comply with CSP) - MUST LOAD FIRST -->
-    <script src="/app-i18n.js"></script>
-    <!-- Auth Modal Functions (external to comply with CSP) -->
-    <script src="/auth-modal.js"></script>
+        });
+    </script>
 </body>
 </html>
