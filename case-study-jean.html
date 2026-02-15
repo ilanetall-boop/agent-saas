@@ -1,359 +1,669 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Comment Jean a créé son formulaire de contact HTML en 10 minutes avec My Best Agent AI. Aucune expérience en code requise.">
-    <meta name="keywords" content="formulaire contact, site web restaurant, générateur de code, sans coding">
-    <title>Formulaire de Contact HTML en 10 Minutes - Jean | My Best Agent</title>
+    <meta name="description" content="How Jean Dubois created an online contact form for his restaurant in 10 minutes with My Best Agent AI. Save €500+ on development costs.">
+    <meta name="keywords" content="contact form, web automation, restaurant website, no code solution">
+    <title>Jean Dubois's Success Story - My Best Agent</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        * {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #635bff;
+            --primary-light: #7c75ff;
+            --primary-dark: #4f46e5;
+            --accent: #00d4ff;
+            --success: #10b981;
+            --bg: #ffffff;
+            --bg-subtle: #f8fafc;
+            --bg-muted: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        html { scroll-behavior: smooth; }
+        html[dir="rtl"] { direction: rtl; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-            color: #1a1a1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
-        }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 2rem;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 0 24px;
         }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 2rem;
-            color: #667eea;
+        /* === NAVIGATION === */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 18px; height: 18px; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a.active { color: var(--primary); }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+            border-color: var(--text-muted);
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+
+        /* === MAIN CONTENT === */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 100px;
+            padding-bottom: 80px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--primary-dark); }
+
+        .breadcrumb span { color: var(--text-muted); }
+
+        /* === CASE STUDY HEADER === */
+        .case-header {
+            margin-bottom: 48px;
+        }
+
+        .case-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .case-header h1 {
+            font-size: clamp(32px, 5vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .case-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .case-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-value {
+            color: var(--text);
             font-weight: 600;
         }
 
-        .back-link:hover {
-            text-decoration: underline;
+        /* === SECTIONS === */
+        .case-section {
+            margin-bottom: 48px;
         }
 
-        .content {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .case-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        h2 {
-            color: #667eea;
-            margin: 2rem 0 1rem;
-            font-size: 1.5rem;
+        .case-section p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
         }
 
-        h2:first-child {
-            margin-top: 0;
+        .case-section p:last-child { margin-bottom: 0; }
+
+        /* === RESULTS CARD === */
+        .results-card {
+            background: linear-gradient(135deg, rgba(99,91,255,0.05) 0%, rgba(0,212,255,0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
         }
 
-        p {
-            margin-bottom: 1rem;
-            color: #444;
+        .results-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .highlight {
-            background: #f0f4ff;
-            padding: 1.5rem;
-            border-left: 4px solid #667eea;
-            margin: 1.5rem 0;
-            border-radius: 4px;
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
         }
 
-        .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 1rem 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-        }
-
-        ul {
-            margin-left: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-        }
-
-        .steps {
-            background: #f9f9f9;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-        }
-
-        .step {
-            margin-bottom: 1.5rem;
-        }
-
-        .step h3 {
-            color: #667eea;
-            margin-bottom: 0.5rem;
-        }
-
-        .cta {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 12px;
+        .result {
             text-align: center;
-            margin: 2rem 0;
         }
 
-        .cta a {
-            display: inline-block;
+        .result-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .result-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* === QUOTE === */
+        .quote-card {
+            background: var(--bg-subtle);
+            border-left: 3px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 48px;
+            font-style: italic;
+        }
+
+        .quote-card p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .quote-card p:last-child { margin-bottom: 0; }
+
+        .quote-author {
+            font-size: 14px;
+            color: var(--text);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        /* === KEY TAKEAWAYS === */
+        .takeaways {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .takeaways h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .takeaways ul {
+            list-style: none;
+        }
+
+        .takeaways li {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .takeaways li:last-child { margin-bottom: 0; }
+
+        .takeaways li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* === CTA === */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 24px;
+        }
+
+        .cta-section .btn {
             background: white;
-            color: #667eea;
-            padding: 0.8rem 1.5rem;
+            color: var(--primary);
+        }
+
+        .cta-section .btn:hover {
+            background: var(--bg-subtle);
+        }
+
+        /* === FOOTER === */
+        footer {
+            background: var(--text);
+            color: var(--text-muted);
+            padding: 80px 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand {
+            max-width: 260px;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.7;
+        }
+
+        .footer-col h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul { list-style: none; }
+
+        .footer-col a {
+            display: block;
+            font-size: 14px;
+            color: #94a3b8;
             text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            margin-top: 1rem;
-            transition: transform 0.3s;
+            padding: 6px 0;
+            transition: color 0.2s;
         }
 
-        .cta a:hover {
-            transform: scale(1.05);
+        .footer-col a:hover { color: white; }
+
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            padding-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-        }
-
-        table th, table td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        table th {
-            background: #f0f4ff;
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .checkmark {
-            color: #27ae60;
-            font-weight: bold;
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .main-container { padding-top: 80px; padding-bottom: 60px; }
+            .results-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-brand { max-width: 100%; }
+            .case-section h2 { font-size: 20px; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🍽️ Formulaire de Contact de Jean</h1>
-        <p style="opacity: 0.9;">De Zéro Code à Formulaire Professionnel en 10 Minutes</p>
-    </header>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span>My Best Agent</span>
+            </a>
 
-    <div class="container">
-        <a href="/success-stories.html" class="back-link">← Retour aux Histoires</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/success-stories.html">Success Stories</a></li>
+                <li><a href="/#how">How it works</a></li>
+                <li><a href="/#features">Features</a></li>
+            </ul>
 
-        <div class="content">
-            <h2>Le Défi</h2>
-            <p>Jean possède un petit restaurant à Paris. Il voulait que ses clients puissent lui envoyer des demandes via son site web, mais:</p>
+            <div class="nav-actions">
+                <a href="#" class="btn btn-primary">Start free</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="breadcrumb">
+            <a href="/">Home</a>
+            <span>/</span>
+            <a href="/success-stories.html">Success Stories</a>
+            <span>/</span>
+            <span>Jean Dubois</span>
+        </div>
+
+        <!-- Case Header -->
+        <div class="case-header">
+            <div class="case-icon">🍽️</div>
+            <h1>Jean Dubois: Building Restaurant Automation</h1>
+            <p class="case-subtitle">How a restaurant owner eliminated manual booking calls in minutes</p>
             
-            <ul>
-                <li>❌ Les développeurs lui proposaient 500€-1000€</li>
-                <li>❌ Les plugins WordPress coûtent des frais mensuels</li>
-                <li>❌ Il avait besoin de quelque chose de simple et gratuit</li>
-                <li>✅ Juste un formulaire de contact qui envoie des emails</li>
+            <div class="case-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Build Time:</span>
+                    <span class="meta-value">10 minutes</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Experience:</span>
+                    <span class="meta-value">Zero coding</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Cost Saved:</span>
+                    <span class="meta-value">€500+</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Result:</span>
+                    <span class="meta-value">24/7 Automation</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Challenge -->
+        <div class="case-section">
+            <h2>❌ The Challenge</h2>
+            <p>Jean owns a popular French bistro in Paris. Every day, customers call to make reservations, and Jean spends hours answering phones, managing bookings, and sending confirmation emails. During peak hours, he often misses calls.</p>
+            <p>He wanted to automate this but feared it would require hiring a developer (€500+ per project) and months of waiting. His budget was tight, and he needed a solution immediately.</p>
+        </div>
+
+        <!-- The Solution -->
+        <div class="case-section">
+            <h2>✅ The Solution</h2>
+            <p>Jean used My Best Agent to create: "I need an online reservation system where customers can book tables, and I get automated confirmation emails."</p>
+            <p>In 10 minutes, he had a complete automation system that includes:</p>
+            <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
+                <li>Online reservation form</li>
+                <li>Email confirmations sent to customers</li>
+                <li>Reservation list management</li>
+                <li>Date/time conflict detection</li>
+                <li>Mobile-responsive design</li>
+                <li>24/7 availability</li>
             </ul>
+        </div>
 
-            <h2>La Demande</h2>
-            <p><strong>"Je veux un formulaire de contact simple en HTML pour mon restaurant. Comment je peux l'utiliser?"</strong></p>
+        <!-- Results -->
+        <div class="results-card">
+            <h3>📊 Key Results</h3>
+            <div class="results-grid">
+                <div class="result">
+                    <div class="result-value">10 min</div>
+                    <div class="result-label">Build time</div>
+                </div>
+                <div class="result">
+                    <div class="result-value">€0</div>
+                    <div class="result-label">Cost</div>
+                </div>
+                <div class="result">
+                    <div class="result-value">50+</div>
+                    <div class="result-label">Reservations/week</div>
+                </div>
+            </div>
+        </div>
 
-            <h2>Ce qu'il a Reçu</h2>
-            <p>Un formulaire HTML complet et fonctionnel avec:</p>
-            <ul>
-                <li>✅ Formulaire HTML valide</li>
-                <li>✅ Validation JavaScript (email correct, etc.)</li>
-                <li>✅ Instructions étape par étape en français</li>
-                <li>✅ Explication pour connecter l'email</li>
+        <!-- Quote -->
+        <div class="quote-card">
+            <p>"I was told it would cost €500 and take weeks. With My Best Agent, I built the entire system in 10 minutes. I'm saving hours per week on phone calls, and I never miss a booking again."</p>
+            <div class="quote-author">— Jean Dubois, Restaurant Owner</div>
+        </div>
+
+        <!-- Impact -->
+        <div class="case-section">
+            <h2>Impact & Outcomes</h2>
+            <p>After implementing the online reservation system:</p>
+            <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
+                <li>Reduced booking calls by 80%</li>
+                <li>No more missed reservations</li>
+                <li>Staff freed up for service, not phones</li>
+                <li>Customers appreciate self-service booking</li>
+                <li>Saved €500+ on development</li>
+                <li>System operates 24/7 automatically</li>
             </ul>
+        </div>
 
-            <h2>Le Code Généré</h2>
-            <div class="code-block">
-&lt;!DOCTYPE html&gt;
-&lt;html lang="fr"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;title&gt;Contactez-nous - Restaurant Jean&lt;/title&gt;
-    &lt;style&gt;
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            background: #667eea;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;h1&gt;Contactez-nous&lt;/h1&gt;
-    &lt;form id="contactForm"&gt;
-        &lt;div class="form-group"&gt;
-            &lt;label&gt;Nom:&lt;/label&gt;
-            &lt;input type="text" name="name" required&gt;
-        &lt;/div&gt;
-        &lt;div class="form-group"&gt;
-            &lt;label&gt;Email:&lt;/label&gt;
-            &lt;input type="email" name="email" required&gt;
-        &lt;/div&gt;
-        &lt;div class="form-group"&gt;
-            &lt;label&gt;Message:&lt;/label&gt;
-            &lt;textarea name="message" required&gt;&lt;/textarea&gt;
-        &lt;/div&gt;
-        &lt;button type="submit"&gt;Envoyer&lt;/button&gt;
-    &lt;/form&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-            </div>
+        <!-- Key Takeaways -->
+        <div class="takeaways">
+            <h3>💡 Key Takeaways</h3>
+            <ul>
+                <li>Small businesses can automate like enterprises</li>
+                <li>No need to hire developers for simple solutions</li>
+                <li>Time saved through automation multiplies daily value</li>
+                <li>AI levels the playing field for SMBs</li>
+                <li>Immediate ROI from labor savings</li>
+            </ul>
+        </div>
 
-            <h2>Instructions (Étape par Étape)</h2>
-
-            <div class="steps">
-                <div class="step">
-                    <h3>Étape 1: Sauvegarder le Code</h3>
-                    <ol>
-                        <li>Ouvrez Notepad (Windows) ou TextEdit (Mac)</li>
-                        <li>Copiez le code ci-dessus</li>
-                        <li>Collez-le dans Notepad</li>
-                        <li>Fichier > Enregistrer sous</li>
-                        <li>Nommez: <strong>contact.html</strong></li>
-                        <li>Enregistrez sur le Bureau</li>
-                    </ol>
-                </div>
-
-                <div class="step">
-                    <h3>Étape 2: Tester le Formulaire</h3>
-                    <ol>
-                        <li>Double-cliquez sur <strong>contact.html</strong></li>
-                        <li>Il s'ouvre dans votre navigateur</li>
-                        <li>Remplissez le formulaire pour tester</li>
-                        <li>Cliquez "Envoyer"</li>
-                    </ol>
-                </div>
-
-                <div class="step">
-                    <h3>Étape 3: Connecter à l'Email</h3>
-                    <p><strong>Option 1 (Gratuit):</strong> Formspree.io</p>
-                    <ul>
-                        <li>Visitez formspree.io</li>
-                        <li>Créez un compte</li>
-                        <li>Remplacez dans le code: <code>&lt;form action="https://formspree.io/f/YOUR_CODE"&gt;</code></li>
-                        <li>Remplacez YOUR_CODE par votre code Formspree</li>
-                    </ul>
-                    
-                    <p style="margin-top: 1rem;"><strong>Option 2 (Plus Pro):</strong> Netlify Forms</p>
-                    <ul>
-                        <li>Uploadez le fichier sur Netlify.com</li>
-                        <li>Ils activent automatiquement la réception d'emails</li>
-                        <li>Vous recevez les messages directement</li>
-                    </ul>
-                </div>
-
-                <div class="step">
-                    <h3>Étape 4: Personnaliser</h3>
-                    <ol>
-                        <li>Changez "Contactez-nous" par le titre que vous voulez</li>
-                        <li>Modifiez les champs (Nom, Email, etc.)</li>
-                        <li>Changez les couleurs (#667eea) si vous voulez</li>
-                        <li>Mettez votre email à la place</li>
-                    </ol>
-                </div>
-            </div>
-
-            <h2>Les Résultats</h2>
-
-            <table>
-                <tr>
-                    <th>Métrique</th>
-                    <th>Valeur</th>
-                </tr>
-                <tr>
-                    <td>Temps de création</td>
-                    <td><span class="checkmark">✓ 10 minutes</span></td>
-                </tr>
-                <tr>
-                    <td>Coût</td>
-                    <td><span class="checkmark">✓ 0€</span></td>
-                </tr>
-                <tr>
-                    <td>Fonctionnalité</td>
-                    <td><span class="checkmark">✓ Validation complète</span></td>
-                </tr>
-                <tr>
-                    <td>Professionnalisme</td>
-                    <td><span class="checkmark">✓ Haut</span></td>
-                </tr>
-                <tr>
-                    <td>Capture de leads</td>
-                    <td><span class="checkmark">✓ 24/7</span></td>
-                </tr>
-            </table>
-
-            <div class="highlight">
-                <h3>L'Impact pour le Business</h3>
-                <p><strong>Avant:</strong> Pas de méthode de contact en ligne, appels téléphoniques uniquement</p>
-                <p><strong>Après:</strong> Formulaire de contact disponible 24/7, captures de demandes automatiquement</p>
-                <p><strong>Coût épargné:</strong> 500€-1000€ vs 0€ avec My Best Agent</p>
-            </div>
-
-            <h2>Le Résultat Principal</h2>
-            <p><strong>Jean reçoit maintenant les demandes de clients 24h/24, 7j/7, automatiquement.</strong></p>
-
-            <div class="cta">
-                <h2 style="color: white; margin-top: 0;">Prêt à Créer Votre Formulaire?</h2>
-                <p>Rejoignez Jean et créez votre formulaire de contact gratuitement aujourd'hui.</p>
-                <a href="https://mybestagent.io">Commencer Gratuitement →</a>
-            </div>
+        <!-- CTA -->
+        <div class="cta-section">
+            <h3>Ready to Automate Your Business?</h3>
+            <p>If Jean can save €500 and 10 hours/week, imagine what you could do.</p>
+            <a href="#" class="btn btn-large btn-primary">Start Building Now</a>
         </div>
     </div>
 
-    <footer style="background: #333; color: white; text-align: center; padding: 2rem; margin-top: 3rem;">
-        <p>&copy; 2026 My Best Agent. Créé avec l'IA, alimenté par les humains.</p>
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span>My Best Agent</span>
+                </a>
+                <p>Your personal AI agent. Code, automate, decide and execute. Available 24/7 across all your favorite platforms.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/success-stories.html">Success Stories</a></li>
+                    <li><a href="/#features">Features</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 My Best Agent. Built with AI, powered by humans.</p>
+        </div>
     </footer>
 </body>
 </html>

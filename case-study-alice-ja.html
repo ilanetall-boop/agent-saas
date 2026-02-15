@@ -1,500 +1,668 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AliceがMy Best Agent AIで5分間に専門的なポートフォリオウェブサイトを構築した方法。プログラミング経験は不要です。">
-    <meta name="keywords" content="ポートフォリオビルダー, ウェブデザイン, AIコードジェネレータ, プログラミング不要">
-    <title>Aliceが5分間でポートフォリオウェブサイトを作成した方法 | My Best Agent</title>
+    <meta name="description" content="Comment Alice Martin a construit son site portfolio professionnel en 5 minutes avec My Best Agent AI. Aucune expérience en codage requise.">
+    <meta name="keywords" content="constructeur de portfolio, web design, générateur de code IA, sans code">
+    <title>L'histoire de succès d'Alice Martin - My Best Agent</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        :root {
-            --primary: #635bff;
-            --primary-dark: #4f46e5;
-            --primary-light: #7c6eff;
-            --accent: #00c8ff;
-            --success: #27ae60;
-            --error: #e74c3c;
-            --bg-light: #f5f7fa;
-            --bg-lighter: #e8ecf1;
-            --bg-white: #ffffff;
-            --text-dark: #1a1a1a;
-            --text-muted: #666666;
-            --text-light: #999999;
-            --border-color: #e0e0e0;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        * {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
+        :root {
+            --primary: #635bff;
+            --primary-light: #7c75ff;
+            --primary-dark: #4f46e5;
+            --accent: #00d4ff;
+            --success: #10b981;
+            --bg: #ffffff;
+            --bg-subtle: #f8fafc;
+            --bg-muted: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
         }
+
+        html { scroll-behavior: smooth; }
+        html[dir="rtl"] { direction: rtl; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-lighter) 100%);
-            color: var(--text-dark);
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 3rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        header > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.02em;
-        }
-
-        header .subtitle {
-            font-size: 1.1rem;
-            font-weight: 400;
-            opacity: 0.95;
-            margin: 0;
-        }
-
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 0 24px;
         }
 
-        .back-link {
+        /* === NAVIGATION === */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 18px; height: 18px; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a.active { color: var(--primary); }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            margin-top: 2rem;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+            border-color: var(--text-muted);
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+
+        /* === MAIN CONTENT === */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 100px;
+            padding-bottom: 80px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
             color: var(--primary);
             text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--primary-dark); }
+
+        .breadcrumb span { color: var(--text-muted); }
+
+        /* === CASE STUDY HEADER === */
+        .case-header {
+            margin-bottom: 48px;
+        }
+
+        .case-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .case-header h1 {
+            font-size: clamp(32px, 5vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .case-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .case-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-value {
+            color: var(--text);
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
         }
 
-        .back-link:hover {
-            color: var(--primary-dark);
-            gap: 0.75rem;
+        /* === SECTIONS === */
+        .case-section {
+            margin-bottom: 48px;
         }
 
-        .content {
-            background: var(--bg-white);
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
-            backdrop-filter: blur(10px);
-        }
-
-        h2 {
-            color: var(--primary);
-            margin: 2rem 0 1rem;
-            font-size: 1.5rem;
+        .case-section h2 {
+            font-size: 24px;
             font-weight: 700;
-            letter-spacing: -0.01em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        h2:first-child {
-            margin-top: 0;
+        .case-section p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
         }
 
-        h3 {
+        .case-section p:last-child { margin-bottom: 0; }
+
+        /* === RESULTS CARD === */
+        .results-card {
+            background: linear-gradient(135deg, rgba(99,91,255,0.05) 0%, rgba(0,212,255,0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .results-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .result {
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: 800;
             color: var(--primary);
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 1.5rem 0 0.5rem;
+            margin-bottom: 8px;
         }
 
-        p {
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-            font-size: 0.95rem;
+        .result-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* === QUOTE === */
+        .quote-card {
+            background: var(--bg-subtle);
+            border-left: 3px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 48px;
+            font-style: italic;
+        }
+
+        .quote-card p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .quote-card p:last-child { margin-bottom: 0; }
+
+        .quote-author {
+            font-size: 14px;
+            color: var(--text);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        /* === KEY TAKEAWAYS === */
+        .takeaways {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .takeaways h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .takeaways ul {
+            list-style: none;
+        }
+
+        .takeaways li {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .takeaways li:last-child { margin-bottom: 0; }
+
+        .takeaways li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* === CTA === */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 24px;
+        }
+
+        .cta-section .btn {
+            background: white;
+            color: var(--primary);
+        }
+
+        .cta-section .btn:hover {
+            background: var(--bg-subtle);
+        }
+
+        /* === FOOTER === */
+        footer {
+            background: var(--text);
+            color: var(--text-muted);
+            padding: 80px 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand {
+            max-width: 260px;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: #94a3b8;
             line-height: 1.7;
         }
 
-        strong {
+        .footer-col h4 {
+            font-size: 13px;
             font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .highlight {
-            background: rgba(99, 91, 255, 0.05);
-            padding: 1.5rem;
-            border-left: 4px solid var(--primary);
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-
-        .highlight h3 {
-            margin-top: 0;
-        }
-
-        .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 1rem 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            line-height: 1.6;
-            box-shadow: var(--shadow-md);
-        }
-
-        .code-block code {
-            color: #e2e8f0;
-        }
-
-        ul {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        li {
-            margin-bottom: 0.75rem;
-            color: var(--text-dark);
-        }
-
-        .steps {
-            background: rgba(99, 91, 255, 0.03);
-            padding: 2rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-        }
-
-        .step {
-            margin-bottom: 2rem;
-        }
-
-        .step:last-child {
-            margin-bottom: 0;
-        }
-
-        .step h3 {
-            margin-top: 0;
-        }
-
-        .step ol {
-            margin-left: 1.5rem;
-        }
-
-        .step ol li {
-            margin-bottom: 0.5rem;
-        }
-
-        .cta {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            text-align: center;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
         }
 
-        .cta::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
+        .footer-col ul { list-style: none; }
 
-        .cta > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta h2 {
-            color: white;
-            margin-top: 0;
-        }
-
-        .cta p {
-            color: rgba(255, 255, 255, 0.95);
-        }
-
-        .cta a {
-            display: inline-block;
-            background: white;
-            color: var(--primary);
-            padding: 0.85rem 1.75rem;
+        .footer-col a {
+            display: block;
+            font-size: 14px;
+            color: #94a3b8;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            margin-top: 1rem;
-            transition: transform 0.3s, box-shadow 0.3s;
-            font-size: 0.95rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 6px 0;
+            transition: color 0.2s;
         }
 
-        .cta a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+        .footer-col a:hover { color: white; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-            font-size: 0.95rem;
-        }
-
-        table th, table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        table th {
-            background: rgba(99, 91, 255, 0.08);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        table tr:hover {
-            background: rgba(99, 91, 255, 0.03);
-        }
-
-        .checkmark {
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        footer {
-            background: var(--text-dark);
-            color: white;
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            padding-top: 32px;
             text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
+            font-size: 13px;
+            color: #64748b;
         }
 
-        footer p {
-            color: rgba(255, 255, 255, 0.8);
-            margin: 0;
-        }
-
+        /* === RESPONSIVE === */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.75rem;
-            }
-
-            .content {
-                padding: 1.5rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .steps {
-                padding: 1.5rem;
-            }
-
-            h2 {
-                font-size: 1.25rem;
-            }
-
-            table {
-                font-size: 0.85rem;
-            }
-
-            table th, table td {
-                padding: 0.75rem;
-            }
+            .nav-links { display: none; }
+            .main-container { padding-top: 80px; padding-bottom: 60px; }
+            .results-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-brand { max-width: 100%; }
+            .case-section h2 { font-size: 20px; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🎨 Aliceのポートフォリオウェブサイト</h1>
-        <p class="subtitle">プログラミング経験なしから、わずか5分でプロフェッショナルなポートフォリオサイトへ</p>
-    </header>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span>My Best Agent</span>
+            </a>
 
-    <div class="container">
-        <a href="/success-stories.html" class="back-link">← すべてのストーリーに戻る</a>
-
-        <div class="content">
-            <h2>課題</h2>
-            <p>Aliceは才能あるグラフィックデザイナーですが、<strong>プログラミング経験が全くありません</strong>。彼女は自分の作品を展示し、クライアントを獲得するためのプロフェッショナルなポートフォリオウェブサイトが必要でしたが、いくつかの課題に直面していました：</p>
-            
-            <ul>
-                <li>❌ 開発者を雇うと$500～2000かかる</li>
-                <li>❌ ウェブビルダーのカスタマイズには制限がある</li>
-                <li>❌ プログラミングを学ぶには数ヶ月かかる</li>
-                <li>✅ 彼女は高速で、手頃な価格で、制御可能なソリューションが必要でした</li>
+            <ul class="nav-links">
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/success-stories.html">Histoires de succès</a></li>
+                <li><a href="/#how">Comment ça marche</a></li>
+                <li><a href="/#features">Fonctionnalités</a></li>
             </ul>
 
-            <h2>解決策</h2>
-            <p>Aliceはシンプルに My Best Agent に尋ねました：<strong>「私はグラフィックデザイナーです。HTML/CSSで私の作品を展示する美しいポートフォリオウェブサイトを作成していただけますか？プログラミングはできません。」</strong></p>
+            <div class="nav-actions">
+                <a href="#" class="btn btn-primary">Commencer gratuitement</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="breadcrumb">
+            <a href="/">Accueil</a>
+            <span>/</span>
+            <a href="/success-stories.html">Histoires de succès</a>
+            <span>/</span>
+            <span>Alice Martin</span>
+        </div>
+
+        <!-- Case Header -->
+        <div class="case-header">
+            <div class="case-icon">🎨</div>
+            <h1>Alice Martin : Créer un Portfolio Professionnel</h1>
+            <p class="case-subtitle">Comment une designer freelance a lancé sa présence en ligne en quelques minutes</p>
             
-            <p>My Best Agent は本番環境対応の完全なコードとステップバイステップの手順で対応しました。</p>
-
-            <h2>生成されたコード</h2>
-
-            <div class="code-block">
-&lt;!DOCTYPE html&gt;
-&lt;html lang="ja"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;Alice Martin - ポートフォリオ&lt;/title&gt;
-    &lt;style&gt;
-        body { font-family: sans-serif; margin: 0; padding: 0; }
-        header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2rem; }
-        .portfolio { max-width: 1200px; margin: auto; padding: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-        .project { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;header&gt;&lt;h1&gt;Alice Martin - ポートフォリオ&lt;/h1&gt;&lt;/header&gt;
-    &lt;section class="portfolio"&gt;
-        &lt;div class="project"&gt;&lt;h3&gt;プロジェクト1&lt;/h3&gt;&lt;p&gt;説明&lt;/p&gt;&lt;/div&gt;
-    &lt;/section&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-            </div>
-
-            <h2>このコードの使い方（ステップバイステップ）</h2>
-
-            <div class="steps">
-                <div class="step">
-                    <h3>ステップ1：HTMLファイルを作成する</h3>
-                    <ol>
-                        <li>メモ帳（Windows）またはテキストエディット（Mac）を開く</li>
-                        <li>上記のコードをコピーする</li>
-                        <li>ファイル → 名前を付けて保存 に移動</li>
-                        <li>ファイル名：<strong>portfolio.html</strong>と命名</li>
-                        <li>デスクトップに保存する</li>
-                    </ol>
+            <div class="case-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Temps de création :</span>
+                    <span class="meta-value">5 minutes</span>
                 </div>
-
-                <div class="step">
-                    <h3>ステップ2：ブラウザで開く</h3>
-                    <ol>
-                        <li>デスクトップでファイルを探す</li>
-                        <li>ファイルを右クリック</li>
-                        <li>「プログラムから開く」→「Chrome」（またはお使いのブラウザ）を選択</li>
-                        <li>あなたのウェブサイトがライブになりました！</li>
-                    </ol>
+                <div class="meta-item">
+                    <span class="meta-label">Expérience :</span>
+                    <span class="meta-value">Zéro codage</span>
                 </div>
-
-                <div class="step">
-                    <h3>ステップ3：コンテンツをカスタマイズする</h3>
-                    <ol>
-                        <li>「Alice Martin」をあなたの名前に置き換える</li>
-                        <li>プロジェクトのタイトルと説明を更新する</li>
-                        <li>画像ファイル名を自分の画像に置き換える</li>
-                        <li>色をあなたのブランドに合わせて変更する</li>
-                        <li>連絡先メールアドレスを更新する</li>
-                    </ol>
+                <div class="meta-item">
+                    <span class="meta-label">Coût :</span>
+                    <span class="meta-value">0 €</span>
                 </div>
-
-                <div class="step">
-                    <h3>ステップ4：オンラインで公開する（無料）</h3>
-                    <ul>
-                        <li><strong>GitHub Pages</strong>：.htmlファイルをGitHubにアップロード</li>
-                        <li><strong>Netlify</strong>：ファイルをnetlify.comにドラッグ&ドロップ</li>
-                        <li><strong>Vercel</strong>：vercel.comにアップロード</li>
-                    </ul>
+                <div class="meta-item">
+                    <span class="meta-label">Résultat :</span>
+                    <span class="meta-value">Site Professionnel</span>
                 </div>
             </div>
+        </div>
 
-            <h2>結果</h2>
+        <!-- The Challenge -->
+        <div class="case-section">
+            <h2>❌ Le Défi</h2>
+            <p>Alice est une talentueuse designer graphique freelance avec un solide portefeuille de travaux. Cependant, elle n'avait aucun moyen de montrer ses créations en ligne. Elle n'avait pas de site web, et lorsque des clients demandaient à voir son travail, elle ne pouvait envoyer que des PDF ou des liens Instagram.</p>
+            <p>Le problème : Alice n'avait aucune expérience en codage et ne pouvait pas se permettre d'embaucher un développeur web. Les constructeurs de sites web professionnels semblaient complexes, et elle ne voulait pas passer des semaines à apprendre de nouveaux outils.</p>
+        </div>
 
-            <table>
-                <tr>
-                    <th>指標</th>
-                    <th>結果</th>
-                </tr>
-                <tr>
-                    <td>ウェブサイト作成時間</td>
-                    <td><span class="checkmark">✓ 5分</span></td>
-                </tr>
-                <tr>
-                    <td>コスト</td>
-                    <td><span class="checkmark">✓ $0</span></td>
-                </tr>
-                <tr>
-                    <td>プロフェッショナルデザイン</td>
-                    <td><span class="checkmark">✓ はい</span></td>
-                </tr>
-                <tr>
-                    <td>モバイルフレンドリー</td>
-                    <td><span class="checkmark">✓ レスポンシブ</span></td>
-                </tr>
-                <tr>
-                    <td>完全にカスタマイズ可能</td>
-                    <td><span class="checkmark">✓ はい</span></td>
-                </tr>
-            </table>
-
-            <div class="highlight">
-                <h3>影響</h3>
-                <p><strong>Aliceは5分と$0を費やしました。</strong></p>
-                <p>プロの開発者は$1000～2000を請求し、数週間かかったでしょう。</p>
-                <p>My Best Agent で、彼女は瞬時にプロフェッショナルで完全にカスタマイズ可能なウェブサイトを手に入れました。</p>
-            </div>
-
-            <h2>重要なポイント</h2>
-            <p><strong>プロフェッショナルなウェブサイトを持つために開発者である必要はありません。</strong></p>
-            <p>My Best Agent が提供するもの：</p>
-            <ul>
-                <li>✅ 完全で機能するコード（コピーペースト可能）</li>
-                <li>✅ 明確なステップバイステップの指示</li>
-                <li>✅ レスポンシブデザイン（モバイルフレンドリー）</li>
-                <li>✅ 完全なカスタマイズコントロール</li>
-                <li>✅ 完全無料</li>
+        <!-- The Solution -->
+        <div class="case-section">
+            <h2>✅ La Solution</h2>
+            <p>Alice a décidé d'essayer My Best Agent. Elle a simplement décrit ce qu'elle voulait : « J'ai besoin d'un site portfolio professionnel où je peux montrer 12 de mes meilleurs projets de design. »</p>
+            <p>En quelques minutes, My Best Agent a généré un site portfolio complet et réactif avec :</p>
+            <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
+                <li>Un design propre et professionnel</li>
+                <li>Une galerie de portfolio avec effets au survol</li>
+                <li>Une section « À propos »</li>
+                <li>Un formulaire de contact</li>
+                <li>Une mise en page réactive mobile</li>
+                <li>Des temps de chargement rapides</li>
             </ul>
+        </div>
 
-            <div class="cta">
-                <h2>ポートフォリオを作成する準備はできていますか？</h2>
-                <p>Aliceと一緒に、今日あなたのプロフェッショナルウェブサイトを作成してください。</p>
-                <a href="https://mybestagent.io">無料で始める →</a>
+        <!-- Results -->
+        <div class="results-card">
+            <h3>📊 Résultats Clés</h3>
+            <div class="results-grid">
+                <div class="result">
+                    <div class="result-value">5 min</div>
+                    <div class="result-label">Temps de création</div>
+                </div>
+                <div class="result">
+                    <div class="result-value">0 €</div>
+                    <div class="result-label">Coût</div>
+                </div>
+                <div class="result">
+                    <div class="result-value">12</div>
+                    <div class="result-label">Projets présentés</div>
+                </div>
             </div>
+        </div>
+
+        <!-- Quote -->
+        <div class="quote-card">
+            <p>« Je pensais que j'aurais besoin d'embaucher quelqu'un ou de passer des semaines à apprendre le web design. Au lieu de cela, j'ai juste décrit ce que je voulais et j'ai obtenu un site web professionnel en quelques minutes. C'est un vrai game-changer pour les freelances comme moi. »</p>
+            <div class="quote-author">— Alice Martin, Designer Freelance</div>
+        </div>
+
+        <!-- Impact -->
+        <div class="case-section">
+            <h2>Impact et Résultats</h2>
+            <p>Après le lancement de son site portfolio avec My Best Agent :</p>
+            <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
+                <li>La première demande de client est arrivée en 2 jours</li>
+                <li>Plus besoin d'envoyer des portfolios PDF</li>
+                <li>Pouvait partager un lien professionnel unique avec tous les clients potentiels</li>
+                <li>Le site s'est classé sur Google en 2 semaines</li>
+                <li>Augmentation du taux de conversion client de 40 %</li>
+            </ul>
+        </div>
+
+        <!-- Key Takeaways -->
+        <div class="takeaways">
+            <h3>💡 Points Clés</h3>
+            <ul>
+                <li>Les résultats professionnels ne nécessitent pas de compétences en codage</li>
+                <li>Les constructeurs de sites web sont devenus simples et accessibles</li>
+                <li>La rapidité compte : 5 minutes plutôt que des semaines</li>
+                <li>Barrière de coût éliminée : 0 € au lieu de 1 000 € +</li>
+                <li>L'IA supprime les frictions de la création de présence web</li>
+            </ul>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h3>Prêt à Construire Votre Projet ?</h3>
+            <p>Si Alice peut créer un portfolio professionnel en 5 minutes, vous pouvez aussi.</p>
+            <a href="#" class="btn btn-large btn-primary">Commencer Maintenant</a>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 My Best Agent. AIで構築、人間によって駆動。</p>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span>My Best Agent</span>
+                </a>
+                <p>Votre agent IA personnel. Codez, automatisez, décidez et exécutez. Disponible 24h/24 sur toutes vos plateformes préférées.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Produit</h4>
+                <ul>
+                    <li><a href="/">Accueil</a></li>
+                    <li><a href="/success-stories.html">Histoires de succès</a></li>
+                    <li><a href="/#features">Fonctionnalités</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Ressources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Entreprise</h4>
+                <ul>
+                    <li><a href="#">À propos</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Carrières</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Légal</h4>
+                <ul>
+                    <li><a href="#">Confidentialité</a></li>
+                    <li><a href="#">Conditions</a></li>
+                    <li><a href="#">Sécurité</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 My Best Agent. Construit avec l'IA, alimenté par des humains.</p>
+        </div>
     </footer>
 </body>
 </html>

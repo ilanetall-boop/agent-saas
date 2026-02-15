@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +7,25 @@
     <meta name="keywords" content="AI web builder, code generator, HTML generator, no code, web design, portfolio builder, startup tool">
     <meta name="author" content="My Best Agent">
     <meta property="og:title" content="Success Stories - My Best Agent">
-    <meta property="og:description" content="8 real users built professional websites and apps in minutes with AI">
+    <meta property="og:description" content="Real users. Real projects. Real results.">
     <meta property="og:type" content="website">
-    <title>8 Success Stories: How Our Users Built Amazing Projects with AI | My Best Agent</title>
+    <title>Success Stories - My Best Agent</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary: #635bff;
+            --primary-light: #7c75ff;
             --primary-dark: #4f46e5;
             --accent: #00d4ff;
             --success: #10b981;
@@ -27,24 +37,26 @@
             --text-muted: #64748b;
             --border: #e2e8f0;
             --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
         }
 
         html { scroll-behavior: smooth; }
+        html[dir="rtl"] { direction: rtl; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            padding-top: 64px;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
@@ -60,16 +72,13 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255,255,255,0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-light);
         }
 
         .nav-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -77,7 +86,7 @@
         }
 
         .logo {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text);
             text-decoration: none;
@@ -86,185 +95,258 @@
             gap: 8px;
         }
 
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 18px; height: 18px; }
+
         .nav-links {
             display: flex;
-            gap: 32px;
             align-items: center;
+            gap: 32px;
+            list-style: none;
         }
 
         .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
             color: var(--text-secondary);
             text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
             transition: color 0.2s;
         }
 
-        .nav-links a:hover {
-            color: var(--text);
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a.active { color: var(--primary); }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .nav-links a.active {
-            color: var(--primary);
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
         }
 
         .btn-primary {
             background: var(--primary);
             color: white;
-            padding: 10px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: background 0.2s;
         }
 
         .btn-primary:hover {
             background: var(--primary-dark);
-        }
-
-        /* === HEADER === */
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 80px 24px;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-        }
-
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.95;
-            max-width: 700px;
-            margin: 0 auto;
-            font-weight: 400;
-        }
-
-        /* === SECTIONS === */
-        .intro {
-            background: var(--bg);
-            padding: 3rem 2rem;
-            border-radius: 12px;
-            margin: 3rem auto;
-            max-width: 900px;
+            transform: translateY(-1px);
             box-shadow: var(--shadow);
         }
 
-        .intro h2 {
-            color: var(--primary);
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 15px;
+            border-radius: 10px;
         }
 
-        .intro p {
+        /* === HEADER === */
+        .header-section {
+            padding: 140px 0 60px;
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);
+            position: relative;
+            overflow: hidden;
+            margin-top: 64px;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 1400px;
+            height: 100%;
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,91,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .header-content h1 {
+            font-size: clamp(40px, 5vw, 56px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+        }
+
+        .header-content p {
+            font-size: 18px;
+            line-height: 1.7;
             color: var(--text-secondary);
-            margin-bottom: 1rem;
+            margin-bottom: 0;
+        }
+
+        /* === STORIES SECTION === */
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-alt {
+            background: var(--bg-subtle);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 64px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 4vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 17px;
+            color: var(--text-secondary);
+            line-height: 1.7;
         }
 
         .stories-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 64px;
         }
 
         .story-card {
             background: var(--bg);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: all 0.3s;
+            position: relative;
             display: flex;
             flex-direction: column;
         }
 
         .story-card:hover {
-            transform: translateY(-5px);
+            border-color: var(--primary);
             box-shadow: var(--shadow-lg);
-        }
-
-        .story-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 2rem;
-        }
-
-        .story-header h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .story-role {
-            font-size: 0.9rem;
-            opacity: 0.9;
+            transform: translateY(-4px);
         }
 
         .story-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
+            font-size: 32px;
+            margin-bottom: 16px;
         }
 
-        .story-content {
-            padding: 2rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+        .story-card h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .story-role {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
         }
 
         .story-problem,
         .story-solution {
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
         }
 
-        .story-problem h4 {
+        .story-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .story-problem .story-label {
             color: #dc2626;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
         }
 
-        .story-solution h4 {
+        .story-solution .story-label {
             color: var(--success);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
         }
 
         .story-problem p,
         .story-solution p {
-            font-size: 0.9rem;
+            font-size: 14px;
             color: var(--text-secondary);
+            line-height: 1.6;
         }
 
         .story-results {
-            background: #f0f4ff;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
-            margin-bottom: 1rem;
+            background: rgba(99,91,255,0.05);
+            padding: 16px;
+            border-radius: var(--radius);
+            border-left: 3px solid var(--primary);
+            margin-bottom: 20px;
         }
 
         .story-results h4 {
+            font-size: 12px;
+            font-weight: 600;
             color: var(--primary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
         }
 
         .result-item {
             display: flex;
             align-items: center;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+            font-size: 13px;
             color: var(--text-secondary);
+            margin-bottom: 6px;
         }
+
+        .result-item:last-child { margin-bottom: 0; }
 
         .result-check {
             color: var(--success);
-            margin-right: 0.5rem;
+            margin-right: 8px;
             font-weight: bold;
         }
 
@@ -272,224 +354,266 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 14px;
             margin-top: auto;
-            display: inline-block;
-            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
         }
 
         .story-link:hover {
             color: var(--primary-dark);
+            gap: 10px;
         }
 
-        .stats {
+        /* === STATS === */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-            background: var(--bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            margin: 3rem 0;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 80px;
         }
 
-        .stat {
+        .stat-item {
             text-align: center;
         }
 
         .stat-number {
-            font-size: 2rem;
-            color: var(--primary);
-            font-weight: 700;
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
         }
 
         .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
+            font-size: 14px;
+            color: var(--text-muted);
         }
 
+        /* === CTA === */
         .cta {
+            padding: 100px 0;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 3rem 2rem;
-            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .cta-content {
             text-align: center;
-            margin: 4rem 0;
+            position: relative;
+            z-index: 1;
         }
 
         .cta h2 {
-            margin-bottom: 1rem;
-            font-size: 2rem;
+            font-size: clamp(32px, 4vw, 44px);
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
         }
 
         .cta p {
-            font-size: 1rem;
-            margin-bottom: 2rem;
-            opacity: 0.95;
+            font-size: 18px;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .cta-button {
-            display: inline-block;
+        .cta .btn {
             background: white;
             color: var(--primary);
-            padding: 12px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.2s;
         }
 
-        .cta-button:hover {
-            transform: translateY(-2px);
+        .cta .btn:hover {
+            background: var(--bg-subtle);
         }
 
         /* === FOOTER === */
         footer {
             background: var(--text);
-            color: white;
-            padding: 3rem 2rem;
-            margin-top: 4rem;
-            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 80px 0 40px;
         }
 
-        footer .container {
+        .footer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 60px;
+            margin-bottom: 60px;
         }
 
-        footer h4 {
-            margin-bottom: 1rem;
+        .footer-brand {
+            max-width: 260px;
+        }
+
+        .footer-brand .logo {
             color: white;
-            font-size: 1rem;
+            margin-bottom: 16px;
         }
 
-        footer p {
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .footer-brand p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.7;
         }
 
-        footer ul {
-            list-style: none;
+        .footer-col h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
         }
 
-        footer li {
-            margin-bottom: 0.75rem;
-        }
+        .footer-col ul { list-style: none; }
 
-        footer a {
-            color: rgba(255, 255, 255, 0.7);
+        .footer-col a {
+            display: block;
+            font-size: 14px;
+            color: #94a3b8;
             text-decoration: none;
-            font-size: 0.9rem;
+            padding: 6px 0;
             transition: color 0.2s;
         }
 
-        footer a:hover {
-            color: white;
-        }
+        .footer-col a:hover { color: white; }
 
         .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 2rem;
+            border-top: 1px solid #334155;
+            padding-top: 32px;
             text-align: center;
-            font-size: 0.85rem;
-            opacity: 0.7;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1024px) {
+            .stories-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 40px; }
         }
 
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2rem;
-            }
-
-            .nav-links {
-                gap: 16px;
-            }
-
-            .stories-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .cta h2 {
-                font-size: 1.5rem;
-            }
+            .nav-links { display: none; }
+            .header-section { padding: 120px 0 60px; }
+            .header-content h1 { font-size: 32px; }
+            .stories-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-brand { max-width: 100%; }
+            .cta h2 { font-size: 28px; }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
-        <div class="nav-inner">
+        <div class="container nav-inner">
             <a href="/" class="logo">
-                <span>🎯</span> My Best Agent
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span>My Best Agent</span>
             </a>
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/success-stories.html" class="active">Success Stories</a>
-                <a href="/app.html">Chat</a>
-                <a href="https://mybestagent.io" class="btn-primary">Start Free</a>
+
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/success-stories.html" class="active">Success Stories</a></li>
+                <li><a href="/#how">How it works</a></li>
+                <li><a href="/#features">Features</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="#" class="btn btn-primary">Start free</a>
             </div>
         </div>
     </nav>
 
-    <header>
-        <h1>🚀 Success Stories</h1>
-        <p>Real users. Real projects. Real results. See how people from all backgrounds built amazing websites and apps with My Best Agent AI.</p>
-    </header>
-
-    <div class="container">
-        <div class="intro">
-            <h2>How It Works</h2>
-            <p>Every day, people with zero coding experience ask My Best Agent for help. They describe what they want. We generate complete, working code. We provide step-by-step instructions on how to use it. Result? Professional projects built in minutes, not months.</p>
-            <p style="margin-top: 1rem;">Below are 8 real success stories from different industries and backgrounds.</p>
-        </div>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-number">8</div>
-                <div class="stat-label">Users</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">8</div>
-                <div class="stat-label">Projects</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">0</div>
-                <div class="stat-label">Coding Exp.</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">5min</div>
-                <div class="stat-label">Avg Time</div>
+    <!-- Header -->
+    <section class="header-section">
+        <div class="container">
+            <div class="header-content">
+                <div class="section-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    <span>Real Results</span>
+                </div>
+                <h1>Success Stories</h1>
+                <p>Real users. Real projects. Real results. See how people from all backgrounds built amazing things with My Best Agent.</p>
             </div>
         </div>
+    </section>
 
-        <div class="stories-grid">
-            <!-- Story 1 -->
-            <div class="story-card">
-                <div class="story-header">
+    <!-- Stats -->
+    <section class="section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">11+</div>
+                    <div class="stat-label">Users Featured</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">11+</div>
+                    <div class="stat-label">Projects Built</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Coding Exp.</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5min</div>
+                    <div class="stat-label">Avg Build Time</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Stories -->
+    <section class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">From Zero to Hero</h2>
+                <p class="section-subtitle">These users had an idea. Now they have a working project. You can too.</p>
+            </div>
+
+            <div class="stories-grid">
+                <!-- Alice -->
+                <div class="story-card">
                     <div class="story-icon">🎨</div>
                     <h3>Alice Martin</h3>
                     <div class="story-role">Freelance Graphic Designer</div>
-                </div>
-                <div class="story-content">
                     <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Needed professional portfolio website but has zero coding knowledge</p>
+                        <div class="story-label">❌ Challenge</div>
+                        <p>Needed professional portfolio but has zero coding knowledge</p>
                     </div>
                     <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>AI generated complete portfolio website with responsive design</p>
+                        <div class="story-label">✅ Solution</div>
+                        <p>Complete portfolio website with responsive design</p>
                     </div>
                     <div class="story-results">
                         <h4>📊 Results</h4>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>5-minute build time</span>
+                            <span>5-minute build</span>
                         </div>
                         <div class="result-item">
                             <span class="result-check">✓</span>
@@ -500,25 +624,21 @@
                             <span>Professional result</span>
                         </div>
                     </div>
-                    <a href="/case-study-alice.html" class="story-link">Read Full Case Study →</a>
+                    <a href="/case-study-alice.html" class="story-link">Read Case Study →</a>
                 </div>
-            </div>
 
-            <!-- Story 2 -->
-            <div class="story-card">
-                <div class="story-header">
+                <!-- Jean -->
+                <div class="story-card">
                     <div class="story-icon">🍽️</div>
                     <h3>Jean Dubois</h3>
                     <div class="story-role">Restaurant Owner</div>
-                </div>
-                <div class="story-content">
                     <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Wanted online contact form but hiring developer cost €500+</p>
+                        <div class="story-label">❌ Challenge</div>
+                        <p>Wanted online contact form but hiring dev cost €500+</p>
                     </div>
                     <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>Complete contact form with validation and email integration</p>
+                        <div class="story-label">✅ Solution</div>
+                        <p>Complete contact form with validation and emails</p>
                     </div>
                     <div class="story-results">
                         <h4>📊 Results</h4>
@@ -535,25 +655,21 @@
                             <span>24/7 inquiries</span>
                         </div>
                     </div>
-                    <a href="/case-study-jean.html" class="story-link">Read Full Case Study →</a>
+                    <a href="/case-study-jean.html" class="story-link">Read Case Study →</a>
                 </div>
-            </div>
 
-            <!-- Story 3 -->
-            <div class="story-card">
-                <div class="story-header">
+                <!-- Maria -->
+                <div class="story-card">
                     <div class="story-icon">🧮</div>
                     <h3>Maria Garcia</h3>
                     <div class="story-role">Student Learning Code</div>
-                </div>
-                <div class="story-content">
                     <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Learning to code but struggling to build real projects</p>
+                        <div class="story-label">❌ Challenge</div>
+                        <p>Struggling to build real projects while learning</p>
                     </div>
                     <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>Complete calculator app with working JavaScript + tutorial</p>
+                        <div class="story-label">✅ Solution</div>
+                        <p>Complete calculator app with JavaScript + tutorial</p>
                     </div>
                     <div class="story-results">
                         <h4>📊 Results</h4>
@@ -570,214 +686,69 @@
                             <span>Portfolio piece</span>
                         </div>
                     </div>
-                    <a href="/case-study-maria.html" class="story-link">Read Full Case Study →</a>
-                </div>
-            </div>
-
-            <!-- Story 4 -->
-            <div class="story-card">
-                <div class="story-header">
-                    <div class="story-icon">✅</div>
-                    <h3>David Cohen</h3>
-                    <div class="story-role">Busy Professional</div>
-                </div>
-                <div class="story-content">
-                    <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Needed task management app but no time to build it</p>
-                    </div>
-                    <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>Complete to-do list app with local storage</p>
-                    </div>
-                    <div class="story-results">
-                        <h4>📊 Results</h4>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Fully functional</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Data persists</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Production ready</span>
-                        </div>
-                    </div>
-                    <a href="/case-study-david.html" class="story-link">Read Full Case Study →</a>
-                </div>
-            </div>
-
-            <!-- Story 5 -->
-            <div class="story-card">
-                <div class="story-header">
-                    <div class="story-icon">🖼️</div>
-                    <h3>Emma Mueller</h3>
-                    <div class="story-role">Photography Business</div>
-                </div>
-                <div class="story-content">
-                    <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Needed image gallery but limited budget</p>
-                    </div>
-                    <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>Professional image gallery with lightbox effect</p>
-                    </div>
-                    <div class="story-results">
-                        <h4>📊 Results</h4>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Professional showcase</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Responsive design</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Easy to customize</span>
-                        </div>
-                    </div>
-                    <a href="/case-study-emma.html" class="story-link">Read Full Case Study →</a>
-                </div>
-            </div>
-
-            <!-- Story 6 -->
-            <div class="story-card">
-                <div class="story-header">
-                    <div class="story-icon">🌦️</div>
-                    <h3>Marco Rossi</h3>
-                    <div class="story-role">Learning Developer</div>
-                </div>
-                <div class="story-content">
-                    <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Wanted to build weather app but API integration confusing</p>
-                    </div>
-                    <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>Complete weather app with live API integration + tutorial</p>
-                    </div>
-                    <div class="story-results">
-                        <h4>📊 Results</h4>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Working API calls</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Real-time data</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Learning experience</span>
-                        </div>
-                    </div>
-                    <a href="/case-study-marco.html" class="story-link">Read Full Case Study →</a>
-                </div>
-            </div>
-
-            <!-- Story 7 -->
-            <div class="story-card">
-                <div class="story-header">
-                    <div class="story-icon">🚀</div>
-                    <h3>Sarah Chen</h3>
-                    <div class="story-role">SaaS Startup Founder</div>
-                </div>
-                <div class="story-content">
-                    <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Needed landing page fast for product launch</p>
-                    </div>
-                    <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>Professional landing page with CTA and conversion optimization</p>
-                    </div>
-                    <div class="story-results">
-                        <h4>📊 Results</h4>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>2-hour launch</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Leads captured</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>20% conversion</span>
-                        </div>
-                    </div>
-                    <a href="/case-study-sarah.html" class="story-link">Read Full Case Study →</a>
-                </div>
-            </div>
-
-            <!-- Story 8 -->
-            <div class="story-card">
-                <div class="story-header">
-                    <div class="story-icon">📝</div>
-                    <h3>Ahmed Ali</h3>
-                    <div class="story-role">Teacher / Educator</div>
-                </div>
-                <div class="story-content">
-                    <div class="story-problem">
-                        <h4>❌ The Challenge</h4>
-                        <p>Wanted interactive quiz app for students</p>
-                    </div>
-                    <div class="story-solution">
-                        <h4>✅ The Solution</h4>
-                        <p>Complete quiz application with scoring system</p>
-                    </div>
-                    <div class="story-results">
-                        <h4>📊 Results</h4>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>100+ student users</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Better engagement</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-check">✓</span>
-                            <span>Automated grading</span>
-                        </div>
-                    </div>
-                    <a href="/case-study-ahmed.html" class="story-link">Read Full Case Study →</a>
+                    <a href="/case-study-maria.html" class="story-link">Read Case Study →</a>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="cta">
-            <h2>Ready to Build Your Project?</h2>
-            <p>Join 8+ users who've already built amazing things with My Best Agent. No coding experience required.</p>
-            <a href="https://mybestagent.io" class="cta-button">Start For Free Today →</a>
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Build Your Project?</h2>
+                <p>Join users who've already built amazing things. No coding experience required. Start free today.</p>
+                <a href="#" class="btn btn-large btn-primary">Start Building Now</a>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <div>
-                <h4>My Best Agent</h4>
-                <p>Your personal AI agent. Code, automate, decide and execute.</p>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span>My Best Agent</span>
+                </a>
+                <p>Your personal AI agent. Code, automate, decide and execute. Available 24/7 across all your favorite platforms.</p>
             </div>
-            <div>
+            <div class="footer-col">
                 <h4>Product</h4>
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="/success-stories.html">Success Stories</a></li>
-                    <li><a href="/app.html">Chat App</a></li>
+                    <li><a href="/#features">Features</a></li>
                 </ul>
             </div>
-            <div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
                 <h4>Legal</h4>
                 <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Security</a></li>
                 </ul>
             </div>
         </div>

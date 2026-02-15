@@ -1,519 +1,668 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cómo María construyó una aplicación calculadora funcional en HTML/JavaScript en 5 minutos con My Best Agent AI.">
-    <meta name="keywords" content="calculadora HTML, JavaScript, generador de código, sin experiencia">
-    <meta property="og:title" content="Calculadora Funcional en 5 Minutos | My Best Agent">
-    <meta property="og:description" content="María aprendió a programar y construyó su primera app">
-    <title>Cómo María Construyó una Calculadora en 5 Minutos | My Best Agent</title>
+    <meta name="description" content="How Maria Garcia built her first real coding project with My Best Agent AI. From struggling student to confident developer.">
+    <meta name="keywords" content="coding education, learning programming, project-based learning, coding assistance">
+    <title>Maria Garcia's Success Story - My Best Agent</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        * {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
+        :root {
+            --primary: #635bff;
+            --primary-light: #7c75ff;
+            --primary-dark: #4f46e5;
+            --accent: #00d4ff;
+            --success: #10b981;
+            --bg: #ffffff;
+            --bg-subtle: #f8fafc;
+            --bg-muted: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
         }
+
+        html { scroll-behavior: smooth; }
+        html[dir="rtl"] { direction: rtl; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-            color: #1a1a1a;
-            line-height: 1.7;
-        }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            top: -100px;
-            right: -100px;
-        }
-
-        header::after {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 50%;
-            bottom: -50px;
-            left: -50px;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-        }
-
-        header .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 3rem 2rem;
+            padding: 0 24px;
         }
 
-        .back-link {
+        /* === NAVIGATION === */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 18px; height: 18px; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a.active { color: var(--primary); }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
             display: inline-flex;
             align-items: center;
-            margin-bottom: 2rem;
-            color: #667eea;
-            text-decoration: none;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
             font-weight: 600;
-            transition: all 0.3s;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
         }
 
-        .back-link:hover {
-            transform: translateX(-4px);
-            color: #764ba2;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
 
-        .content {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            animation: slideUp 0.6s ease-out;
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
         }
 
-        h2 {
-            color: #667eea;
-            margin: 2.5rem 0 1rem;
-            font-size: 1.8rem;
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+            border-color: var(--text-muted);
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+
+        /* === MAIN CONTENT === */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 100px;
+            padding-bottom: 80px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--primary-dark); }
+
+        .breadcrumb span { color: var(--text-muted); }
+
+        /* === CASE STUDY HEADER === */
+        .case-header {
+            margin-bottom: 48px;
+        }
+
+        .case-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .case-header h1 {
+            font-size: clamp(32px, 5vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .case-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .case-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-value {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* === SECTIONS === */
+        .case-section {
+            margin-bottom: 48px;
+        }
+
+        .case-section h2 {
+            font-size: 24px;
             font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        h2:first-child {
-            margin-top: 0;
+        .case-section p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
         }
 
-        h3 {
-            color: #333;
-            margin: 1.5rem 0 0.8rem;
-            font-weight: 600;
-            font-size: 1.2rem;
+        .case-section p:last-child { margin-bottom: 0; }
+
+        /* === RESULTS CARD === */
+        .results-card {
+            background: linear-gradient(135deg, rgba(99,91,255,0.05) 0%, rgba(0,212,255,0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
         }
 
-        p {
-            margin-bottom: 1rem;
-            color: #555;
-            font-size: 1rem;
+        .results-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        ul, ol {
-            margin-left: 2rem;
-            margin-bottom: 1.5rem;
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
         }
 
-        li {
-            margin-bottom: 0.7rem;
-            color: #555;
-        }
-
-        .highlight {
-            background: linear-gradient(135deg, #f0f4ff 0%, #f5f0ff 100%);
-            padding: 2rem;
-            border-left: 5px solid #667eea;
-            margin: 2rem 0;
-            border-radius: 12px;
-        }
-
-        .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 12px;
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .steps {
-            background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
-            padding: 2rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-        }
-
-        .step {
-            margin-bottom: 2rem;
-        }
-
-        .step:last-child {
-            margin-bottom: 0;
-        }
-
-        .step-number {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .result {
             text-align: center;
-            line-height: 40px;
-            font-weight: bold;
-            margin-right: 1rem;
-            margin-bottom: 0.5rem;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        .result-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
         }
 
-        table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.2rem;
-            text-align: left;
+        .result-label {
+            font-size: 13px;
+            color: var(--text-muted);
             font-weight: 600;
         }
 
-        table td {
-            padding: 1rem 1.2rem;
-            border-bottom: 1px solid #f0f0f0;
-            color: #555;
+        /* === QUOTE === */
+        .quote-card {
+            background: var(--bg-subtle);
+            border-left: 3px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 48px;
+            font-style: italic;
         }
 
-        table tr:last-child td {
-            border-bottom: none;
+        .quote-card p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
         }
 
-        table tr:hover {
-            background: #f8f8f8;
+        .quote-card p:last-child { margin-bottom: 0; }
+
+        .quote-author {
+            font-size: 14px;
+            color: var(--text);
+            font-style: normal;
+            font-weight: 600;
         }
 
-        .checkmark {
-            color: #27ae60;
-            font-weight: bold;
-            font-size: 1.2rem;
+        /* === KEY TAKEAWAYS === */
+        .takeaways {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
         }
 
-        .cta {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 2rem;
-            border-radius: 20px;
+        .takeaways h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .takeaways ul {
+            list-style: none;
+        }
+
+        .takeaways li {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .takeaways li:last-child { margin-bottom: 0; }
+
+        .takeaways li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* === CTA === */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-xl);
+            padding: 48px;
             text-align: center;
-            margin: 3rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta::before {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            top: -150px;
-            right: -150px;
-        }
-
-        .cta h2 {
             color: white;
-            margin-top: 0;
-            position: relative;
-            z-index: 1;
         }
 
-        .cta p {
-            color: rgba(255,255,255,0.95);
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 1;
+        .cta-section h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
-        .cta-button {
-            display: inline-block;
+        .cta-section p {
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 24px;
+        }
+
+        .cta-section .btn {
             background: white;
-            color: #667eea;
-            padding: 1rem 2.5rem;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            z-index: 1;
+            color: var(--primary);
         }
 
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        .cta-section .btn:hover {
+            background: var(--bg-subtle);
         }
 
+        /* === FOOTER === */
         footer {
-            background: #1a1a1a;
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-            border-top: 1px solid #333;
+            background: var(--text);
+            color: var(--text-muted);
+            padding: 80px 0 40px;
         }
 
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand {
+            max-width: 260px;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.7;
+        }
+
+        .footer-col h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul { list-style: none; }
+
+        .footer-col a {
+            display: block;
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 6px 0;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover { color: white; }
+
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            padding-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* === RESPONSIVE === */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8rem;
-            }
-
-            .container {
-                padding: 1.5rem;
-            }
-
-            .content {
-                padding: 1.5rem;
-            }
-
-            table {
-                font-size: 0.9rem;
-            }
-
-            table th, table td {
-                padding: 0.8rem;
-            }
-
-            .cta {
-                padding: 2rem 1rem;
-            }
+            .nav-links { display: none; }
+            .main-container { padding-top: 80px; padding-bottom: 60px; }
+            .results-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-brand { max-width: 100%; }
+            .case-section h2 { font-size: 20px; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🧮 La Calculadora de María</h1>
-        <p class="subtitle">De Cero Experiencia a Aplicación Funcional en 5 Minutos</p>
-    </header>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span>My Best Agent</span>
+            </a>
 
-    <div class="container">
-        <a href="/success-stories.html" class="back-link">← Volver a Todas las Historias</a>
-
-        <div class="content">
-            <h2>El Desafío</h2>
-            <p>María es estudiante y estaba aprendiendo a programar. Quería construir su primer proyecto real en HTML y JavaScript, pero:</p>
-            
-            <ul>
-                <li>❌ Los tutoriales eran confusos y largos</li>
-                <li>❌ Construir desde cero tomaba semanas</li>
-                <li>❌ Necesitaba algo funcional para su portafolio</li>
-                <li>✅ Una aplicación simple pero real que funcionara</li>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/success-stories.html">Success Stories</a></li>
+                <li><a href="/#how">How it works</a></li>
+                <li><a href="/#features">Features</a></li>
             </ul>
 
-            <h2>La Solución</h2>
-            <p>María pidió: <strong>"Write me a simple calculator app in HTML and JavaScript. I want to add, subtract, multiply and divide. Tell me exactly how to use it."</strong></p>
+            <div class="nav-actions">
+                <a href="#" class="btn btn-primary">Start free</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="breadcrumb">
+            <a href="/">Home</a>
+            <span>/</span>
+            <a href="/success-stories.html">Success Stories</a>
+            <span>/</span>
+            <span>Maria Garcia</span>
+        </div>
+
+        <!-- Case Header -->
+        <div class="case-header">
+            <div class="case-icon">🧮</div>
+            <h1>Maria Garcia: Learning Through Building</h1>
+            <p class="case-subtitle">How a student transformed from struggling learner to confident developer</p>
             
-            <p>My Best Agent generó:</p>
-            <ul>
-                <li>✅ Calculadora HTML/JavaScript completa</li>
-                <li>✅ Con todas las operaciones (suma, resta, multiplicación, división)</li>
-                <li>✅ Explicación paso a paso de cómo funciona</li>
-                <li>✅ Cómo modificar y extender el código</li>
+            <div class="case-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Build Time:</span>
+                    <span class="meta-value">15 minutes</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Experience:</span>
+                    <span class="meta-value">Beginner coder</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Cost:</span>
+                    <span class="meta-value">Free</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Result:</span>
+                    <span class="meta-value">Working App</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Challenge -->
+        <div class="case-section">
+            <h2>❌ The Challenge</h2>
+            <p>Maria is a computer science student struggling with her programming courses. Her professors taught theory, but she couldn't build real projects. Every tutorial she followed either was outdated or too simple. She felt stuck between "Hello World" and real applications.</p>
+            <p>What she really needed: a real, functional project to build her confidence and portfolio. Not another tutorial. Something she could show employers.</p>
+        </div>
+
+        <!-- The Solution -->
+        <div class="case-section">
+            <h2>✅ The Solution</h2>
+            <p>Maria asked My Best Agent: "I want to build a calculator app with JavaScript. I need the code, and I want to understand how it works so I can learn from it."</p>
+            <p>In 15 minutes, she had:</p>
+            <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
+                <li>Complete, working calculator application</li>
+                <li>Clean, readable source code</li>
+                <li>Step-by-step explanation of how it works</li>
+                <li>Suggestions for how to extend it</li>
+                <li>Working example she could customize</li>
             </ul>
+        </div>
 
-            <h2>El Código Generado</h2>
-            <div class="code-block">
-&lt;!DOCTYPE html&gt;
-&lt;html lang="es"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;title&gt;Calculadora&lt;/title&gt;
-    &lt;style&gt;
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-        }
-        .calculator {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            background: #667eea;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #764ba2;
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;div class="calculator"&gt;
-        &lt;h1&gt;Calculadora&lt;/h1&gt;
-        &lt;input type="number" id="num1" placeholder="Número 1"&gt;
-        &lt;input type="number" id="num2" placeholder="Número 2"&gt;
-        &lt;button onclick="sumar()"&gt;+&lt;/button&gt;
-        &lt;button onclick="restar()"&gt;-&lt;/button&gt;
-        &lt;button onclick="multiplicar()"&gt;×&lt;/button&gt;
-        &lt;button onclick="dividir()"&gt;÷&lt;/button&gt;
-        &lt;h2 id="resultado"&gt;&lt;/h2&gt;
-    &lt;/div&gt;
-    &lt;script&gt;
-        function sumar() { 
-            const resultado = parseFloat(document.getElementById('num1').value) + parseFloat(document.getElementById('num2').value);
-            document.getElementById('resultado').textContent = 'Resultado: ' + resultado;
-        }
-        // ... más funciones
-    &lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-            </div>
-
-            <h2>Instrucciones (Paso a Paso)</h2>
-
-            <div class="steps">
-                <div class="step">
-                    <span class="step-number">1</span>
-                    <h3>Crear el Archivo</h3>
-                    <ol>
-                        <li>Abra Notepad</li>
-                        <li>Copie el código arriba</li>
-                        <li>Pegue en Notepad</li>
-                        <li>Archivo > Guardar Como</li>
-                        <li>Nombre: <strong>calculadora.html</strong></li>
-                        <li>Guarde en el Escritorio</li>
-                    </ol>
+        <!-- Results -->
+        <div class="results-card">
+            <h3>📊 Key Results</h3>
+            <div class="results-grid">
+                <div class="result">
+                    <div class="result-value">15 min</div>
+                    <div class="result-label">First working app</div>
                 </div>
-
-                <div class="step">
-                    <span class="step-number">2</span>
-                    <h3>Probar la Aplicación</h3>
-                    <ol>
-                        <li>Doble-clic en <strong>calculadora.html</strong></li>
-                        <li>Se abre en su navegador</li>
-                        <li>Ingrese dos números</li>
-                        <li>Haga clic en cualquier botón (+, -, ×, ÷)</li>
-                        <li>¡Vea el resultado!</li>
-                    </ol>
+                <div class="result">
+                    <div class="result-value">100%</div>
+                    <div class="result-label">Understanding code</div>
                 </div>
-
-                <div class="step">
-                    <span class="step-number">3</span>
-                    <h3>Personalizar</h3>
-                    <ol>
-                        <li>Abra el archivo en Notepad</li>
-                        <li>Cambie los colores (sustituya #667eea)</li>
-                        <li>Agregue más operaciones (raíz cuadrada, potencia, etc.)</li>
-                        <li>Guarde y actualice el navegador</li>
-                    </ol>
-                </div>
-
-                <div class="step">
-                    <span class="step-number">4</span>
-                    <h3>Publicar Online (Gratis)</h3>
-                    <ul>
-                        <li><strong>GitHub Pages:</strong> Suba a GitHub</li>
-                        <li><strong>Netlify:</strong> Arrastra el archivo a netlify.com</li>
-                        <li><strong>Surge:</strong> Usa el comando surge</li>
-                    </ul>
+                <div class="result">
+                    <div class="result-value">3</div>
+                    <div class="result-label">Extensions built</div>
                 </div>
             </div>
+        </div>
 
-            <h2>Los Resultados</h2>
+        <!-- Quote -->
+        <div class="quote-card">
+            <p>"I was stuck for weeks on a project I didn't know how to start. My Best Agent gave me working code AND taught me how it works. Now I understand JavaScript better, and I can build my own apps. This changed how I learn."</p>
+            <div class="quote-author">— Maria Garcia, Computer Science Student</div>
+        </div>
 
-            <table>
-                <tr>
-                    <th>Métrica</th>
-                    <th>Valor</th>
-                </tr>
-                <tr>
-                    <td>Tiempo de creación</td>
-                    <td><span class="checkmark">✓ 5 minutos</span></td>
-                </tr>
-                <tr>
-                    <td>Costo</td>
-                    <td><span class="checkmark">✓ $0</span></td>
-                </tr>
-                <tr>
-                    <td>Funcionalidad</td>
-                    <td><span class="checkmark">✓ Completa</span></td>
-                </tr>
-                <tr>
-                    <td>Para Portafolio</td>
-                    <td><span class="checkmark">✓ Sí</span></td>
-                </tr>
-                <tr>
-                    <td>Experiencia de Aprendizaje</td>
-                    <td><span class="checkmark">✓ Excelente</span></td>
-                </tr>
-            </table>
+        <!-- Impact -->
+        <div class="case-section">
+            <h2>Impact & Outcomes</h2>
+            <p>After building her first real project with AI assistance:</p>
+            <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
+                <li>Built 3 additional projects in the following weeks</li>
+                <li>Improved from C to A in her programming course</li>
+                <li>Added real projects to her portfolio</li>
+                <li>Gained confidence to tackle harder problems</li>
+                <li>Learned faster through building vs. theory alone</li>
+                <li>Now helps other students using the same approach</li>
+            </ul>
+        </div>
 
-            <div class="highlight">
-                <h3>El Impacto para María</h3>
-                <p><strong>Antes:</strong> Tutoriales confusos, no sabía por dónde empezar</p>
-                <p><strong>Después:</strong> Una aplicación funcional, código que entiende, proyecto real para su portafolio</p>
-                <p><strong>Tiempo ahorrado:</strong> 1-2 semanas vs 5 minutos</p>
-            </div>
+        <!-- Key Takeaways -->
+        <div class="takeaways">
+            <h3>💡 Key Takeaways</h3>
+            <ul>
+                <li>Learning accelerates when you build real projects</li>
+                <li>AI can bridge the gap between theory and practice</li>
+                <li>Project-based learning is more effective than tutorials</li>
+                <li>Understanding code matters more than just reading it</li>
+                <li>Students benefit most from scaffolded projects</li>
+            </ul>
+        </div>
 
-            <div class="cta">
-                <h2>¿Listo para Crear Tu Primera Aplicación?</h2>
-                <p>Únete a María y construye proyectos reales con My Best Agent.</p>
-                <a href="https://mybestagent.io" class="cta-button">Comienza Gratis Hoy →</a>
-            </div>
+        <!-- CTA -->
+        <div class="cta-section">
+            <h3>Start Building Your First Project Today</h3>
+            <p>Whether you're learning or creating, building real projects is the fastest way to grow.</p>
+            <a href="#" class="btn btn-large btn-primary">Start Building Now</a>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 My Best Agent. Construido con IA, alimentado por humanos.</p>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span>My Best Agent</span>
+                </a>
+                <p>Your personal AI agent. Code, automate, decide and execute. Available 24/7 across all your favorite platforms.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/success-stories.html">Success Stories</a></li>
+                    <li><a href="/#features">Features</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 My Best Agent. Built with AI, powered by humans.</p>
+        </div>
     </footer>
 </body>
 </html>
