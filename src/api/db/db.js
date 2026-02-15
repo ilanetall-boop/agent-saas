@@ -333,6 +333,42 @@ const dbOps = {
     isEmailVerified: async (userId) => {
         const user = await get('SELECT email_verified FROM users WHERE id = $1', [userId]);
         return user?.email_verified === 1;
+    },
+
+    // Sites (user-generated websites)
+    createSite: async (id, userId, slug, name, htmlContent, cssContent = null, jsContent = null) => {
+        await run(`
+            INSERT INTO sites (id, user_id, slug, name, html_content, css_content, js_content)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            ON CONFLICT(user_id, slug) DO UPDATE
+            SET html_content = EXCLUDED.html_content,
+                css_content = EXCLUDED.css_content,
+                js_content = EXCLUDED.js_content,
+                name = EXCLUDED.name,
+                updated_at = CURRENT_TIMESTAMP
+        `, [id, userId, slug, name, htmlContent, cssContent, jsContent]);
+    },
+
+    getSite: async (userId, slug) => {
+        return await get(
+            'SELECT * FROM sites WHERE user_id = $1 AND slug = $2',
+            [userId, slug]
+        );
+    },
+
+    getSiteBySlug: async (slug) => {
+        return await get('SELECT * FROM sites WHERE slug = $1', [slug]);
+    },
+
+    getUserSites: async (userId) => {
+        return await all(
+            'SELECT id, slug, name, created_at, updated_at FROM sites WHERE user_id = $1 ORDER BY updated_at DESC',
+            [userId]
+        );
+    },
+
+    deleteSite: async (userId, slug) => {
+        await run('DELETE FROM sites WHERE user_id = $1 AND slug = $2', [userId, slug]);
     }
 };
 

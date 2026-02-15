@@ -906,6 +906,69 @@
                 font-size: 12px;
             }
         }
+
+        /* Site Deployed Card */
+        .site-deployed-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+            color: white;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .site-deployed-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .site-deployed-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 14px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            word-break: break-all;
+        }
+
+        .site-deployed-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .site-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .site-url {
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .site-deployed-hint {
+            margin-top: 12px;
+            font-size: 13px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>

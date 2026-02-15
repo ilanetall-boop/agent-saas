@@ -250,7 +250,56 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         
         // Save assistant message
         await db.addMessage(nanoid(), conversation.id, 'assistant', response.content);
-        
+
+        // Auto-deploy site if Eva generated HTML code
+        let deployedSite = null;
+        const htmlMatch = response.content.match(/```(?:html)?\n?([\s\S]*?<!DOCTYPE html[\s\S]*?<\/html>[\s\S]*?)```/i) ||
+                          response.content.match(/(<!DOCTYPE html[\s\S]*?<\/html>)/i);
+
+        if (htmlMatch) {
+            try {
+                const htmlContent = htmlMatch[1].trim();
+
+                // Extract CSS if present
+                const cssMatch = response.content.match(/```css\n?([\s\S]*?)```/i);
+                const cssContent = cssMatch ? cssMatch[1].trim() : null;
+
+                // Extract JS if present
+                const jsMatch = response.content.match(/```(?:javascript|js)\n?([\s\S]*?)```/i);
+                const jsContent = jsMatch ? jsMatch[1].trim() : null;
+
+                // Generate slug from user's name or a default
+                const userName = memoryMap.name || 'site';
+                const baseSlug = userName.toLowerCase()
+                    .replace(/[àáâãäå]/g, 'a')
+                    .replace(/[èéêë]/g, 'e')
+                    .replace(/[ìíîï]/g, 'i')
+                    .replace(/[òóôõö]/g, 'o')
+                    .replace(/[ùúûü]/g, 'u')
+                    .replace(/[ç]/g, 'c')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-|-$/g, '');
+
+                // Create unique slug with timestamp
+                const siteSlug = `${baseSlug}-${Date.now().toString(36)}`;
+                const siteName = `${memoryMap.name || 'Mon'}'s Site`;
+                const siteId = nanoid();
+
+                await db.createSite(siteId, req.user.id, siteSlug, siteName, htmlContent, cssContent, jsContent);
+
+                // Build site URL
+                const protocol = req.protocol;
+                const host = req.get('host');
+                const siteUrl = `${protocol}://${host}/sites/${siteSlug}`;
+
+                deployedSite = { slug: siteSlug, url: siteUrl, name: siteName };
+                console.log(`🚀 [SITE DEPLOYED] ${siteUrl}`);
+
+            } catch (siteError) {
+                console.error('Failed to auto-deploy site:', siteError.message);
+            }
+        }
+
         // Update message count
         await db.updateUserMessages(req.user.id);
         
@@ -308,7 +357,9 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
                 fromCache: response.fromCache || false,
                 cost: response.cost || 0,
                 latency: response.routing?.latency || 0
-            }
+            },
+            // Site deployment info (if Eva generated a site)
+            site: deployedSite
         });
     } catch (error) {
         console.error(`\n❌ [CHAT ERROR] User: ${req.user?.email}, Error: ${error.message}`);

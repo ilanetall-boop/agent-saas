@@ -351,7 +351,23 @@ async function sendMessage() {
             const data = await res.json();
             // Pass AI routing info to show model used
             addMessage('assistant', data.response, data.ai || null);
-            
+
+            // Show site deployment link if Eva created a site
+            if (data.site && data.site.url) {
+                const siteCard = document.createElement('div');
+                siteCard.className = 'site-deployed-card';
+                siteCard.innerHTML = `
+                    <div class="site-deployed-header">🚀 Site déployé !</div>
+                    <a href="${data.site.url}" target="_blank" class="site-deployed-link">
+                        <span class="site-icon">🌐</span>
+                        <span class="site-url">${data.site.url}</span>
+                    </a>
+                    <div class="site-deployed-hint">Clique pour voir ton site en ligne</div>
+                `;
+                document.getElementById('chatMessages').appendChild(siteCard);
+                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+            }
+
             // Show degradation warning if applicable
             if (data.usage && data.usage.degraded) {
                 document.getElementById('degradationWarning').style.display = 'block';

@@ -94,6 +94,24 @@ CREATE TABLE IF NOT EXISTS vaults (
     last_rotated_at TIMESTAMP
 );
 
+-- Sites table (user-generated websites by Eva)
+CREATE TABLE IF NOT EXISTS sites (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    name TEXT NOT NULL,
+    html_content TEXT NOT NULL,
+    css_content TEXT,
+    js_content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(user_id, slug)
+);
+
+CREATE INDEX IF NOT EXISTS idx_sites_user ON sites(user_id);
+CREATE INDEX IF NOT EXISTS idx_sites_slug ON sites(slug);
+
 -- Indexes (NOTE: idx_sessions_last_rotated created by migrations.js after column exists)
 CREATE INDEX IF NOT EXISTS idx_agents_user ON agents(user_id);
 CREATE INDEX IF NOT EXISTS idx_memories_agent ON memories(agent_id);

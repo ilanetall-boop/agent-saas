@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit');
 const Sentry = require('@sentry/node');
 const helmet = require('helmet');
 const config = require('./config');
-const { initDb } = require('./db/db');
+const { initDb, getSiteBySlug } = require('./db/db');
 const { initCache } = require('./services/knowledge-cache');
 
 // Initialize Sentry for error tracking (if SENTRY_DSN is set)
@@ -111,6 +111,7 @@ app.use('/api/oauth', require('./routes/oauth'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/telegram', require('./routes/telegram'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/sites', require('./routes/sites'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -155,6 +156,50 @@ app.post('/api/desktop/execute', require('./middleware/auth').authMiddleware, as
 // Onboarding redirect
 app.get('/onboarding', (req, res) => {
     res.sendFile(path.join(__dirname, '../../onboarding.html'));
+});
+
+// Public sites route - serve user-generated sites
+app.get('/sites/:slug', async (req, res) => {
+    try {
+        const site = await getSiteBySlug(req.params.slug);
+
+        if (!site) {
+            return res.status(404).send(`
+                <!DOCTYPE html>
+                <html><head><title>Site non trouvé</title></head>
+                <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+                    <h1>Site non trouvé</h1>
+                    <p>Ce site n'existe pas ou a été supprimé.</p>
+                    <a href="/">Retour à l'accueil</a>
+                </body></html>
+            `);
+        }
+
+        // Build complete HTML page with CSS and JS
+        const fullHtml = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${site.name} - My Best Agent</title>
+    <style>
+        ${site.css_content || ''}
+    </style>
+</head>
+<body>
+    ${site.html_content}
+    ${site.js_content ? `<script>${site.js_content}</script>` : ''}
+</body>
+</html>`;
+
+        res.setHeader('Content-Type', 'text/html');
+        res.send(fullHtml);
+
+    } catch (error) {
+        console.error('Error serving site:', error);
+        res.status(500).send('Erreur lors du chargement du site');
+    }
 });
 
 // Serve static files (landing page)
