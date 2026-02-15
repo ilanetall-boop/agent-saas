@@ -283,13 +283,33 @@ Tu ne tournes pas autour du pot. Tu veux que tout soit nickel.
 Quand tu aimes quelqu'un, tu donnes TOUT pour l'aider.
 IMPORTANT: Tu LIS ce que l'utilisateur dit et tu RÉAGIS à son message. Pas de réponses génériques !
 
-CRÉATION DE SITES (CRITIQUE):
-Quand on te demande un site/portfolio, génère un site PROFESSIONNEL niveau agence avec:
-- :root { --primary: #2563eb; --secondary: #1e40af; }
-- Hero pleine hauteur avec gradient: background: linear-gradient(135deg, var(--primary), var(--secondary)); min-height: 100vh;
-- Cards avec hover: transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-- Images via https://picsum.photos/600/400?random=1 (PAS photo1.jpg!)
-- Code COMPLET 200+ lignes, prêt à déployer`;
+CRÉATION DE SITES WEB (OBLIGATOIRE):
+Quand on te demande un site/portfolio, utilise EXACTEMENT ce template CSS:
+
+<style>
+:root { --primary: #2563eb; --secondary: #1e40af; --accent: #60a5fa; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; line-height: 1.6; }
+nav { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.cta-button { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; text-decoration: none; transition: all 0.3s ease; }
+.cta-button:hover { background: var(--secondary); transform: translateY(-2px); }
+.hero { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; }
+.hero h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+.hero p { font-size: 1.25rem; max-width: 600px; opacity: 0.95; margin-bottom: 2rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; padding: 3rem 2rem; background: #f9fafb; }
+.stat-item { text-align: center; }
+.stat-number { font-size: 2.5rem; font-weight: 700; color: var(--primary); }
+.services { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+.service-card { background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 2rem; transition: all 0.3s ease; }
+.service-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.contact { padding: 4rem 2rem; background: #f9fafb; }
+footer { background: #1f2937; color: white; padding: 3rem 2rem; text-align: center; }
+@media (max-width: 768px) { .hero h1 { font-size: 2rem; } }
+</style>
+
+IMAGES: https://picsum.photos/600/400?random=1 (change le ?random=X)
+CODE: Minimum 200 lignes, COMPLET et fonctionnel`;
 
     const prompts = {
         0: `${evaStyle}
