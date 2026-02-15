@@ -74,11 +74,12 @@
             border-bottom: 1px solid var(--border-light);
         }
 
-        .nav-inner {
+                .nav-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
             height: 64px;
+            flex-wrap: nowrap;
         }
 
         .logo {
@@ -103,11 +104,13 @@
 
         .logo-icon svg { width: 18px; height: 18px; }
 
-        .nav-links {
+                .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 24px;
             list-style: none;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .nav-links a {
@@ -116,15 +119,18 @@
             color: var(--text-secondary);
             text-decoration: none;
             transition: color 0.2s;
+            white-space: nowrap;
         }
 
         .nav-links a:hover { color: var(--text); }
         .nav-links a.active { color: var(--primary); }
 
-        .nav-actions {
+                .nav-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .btn {
@@ -525,30 +531,30 @@
                 <span>My Best Agent</span>
             </a>
 
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/success-stories.html">Success Stories</a></li>
-                <li><a href="/#how">How it works</a></li>
-                <li><a href="/#features">Features</a></li>
+                        <ul class="nav-links">
+                <li><a href="/" data-i18n="nav_home">Home</a></li>
+                <li><a href="/success-stories.html" data-i18n="nav_success">Success Stories</a></li>
+                <li><a href="/#how" data-i18n="nav_how">How it works</a></li>
+                <li><a href="/#features" data-i18n="nav_features">Features</a></li>
             </ul>
 
-            <div class="nav-actions">
-<div class="language-switcher">
-                    <select onchange="if(this.value === 'en') { window.location.href = '/case-study-maria.html'; } else { window.location.href = '/case-study-maria-' + this.value + '.html'; }">
-<option value="en" selected>English</option>
-<option value="fr" >Français</option>
-<option value="es" >Español</option>
-<option value="de" >Deutsch</option>
-<option value="it" >Italiano</option>
-<option value="pt" >Português</option>
-<option value="zh" >中文</option>
-<option value="ar" >العربية</option>
-<option value="ja" >日本語</option>
-<option value="ru" >Русский</option>
+                        <div class="nav-actions">
+                <div class="language-switcher">
+                    <select id="langSelector">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Português</option>
+                        <option value="zh">中文</option>
+                        <option value="ar">العربية</option>
+                        <option value="ja">日本語</option>
+                        <option value="ru">Русский</option>
                     </select>
                 </div>
-                <a href="/login.html" class="btn btn-secondary">Sign In</a>
-                <a href="#" class="btn btn-primary">Start free</a>
+                <a href="/login.html" class="btn btn-secondary" data-i18n="nav_signin">Sign In</a>
+                <a href="/" class="btn btn-primary" data-i18n="btn_start_free">Start free</a>
             </div>
         </div>
     </nav>
@@ -722,5 +728,8 @@
             <p>&copy; 2026 My Best Agent. Built with AI, powered by humans.</p>
         </div>
     </footer>
+
+    <!-- i18n Scripts (includes language selector functions) -->
+    <script src="/app-i18n.js"></script>
 </body>
 </html>
