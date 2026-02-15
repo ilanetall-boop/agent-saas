@@ -829,26 +829,7 @@
         </div>
     </footer>
 
-    <!-- i18n Scripts -->
+    <!-- i18n Scripts (includes language selector functions) -->
     <script src="/app-i18n.js"></script>
-    <script>
-        function initLangSelector() {
-            const selector = document.getElementById('langSelector');
-            if (selector) {
-                const savedLang = localStorage.getItem('language');
-                if (savedLang && selector.querySelector(`option[value="${savedLang}"]`)) {
-                    selector.value = savedLang;
-                }
-            }
-        }
-
-        function changeLanguage(lang) {
-            localStorage.setItem('language', lang);
-            window.location.reload();
-        }
-
-        initLangSelector();
-        document.addEventListener('DOMContentLoaded', initLangSelector);
-    </script>
 </body>
 </html>

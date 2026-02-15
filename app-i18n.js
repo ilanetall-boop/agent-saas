@@ -158,7 +158,32 @@ window.switchLanguage = switchLanguage;
 window.updatePageTranslations = updatePageTranslations;
 window.i18nInstance = i18nInstance;
 
+// Language selector initialization - syncs selector with localStorage
+function initLangSelector() {
+    const selector = document.getElementById('langSelector');
+    if (selector) {
+        const savedLang = localStorage.getItem('language');
+        if (savedLang && selector.querySelector(`option[value="${savedLang}"]`)) {
+            selector.value = savedLang;
+        }
+    }
+}
+
+// Change language and reload page
+function changeLanguage(lang) {
+    localStorage.setItem('language', lang);
+    window.location.reload();
+}
+
+// Initialize selector on DOM ready and immediately
+initLangSelector();
+document.addEventListener('DOMContentLoaded', initLangSelector);
+
+// Make functions globally accessible
+window.initLangSelector = initLangSelector;
+window.changeLanguage = changeLanguage;
+
 // Export for use in other scripts (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { i18nInstance, updatePageTranslations, switchLanguage };
+    module.exports = { i18nInstance, updatePageTranslations, switchLanguage, initLangSelector, changeLanguage };
 }
