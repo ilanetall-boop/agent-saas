@@ -61,11 +61,16 @@ const PATTERNS = {
         /en (français|anglais|espagnol|allemand)/i,
         /to (french|english|spanish|german)/i
     ],
+    website: [
+        /\b(portfolio|site|website|landing.?page|webpage)\b/i,
+        /\b(créer?|build|make|write).*(site|portfolio|page)\b/i,
+        /\b(html|css).*(complet|professionnel|moderne)/i
+    ],
     code: [
         /\b(code|function|script|program|debug|error|bug|fix)\b/i,
-        /\b(javascript|typescript|python|java|html|css|sql|api|json|react|node)\b/i,
+        /\b(javascript|typescript|python|java|sql|api|json|react|node)\b/i,
         /```[\s\S]*```/,
-        /\b(créer?|build|make|write|implement).*(app|site|website|component)\b/i
+        /\b(implement|develop|program)\b/i
     ],
     analysis: [
         /\b(analy[sz]e|explain|compare|evaluate|review)\b/i,
@@ -113,6 +118,7 @@ function selectModel(complexity, userTier = 'free') {
     const capabilityMap = {
         simple: 'chat',
         translate: 'translate',
+        website: 'code',  // Website creation needs full code capability (Sonnet)
         code: 'code',
         'code-simple': 'code-simple',
         analysis: 'analysis',
@@ -129,26 +135,36 @@ function selectModel(complexity, userTier = 'free') {
     // Find all capable models
     const candidates = [];
 
+    // For code/website tasks, require actual code capability (no chat fallback)
+    const strictCapabilities = ['code', 'website', 'analysis', 'complex'];
+    const isStrict = strictCapabilities.includes(complexity);
+
     for (const [providerName, provider] of Object.entries(PROVIDERS)) {
         for (const [modelName, config] of Object.entries(provider.models)) {
-            if (allowedTiers.includes(config.tier) &&
-                (config.capabilities.includes(requiredCapability) ||
-                 config.capabilities.includes('chat'))) { // chat is fallback
+            const hasCapability = config.capabilities.includes(requiredCapability);
+            const hasChatFallback = !isStrict && config.capabilities.includes('chat');
+
+            if (allowedTiers.includes(config.tier) && (hasCapability || hasChatFallback)) {
                 const cost = MODEL_COSTS[modelName];
                 candidates.push({
                     provider: providerName,
                     model: modelName,
                     tier: config.tier,
-                    cost: cost ? cost.input + cost.output : 999
+                    cost: cost ? cost.input + cost.output : 999,
+                    hasExactCapability: hasCapability
                 });
             }
         }
     }
 
-    // Sort by cost (cheapest first)
-    candidates.sort((a, b) => a.cost - b.cost);
+    // Prefer models with exact capability match
+    candidates.sort((a, b) => {
+        if (a.hasExactCapability && !b.hasExactCapability) return -1;
+        if (!a.hasExactCapability && b.hasExactCapability) return 1;
+        return a.cost - b.cost;
+    });
 
-    // Return cheapest capable model
+    // Return best model (already sorted by capability match, then cost)
     return candidates[0] || {
         provider: 'anthropic',
         model: 'claude-3-5-haiku-20241022',
