@@ -618,6 +618,294 @@
         .btn-secondary:hover {
             background: rgba(255,255,255,0.2);
         }
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .chat-header {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+            }
+
+            .chat-header h1 {
+                font-size: 16px;
+            }
+
+            .chat-header h1 .status {
+                display: none;
+            }
+
+            .chat-header > div:last-child {
+                width: 100%;
+                display: flex;
+                gap: 8px;
+                margin-top: 8px;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .tier-badge {
+                font-size: 11px;
+                padding: 3px 8px;
+            }
+
+            .user-info {
+                font-size: 12px;
+                margin: 0;
+            }
+
+            .logout {
+                font-size: 13px;
+                padding: 6px 12px;
+                flex: 1;
+                min-width: 80px;
+            }
+
+            .logout:nth-child(3) {
+                display: none;
+            }
+
+            .chat-messages {
+                padding: 12px 12px;
+                gap: 8px;
+            }
+
+            .message {
+                max-width: 100%;
+            }
+
+            .message .bubble {
+                padding: 10px 12px;
+                font-size: 14px;
+                border-radius: 10px;
+            }
+
+            .message .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .chat-input-container {
+                padding: 12px 16px 16px;
+            }
+
+            .chat-input {
+                padding: 10px 12px;
+                font-size: 16px;
+                min-height: 44px;
+                border-radius: 8px;
+            }
+
+            .send-btn {
+                width: 44px;
+                height: 44px;
+                border-radius: 8px;
+            }
+
+            .send-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .usage-bar {
+                font-size: 11px;
+                margin-top: 8px;
+            }
+
+            #languageSwitcher {
+                font-size: 12px;
+                padding: 6px 10px;
+                min-width: 100px;
+                top: 12px;
+                right: 12px;
+            }
+
+            .auth-box {
+                padding: 24px;
+                border-radius: 12px;
+            }
+
+            .auth-box h1 {
+                font-size: 20px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .form-group input {
+                padding: 12px 14px;
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+            .modal-content {
+                width: 95%;
+                border-radius: 12px;
+            }
+
+            .modal-header {
+                padding: 16px;
+            }
+
+            .modal-header h2 {
+                font-size: 16px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            .modal-footer {
+                padding: 16px;
+                gap: 8px;
+            }
+
+            .tier-badge {
+                order: 1;
+            }
+
+            .user-info {
+                order: 2;
+            }
+
+            .logout {
+                order: 3;
+            }
+
+            .auth-container {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chat-header {
+                padding: 10px 12px;
+            }
+
+            .chat-header h1 {
+                font-size: 14px;
+            }
+
+            .chat-header > div:last-child {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .logout {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+
+            .message {
+                max-width: 95%;
+            }
+
+            .message .bubble {
+                padding: 8px 10px;
+                font-size: 13px;
+                border-radius: 8px;
+            }
+
+            .message .avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .chat-input-container {
+                padding: 10px 12px 12px;
+            }
+
+            .chat-input-wrapper {
+                gap: 8px;
+            }
+
+            .chat-input {
+                padding: 8px 10px;
+                font-size: 15px;
+                min-height: 40px;
+                border-radius: 6px;
+            }
+
+            .send-btn {
+                width: 40px;
+                height: 40px;
+                border-radius: 6px;
+            }
+
+            .send-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .usage-bar {
+                font-size: 10px;
+            }
+
+            #languageSwitcher {
+                font-size: 11px;
+                padding: 5px 8px;
+                min-width: 90px;
+            }
+
+            .auth-box {
+                padding: 16px;
+                border-radius: 10px;
+            }
+
+            .auth-box h1 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            .auth-box p {
+                margin-bottom: 20px;
+                font-size: 13px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 15px;
+            }
+
+            .oauth-btn {
+                padding: 10px;
+                font-size: 13px;
+                gap: 6px;
+            }
+
+            .btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .auth-switch {
+                margin-top: 16px;
+                font-size: 12px;
+            }
+
+            .divider {
+                margin: 12px 0;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
