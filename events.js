@@ -2,10 +2,44 @@
 // Attach all DOM event listeners on page load
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Language Switcher
+    // Language Switcher (auth page)
     const languageSwitcher = document.getElementById('langSelector');
     if (languageSwitcher) {
         languageSwitcher.addEventListener('change', (e) => switchLanguage(e.target.value));
+    }
+
+    // Language Switcher (chat page)
+    const chatLanguageSwitcher = document.getElementById('chatLanguageSwitcher');
+    if (chatLanguageSwitcher) {
+        // Sync with current language
+        const currentLang = localStorage.getItem('language') || 'en';
+        chatLanguageSwitcher.value = currentLang;
+
+        chatLanguageSwitcher.addEventListener('change', (e) => {
+            if (typeof switchLanguage === 'function') {
+                switchLanguage(e.target.value);
+            } else if (typeof i18nInstance !== 'undefined') {
+                i18nInstance.setLanguage(e.target.value);
+            }
+        });
+    }
+
+    // Also sync the main language switcher on page load
+    const mainLangSwitcher = document.getElementById('languageSwitcher');
+    if (mainLangSwitcher) {
+        const currentLang = localStorage.getItem('language') || 'en';
+        mainLangSwitcher.value = currentLang;
+        mainLangSwitcher.addEventListener('change', (e) => {
+            if (typeof switchLanguage === 'function') {
+                switchLanguage(e.target.value);
+            } else if (typeof i18nInstance !== 'undefined') {
+                i18nInstance.setLanguage(e.target.value);
+            }
+            // Sync chat switcher if visible
+            if (chatLanguageSwitcher) {
+                chatLanguageSwitcher.value = e.target.value;
+            }
+        });
     }
     
     // "Start free" buttons - Show signup modal instead of redirecting to /app.html

@@ -499,6 +499,35 @@
 
         .hidden { display: none !important; }
 
+        /* Chat language selector */
+        .chat-lang-select {
+            padding: 6px 10px;
+            background: #f5f7fa;
+            border: 1px solid #d0d6dd;
+            border-radius: 6px;
+            color: #1a1a1a;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            min-width: 60px;
+        }
+
+        .chat-lang-select:hover {
+            border-color: #635bff;
+        }
+
+        .chat-lang-select:focus {
+            outline: none;
+            border-color: #635bff;
+            box-shadow: 0 0 0 2px rgba(99, 91, 255, 0.1);
+        }
+
+        /* Hide absolute language switcher when chat is visible */
+        .chat-container:not([style*="none"]) ~ .language-switcher,
+        body:has(.chat-container[style*="flex"]) .language-switcher {
+            display: none;
+        }
+
         /* Modal */
         .modal {
             position: fixed;
@@ -1067,9 +1096,21 @@
                 <span class="status"></span>
                 <span id="agentName" data-i18n="chat.my_agent">My Best Agent</span>
             </h1>
-            <div style="display:flex;align-items:center;gap:16px;">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                 <span class="tier-badge starter" id="tierBadge">Starter</span>
                 <span class="user-info" id="userInfo"></span>
+                <select id="chatLanguageSwitcher" class="chat-lang-select">
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="es">ES</option>
+                    <option value="de">DE</option>
+                    <option value="it">IT</option>
+                    <option value="pt">PT</option>
+                    <option value="zh">中文</option>
+                    <option value="ja">日本</option>
+                    <option value="ru">RU</option>
+                    <option value="ar">ع</option>
+                </select>
                 <button class="logout" data-i18n="chat.telegram">📱 Telegram</button>
                 <button class="logout" data-i18n="chat.logout">Sign Out</button>
             </div>
