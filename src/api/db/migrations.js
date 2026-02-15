@@ -113,6 +113,27 @@ async function runMigrations(pool) {
         await createIndexIfNotExists(pool, 'cost_tracking', 'idx_cost_user', 'user_id');
         await createIndexIfNotExists(pool, 'cost_tracking', 'idx_cost_created', 'created_at');
 
+        // Migration 22: Create user_integrations table for N8N connections
+        await createTableIfNotExists(pool, 'user_integrations', `
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            service TEXT NOT NULL,
+            credentials TEXT,
+            status TEXT DEFAULT 'disconnected',
+            connected_at TIMESTAMP,
+            last_used TIMESTAMP,
+            expires_at TIMESTAMP,
+            metadata TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, service)
+        `);
+
+        // Migration 23: Create indexes for user_integrations
+        await createIndexIfNotExists(pool, 'user_integrations', 'idx_user_integrations_user', 'user_id');
+        await createIndexIfNotExists(pool, 'user_integrations', 'idx_user_integrations_service', 'service');
+        await createIndexIfNotExists(pool, 'user_integrations', 'idx_user_integrations_status', 'status');
+
         console.log('✅ Migrations completed successfully');
     } catch (error) {
         console.error('❌ Migration error:', error);

@@ -104,7 +104,29 @@ document.addEventListener('DOMContentLoaded', function() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
     }
-    
+
+    // Connections Button
+    const connectionsBtn = document.getElementById('connectionsBtn');
+    if (connectionsBtn) {
+        connectionsBtn.addEventListener('click', openConnectionsModal);
+    }
+
+    // Connections Modal Close
+    const closeConnectionsBtn = document.getElementById('closeConnectionsModal');
+    if (closeConnectionsBtn) {
+        closeConnectionsBtn.addEventListener('click', closeConnectionsModal);
+    }
+
+    // Close connections modal on outside click
+    const connectionsModal = document.getElementById('connectionsModal');
+    if (connectionsModal) {
+        connectionsModal.addEventListener('click', (e) => {
+            if (e.target === connectionsModal) {
+                closeConnectionsModal();
+            }
+        });
+    }
+
     // Telegram Modal
     const telegramResendBtn = document.querySelector('#verificationModal .btn-primary');
     if (telegramResendBtn) {

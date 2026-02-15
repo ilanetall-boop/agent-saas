@@ -12,6 +12,7 @@
 
 const { searchCache, storeInCache, recordCacheHit } = require('./knowledge-cache');
 const { trackRequest, calculateCost, MODEL_COSTS } = require('./cost-tracker');
+const { detectAction, handleAction, generateConnectionPrompt } = require('./n8n-integration');
 
 // Provider configurations
 const PROVIDERS = {
@@ -250,6 +251,70 @@ async function route(message, conversationHistory = [], options = {}, db = null)
     const startTime = Date.now();
     let usedCache = false;
     let cacheEntryId = null;
+
+    // 0. Check if this is an ACTION request (Gmail, Calendar, etc.)
+    const actionDetection = detectAction(message);
+
+    if (actionDetection.isAction) {
+        console.log(`[SmartRouter] ACTION detected: ${actionDetection.service}/${actionDetection.action}`);
+
+        // Handle the action via N8N
+        const actionResult = await handleAction(
+            userId,
+            actionDetection.service,
+            actionDetection.action,
+            { message, language },
+            db
+        );
+
+        if (actionResult.needsConnection) {
+            // User needs to connect the service first
+            const prompt = generateConnectionPrompt(actionDetection.service, actionDetection.action);
+
+            return {
+                success: true,
+                content: prompt.message,
+                isAction: true,
+                needsConnection: true,
+                connectionData: {
+                    service: actionDetection.service,
+                    serviceName: actionResult.serviceName,
+                    icon: actionResult.icon
+                },
+                model: 'action-router',
+                provider: 'n8n',
+                cost: 0,
+                routing: {
+                    complexity: 'action',
+                    tier: 'action',
+                    userTier,
+                    latency: Date.now() - startTime
+                }
+            };
+        }
+
+        if (actionResult.success) {
+            // Action executed successfully
+            return {
+                success: true,
+                content: formatActionResult(actionResult),
+                isAction: true,
+                actionResult,
+                model: 'action-router',
+                provider: 'n8n',
+                cost: 0,
+                routing: {
+                    complexity: 'action',
+                    tier: 'action',
+                    userTier,
+                    latency: Date.now() - startTime
+                }
+            };
+        }
+
+        // Action failed, let Eva handle it with context
+        console.log(`[SmartRouter] Action failed, falling back to AI: ${actionResult.message}`);
+    }
 
     // 1. Check semantic cache (unless skipped)
     if (!skipCache && db) {
@@ -723,9 +788,39 @@ function getFallbackOrder(primary) {
     return [primary, ...all.filter(p => p !== primary)];
 }
 
+/**
+ * Format action result into a human-readable response
+ */
+function formatActionResult(actionResult) {
+    const { service, action, result } = actionResult;
+
+    const templates = {
+        gmail: {
+            sort: `📧 J'ai trié tes mails!\n\n${result?.summary || 'Mails organisés avec succès.'}`,
+            send: `📧 Mail envoyé avec succès à ${result?.recipient || 'destinataire'}!`,
+            search: `📧 J'ai trouvé ${result?.count || 0} mails:\n${result?.preview || ''}`,
+            read: `📧 Voici tes derniers mails:\n${result?.emails?.map(e => `• ${e.subject}`).join('\n') || 'Aucun nouveau mail'}`
+        },
+        calendar: {
+            create: `📅 Événement créé: "${result?.title || 'Nouvel événement'}" le ${result?.date || ''}`,
+            list: `📅 Tes prochains événements:\n${result?.events?.map(e => `• ${e.date}: ${e.title}`).join('\n') || 'Aucun événement'}`
+        },
+        drive: {
+            list: `📁 Fichiers dans Drive:\n${result?.files?.map(f => `• ${f.name}`).join('\n') || 'Aucun fichier'}`,
+            upload: `📁 Fichier "${result?.fileName || 'fichier'}" uploadé avec succès!`
+        },
+        slack: {
+            send: `💬 Message envoyé sur #${result?.channel || 'channel'}!`
+        }
+    };
+
+    return templates[service]?.[action] || `✅ Action "${action}" exécutée sur ${service} avec succès!`;
+}
+
 module.exports = {
     route,
     analyzeComplexity,
     selectModel,
-    PROVIDERS
+    PROVIDERS,
+    detectAction
 };

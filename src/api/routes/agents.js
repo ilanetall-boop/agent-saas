@@ -340,7 +340,8 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         console.log(`   Response: "${response.content.substring(0, 100)}${response.content.length > 100 ? '...' : ''}"`);
         console.log(`   Usage: ${updatedUser.messages_used}/${updatedUser.messages_limit} messages\n`);
         
-        res.json({
+        // Build response object
+        const responseData = {
             response: response.content,
             usage: {
                 messagesUsed: updatedUser.messages_used,
@@ -360,7 +361,19 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             },
             // Site deployment info (if Eva generated a site)
             site: deployedSite
-        });
+        };
+
+        // Add action-specific data if this was an action request
+        if (response.isAction) {
+            responseData.action = {
+                isAction: true,
+                needsConnection: response.needsConnection || false,
+                connectionData: response.connectionData || null,
+                actionResult: response.actionResult || null
+            };
+        }
+
+        res.json(responseData);
     } catch (error) {
         console.error(`\n❌ [CHAT ERROR] User: ${req.user?.email}, Error: ${error.message}`);
         console.error('Stack:', error.stack.substring(0, 200));

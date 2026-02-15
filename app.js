@@ -388,6 +388,30 @@ async function sendMessage() {
             // Pass AI routing info to show model used
             addMessage('assistant', data.response, data.ai || null);
 
+            // Show connection button if Eva needs to connect to a service
+            if (data.action && data.action.needsConnection) {
+                const connectionData = data.action.connectionData;
+                const connectionCard = document.createElement('div');
+                connectionCard.className = 'connection-required-card';
+                connectionCard.innerHTML = `
+                    <div class="connection-card-icon">${connectionData.icon || '🔗'}</div>
+                    <div class="connection-card-text">
+                        <strong>Connexion requise</strong>
+                        <p>Connecte ${connectionData.serviceName} pour que je puisse agir</p>
+                    </div>
+                    <button class="connection-card-btn" data-service="${connectionData.service}">
+                        Connecter ${connectionData.serviceName}
+                    </button>
+                `;
+                document.getElementById('chatMessages').appendChild(connectionCard);
+                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+
+                // Add click handler
+                connectionCard.querySelector('.connection-card-btn').addEventListener('click', (e) => {
+                    connectService(e.target.dataset.service);
+                });
+            }
+
             // Show site deployment link if Eva created a site
             if (data.site && data.site.url) {
                 const siteCard = document.createElement('div');
@@ -482,6 +506,145 @@ async function linkTelegramBot() {
     } catch (e) {
         errorEl.textContent = `${i18nInstance.t('errors.network_error')}: ${e.message}`;
         errorEl.style.display = 'block';
+    }
+}
+
+// ==========================================
+// INTEGRATIONS / CONNEXIONS
+// ==========================================
+
+// Available integrations (synced with n8n-integration.js)
+const INTEGRATIONS = {
+    gmail: { name: 'Gmail', icon: '📧', description: 'Lire, trier, envoyer des mails' },
+    calendar: { name: 'Google Calendar', icon: '📅', description: 'Gérer tes événements' },
+    drive: { name: 'Google Drive', icon: '📁', description: 'Accéder à tes fichiers' },
+    slack: { name: 'Slack', icon: '💬', description: 'Envoyer des messages' },
+    notion: { name: 'Notion', icon: '📝', description: 'Créer des pages et notes' },
+    trello: { name: 'Trello', icon: '📋', description: 'Gérer tes cartes et boards' },
+    sheets: { name: 'Google Sheets', icon: '📊', description: 'Lire et écrire des données' },
+    whatsapp: { name: 'WhatsApp', icon: '📱', description: 'Envoyer des messages' }
+};
+
+let userConnections = [];
+
+function openConnectionsModal() {
+    document.getElementById('connectionsModal').style.display = 'flex';
+    loadIntegrations();
+}
+
+function closeConnectionsModal() {
+    document.getElementById('connectionsModal').style.display = 'none';
+}
+
+async function loadIntegrations() {
+    const grid = document.getElementById('integrationsGrid');
+    grid.innerHTML = '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">Chargement...</div>';
+
+    try {
+        // Fetch user's current connections
+        const res = await fetch(`${API_URL}/integrations/status`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            userConnections = data.connections || [];
+        }
+    } catch (e) {
+        console.error('Failed to load connections:', e);
+        userConnections = [];
+    }
+
+    renderIntegrations();
+}
+
+function renderIntegrations() {
+    const grid = document.getElementById('integrationsGrid');
+    const connectionMap = new Map(userConnections.map(c => [c.service, c]));
+
+    grid.innerHTML = Object.entries(INTEGRATIONS).map(([key, integration]) => {
+        const connection = connectionMap.get(key);
+        const isConnected = connection && connection.status === 'active';
+
+        return `
+            <div class="integration-card ${isConnected ? 'connected' : ''}">
+                <div class="integration-header">
+                    <div class="integration-icon">${integration.icon}</div>
+                    <div class="integration-info">
+                        <h4>${integration.name}</h4>
+                        <span>${integration.description}</span>
+                    </div>
+                </div>
+                <div class="integration-status ${isConnected ? 'connected' : 'disconnected'}">
+                    ${isConnected ? '✓ Connecté' : '○ Non connecté'}
+                </div>
+                <button class="integration-btn ${isConnected ? 'disconnect' : 'connect'}"
+                        data-service="${key}"
+                        data-connected="${isConnected}">
+                    ${isConnected ? 'Déconnecter' : 'Connecter'}
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    // Add click handlers
+    grid.querySelectorAll('.integration-btn').forEach(btn => {
+        btn.addEventListener('click', handleIntegrationClick);
+    });
+}
+
+async function handleIntegrationClick(e) {
+    const service = e.target.dataset.service;
+    const isConnected = e.target.dataset.connected === 'true';
+
+    if (isConnected) {
+        await disconnectService(service);
+    } else {
+        await connectService(service);
+    }
+}
+
+async function connectService(service) {
+    try {
+        // Get OAuth URL from backend
+        const res = await fetch(`${API_URL}/integrations/connect/${service}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data.oauthUrl) {
+                // Open OAuth window
+                window.open(data.oauthUrl, '_blank', 'width=600,height=700');
+            } else {
+                // For demo: show instructions
+                alert(`🔗 Connexion ${INTEGRATIONS[service].name}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${INTEGRATIONS[service].name}?"`);
+            }
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Erreur de connexion');
+        }
+    } catch (e) {
+        console.error('Connect error:', e);
+        alert(`🔗 Connexion ${INTEGRATIONS[service].name}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${INTEGRATIONS[service].name}?"`);
+    }
+}
+
+async function disconnectService(service) {
+    if (!confirm(`Déconnecter ${INTEGRATIONS[service].name}?`)) return;
+
+    try {
+        const res = await fetch(`${API_URL}/integrations/disconnect/${service}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            loadIntegrations(); // Refresh
+        }
+    } catch (e) {
+        console.error('Disconnect error:', e);
     }
 }
 

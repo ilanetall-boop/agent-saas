@@ -31,10 +31,19 @@
   "chat": {
     "my_agent": "Eva",
     "telegram": "📱 Telegram",
+    "connections": "🔗 Connexions",
     "logout": "Déconnexion",
     "type_message": "Écris ton message...",
     "unlimited": "✅ Illimité - Pas de limite de messages",
     "degraded_warning": "⚠️ Réponses plus lentes après 100 messages/jour"
+  },
+  "connections": {
+    "title": "🔗 Mes Connexions",
+    "subtitle": "Connecte tes services pour que Eva puisse agir pour toi",
+    "connected": "✓ Connecté",
+    "disconnected": "○ Non connecté",
+    "connect": "Connecter",
+    "disconnect": "Déconnecter"
   },
   "chat_messages_today": "messages aujourd'hui",
   "chat_placeholder": "Tu veux créer quoi ?",

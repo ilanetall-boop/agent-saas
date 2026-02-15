@@ -189,9 +189,18 @@
   "chat": {
     "my_agent": "Eva",
     "telegram": "📱 Telegram",
+    "connections": "🔗 Connections",
     "logout": "Sign Out",
     "type_message": "Write your message...",
     "unlimited": "✅ Unlimited - No message limits",
     "degraded_warning": "⚠️ Slow responses after 100 messages/day"
+  },
+  "connections": {
+    "title": "🔗 My Connections",
+    "subtitle": "Connect your services so Eva can act for you",
+    "connected": "✓ Connected",
+    "disconnected": "○ Not connected",
+    "connect": "Connect",
+    "disconnect": "Disconnect"
   }
 }
