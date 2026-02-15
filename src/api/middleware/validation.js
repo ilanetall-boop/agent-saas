@@ -31,7 +31,7 @@ const schemas = {
     
     name: Joi.string()
       .max(50)
-      .pattern(/^[a-zA-Z\s'-]+$/, 'valid-name')
+      .pattern(/^[a-zA-ZÀ-ÿ\s'-]+$/, 'valid-name')
       .messages({
         'string.pattern.name': 'Nom invalide (lettres, espaces, tirets seulement)',
         'string.max': 'Nom maximum 50 caractères'
