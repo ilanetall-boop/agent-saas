@@ -167,14 +167,27 @@ window.switchToLogin = function(event) {
 };
 
 // ===== PASSWORD VISIBILITY TOGGLE =====
-window.togglePasswordVisibility = function(inputId) {
+window.togglePasswordVisibility = function(inputId, btnElement) {
     const input = document.getElementById(inputId);
-    const btn = event.target.closest('.password-toggle');
-    if (!input || !btn) return;
+    if (!input) return;
     
     const isPassword = input.type === 'password';
     input.type = isPassword ? 'text' : 'password';
-    btn.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+    
+    // Update button icon and aria-label for accessibility
+    if (btnElement) {
+        if (isPassword) {
+            // Was hidden, now visible → show eye icon
+            btnElement.innerHTML = '<span style="font-size: 16px;">👁️</span>';
+            btnElement.setAttribute('aria-label', 'Hide password');
+            btnElement.title = 'Hide password';
+        } else {
+            // Was visible, now hidden → show crossed eye icon
+            btnElement.innerHTML = '<span style="font-size: 16px;">🚫</span>';
+            btnElement.setAttribute('aria-label', 'Show password');
+            btnElement.title = 'Show password';
+        }
+    }
 };
 
 // ===== ATTACH EVENT LISTENERS (after all functions are defined) =====
@@ -200,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             const inputId = btn.getAttribute('data-toggle-for');
-            window.togglePasswordVisibility(inputId);
+            window.togglePasswordVisibility(inputId, btn);
         });
     });
     
