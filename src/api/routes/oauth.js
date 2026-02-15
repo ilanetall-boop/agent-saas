@@ -153,13 +153,22 @@ router.post('/google/callback', async (req, res) => {
                 ipAddress: req.ip
             });
         } else {
-            // Link Google account to existing user
+            // Link Google account to existing user and update avatar
+            const updates = {};
             if (!user.google_id) {
-                await db.updateUser(user.id, {
-                    google_id: googleId
-                });
+                updates.google_id = googleId;
             }
-            
+            // Always update avatar from Google (fresh profile pic)
+            if (googleUser.picture) {
+                updates.avatar_url = googleUser.picture;
+            }
+
+            if (Object.keys(updates).length > 0) {
+                await db.updateUser(user.id, updates);
+                // Refresh user object with updated data
+                user = await db.getUserById(user.id);
+            }
+
             auditLog({
                 type: 'oauth_google_login',
                 userId: user.id,
