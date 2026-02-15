@@ -32,26 +32,51 @@ router.get('/config', (req, res) => {
 });
 
 /**
+ * GET /api/oauth/google
+ * Direct redirect to Google OAuth (for simple button click)
+ */
+router.get('/google', (req, res) => {
+    try {
+        const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+        const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+        const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
+
+        // Check if OAuth is configured
+        if (!clientId || !clientSecret || !redirectUri) {
+            console.log('⚠️ [OAUTH] Google OAuth not configured');
+            return res.redirect('/login.html?error=google_not_configured');
+        }
+
+        const authUrl = oauth.getGoogleAuthUrl();
+        console.log('[OAUTH] Redirecting to Google:', authUrl);
+        res.redirect(authUrl);
+    } catch (error) {
+        console.error('[OAUTH] Google redirect error:', error.message);
+        res.redirect('/login.html?error=google_failed');
+    }
+});
+
+/**
  * GET /api/oauth/google/auth
- * Redirect to Google OAuth login
+ * Redirect to Google OAuth login (JSON response)
  */
 router.get('/google/auth', (req, res) => {
     try {
         const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
         const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
-        
+
         // Check if OAuth is configured
         if (!clientId || !clientSecret || !redirectUri) {
             console.log('⚠️ [OAUTH] Google OAuth not configured');
-            return res.status(503).json({ 
+            return res.status(503).json({
                 error: 'Google OAuth not configured',
                 code: 'OAUTH_NOT_CONFIGURED',
                 message: 'Admin must configure GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, and GOOGLE_OAUTH_REDIRECT_URI',
                 hint: 'Use email/password login for now'
             });
         }
-        
+
         const authUrl = oauth.getGoogleAuthUrl();
         res.json({ success: true, url: authUrl });
     } catch (error) {
