@@ -232,6 +232,15 @@ document.addEventListener('DOMContentLoaded', function() {
             window.showRegister();
         });
     });
+
+    // "Sign In" button - Show login modal
+    const navSignInBtn = document.getElementById('navSignInBtn');
+    if (navSignInBtn) {
+        navSignInBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.showLogin();
+        });
+    }
     
     // Form submissions
     const loginFormEl = document.getElementById('loginFormElement');
