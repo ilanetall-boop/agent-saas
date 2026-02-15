@@ -336,4 +336,4 @@ const dbOps = {
     }
 };
 
-module.exports = { initDb, ...dbOps };
+module.exports = { initDb, run, get, all, ...dbOps };

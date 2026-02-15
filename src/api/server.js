@@ -7,6 +7,7 @@ const Sentry = require('@sentry/node');
 const helmet = require('helmet');
 const config = require('./config');
 const { initDb } = require('./db/db');
+const { initCache } = require('./services/knowledge-cache');
 
 // Initialize Sentry for error tracking (if SENTRY_DSN is set)
 if (config.sentryDsn) {
@@ -109,6 +110,7 @@ app.use('/api/agent', require('./routes/agents'));
 app.use('/api/oauth', require('./routes/oauth'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/telegram', require('./routes/telegram'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -208,8 +210,16 @@ app.use((err, req, res, next) => {
 // Start server after DB init
 async function start() {
     try {
-        await initDb();
-        
+        const db = await initDb();
+
+        // Initialize knowledge cache for semantic search
+        try {
+            await initCache(db);
+            console.log('✅ Knowledge cache initialized');
+        } catch (cacheError) {
+            console.warn('⚠️ Knowledge cache init failed (non-blocking):', cacheError.message);
+        }
+
         app.listen(config.port, () => {
             console.log(`
 🚀 Agent SaaS server running

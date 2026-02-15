@@ -54,7 +54,65 @@ async function runMigrations(pool) {
         
         // Migration 16: Add avatar URL
         await addColumnIfNotExists(pool, 'users', 'avatar_url', 'TEXT');
-        
+
+        // Migration 17: Create knowledge_base table for semantic cache
+        await createTableIfNotExists(pool, 'knowledge_base', `
+            id TEXT PRIMARY KEY,
+            question TEXT NOT NULL,
+            answer TEXT NOT NULL,
+            question_embedding TEXT,
+            category TEXT,
+            language TEXT DEFAULT 'en',
+            quality_score REAL DEFAULT 0.5,
+            use_count INTEGER DEFAULT 0,
+            original_model TEXT,
+            original_cost REAL,
+            created_by_user_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_used_at TIMESTAMP
+        `);
+
+        // Migration 18: Create cost_tracking table
+        await createTableIfNotExists(pool, 'cost_tracking', `
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            request_type TEXT,
+            provider TEXT NOT NULL,
+            model TEXT NOT NULL,
+            input_tokens INTEGER DEFAULT 0,
+            output_tokens INTEGER DEFAULT 0,
+            cost_usd REAL NOT NULL,
+            price_usd REAL,
+            margin_usd REAL,
+            margin_percent REAL,
+            from_cache BOOLEAN DEFAULT FALSE,
+            cache_hit_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        `);
+
+        // Migration 19: Create cost_daily_stats table
+        await createTableIfNotExists(pool, 'cost_daily_stats', `
+            id TEXT PRIMARY KEY,
+            date DATE NOT NULL UNIQUE,
+            total_requests INTEGER DEFAULT 0,
+            total_cost_usd REAL DEFAULT 0,
+            total_revenue_usd REAL DEFAULT 0,
+            total_margin_usd REAL DEFAULT 0,
+            cache_hits INTEGER DEFAULT 0,
+            cache_misses INTEGER DEFAULT 0,
+            cache_savings_usd REAL DEFAULT 0,
+            anthropic_cost REAL DEFAULT 0,
+            openai_cost REAL DEFAULT 0,
+            mistral_cost REAL DEFAULT 0,
+            other_cost REAL DEFAULT 0
+        `);
+
+        // Migration 20: Create indexes for knowledge system
+        await createIndexIfNotExists(pool, 'knowledge_base', 'idx_knowledge_category', 'category');
+        await createIndexIfNotExists(pool, 'knowledge_base', 'idx_knowledge_quality', 'quality_score');
+        await createIndexIfNotExists(pool, 'cost_tracking', 'idx_cost_user', 'user_id');
+        await createIndexIfNotExists(pool, 'cost_tracking', 'idx_cost_created', 'created_at');
+
         console.log('✅ Migrations completed successfully');
     } catch (error) {
         console.error('❌ Migration error:', error);
@@ -83,6 +141,31 @@ async function addColumnIfNotExists(pool, tableName, columnName, columnDef) {
         }
     } catch (error) {
         console.error(`Error adding column ${columnName} to ${tableName}:`, error);
+        throw error;
+    }
+}
+
+async function createTableIfNotExists(pool, tableName, columns) {
+    try {
+        // Check if table exists
+        const checkResult = await pool.query(`
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.tables
+                WHERE table_name = $1
+            )
+        `, [tableName]);
+
+        const tableExists = checkResult.rows[0].exists;
+
+        if (!tableExists) {
+            console.log(`  ➕ Creating table ${tableName}...`);
+            await pool.query(`CREATE TABLE ${tableName} (${columns})`);
+            console.log(`  ✅ Table ${tableName} created`);
+        } else {
+            console.log(`  ✓ Table ${tableName} already exists`);
+        }
+    } catch (error) {
+        console.error(`Error creating table ${tableName}:`, error);
         throw error;
     }
 }
