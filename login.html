@@ -304,12 +304,14 @@
     </div>
 
     <script>
-        function handleLogin(event) {
+        const API_URL = window.location.origin + '/api';
+
+        async function handleLogin(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('errorMsg');
+            const submitBtn = document.querySelector('button[type="submit"]');
 
             // Validate email
             if (!email || !email.includes('@')) {
@@ -318,21 +320,42 @@
             }
 
             // Validate password
-            if (!password || password.length < 8) {
-                showError('Password must be at least 8 characters');
+            if (!password || password.length < 6) {
+                showError('Password must be at least 6 characters');
                 return;
             }
 
-            // Show success (in real app, this would be an API call)
-            errorMsg.classList.remove('show');
-            
-            // Simulate login
-            console.log('Logging in with:', { email });
-            
-            // Redirect to onboarding after successful login
-            setTimeout(() => {
-                window.location.href = '/onboarding.html';
-            }, 500);
+            // Disable button during request
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.accessToken) {
+                    // Store token
+                    localStorage.setItem('accessToken', data.accessToken);
+                    localStorage.setItem('token', data.accessToken);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    // Redirect to app
+                    window.location.href = '/app.html';
+                } else {
+                    showError(data.error || 'Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
         }
 
         function showError(message) {
@@ -341,20 +364,33 @@
             errorMsg.classList.add('show');
             setTimeout(() => {
                 errorMsg.classList.remove('show');
-            }, 4000);
+            }, 5000);
         }
 
         function loginWithGoogle() {
-            console.log('Login with Google');
-            // In a real app, this would initiate OAuth flow
-            window.location.href = '/onboarding.html';
+            // Google OAuth - redirect to OAuth endpoint
+            window.location.href = `${API_URL}/oauth/google`;
         }
 
         function loginWithGithub() {
-            console.log('Login with GitHub');
-            // In a real app, this would initiate OAuth flow
-            window.location.href = '/onboarding.html';
+            // GitHub OAuth - redirect to OAuth endpoint
+            window.location.href = `${API_URL}/oauth/github`;
         }
+
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+                // Verify token is still valid
+                fetch(`${API_URL}/auth/verify-token`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(res => {
+                    if (res.ok) {
+                        window.location.href = '/app.html';
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
