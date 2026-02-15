@@ -130,7 +130,7 @@ app.get('/api/download/desktop', (req, res) => {
 });
 
 // Desktop App Execute (Protected)
-app.post('/api/desktop/execute', require('./middleware/auth'), async (req, res) => {
+app.post('/api/desktop/execute', require('./middleware/auth').authMiddleware, async (req, res) => {
     try {
         const { action, command, path: filePath, content } = req.body;
         const userId = req.user.id;
