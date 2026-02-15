@@ -453,7 +453,8 @@ CTA (Call-to-Action):
         enhancedPrompt += `
 
 INSTRUCTION DOCUMENT PRO:
-Génère un document HTML imprimable avec CSS print-friendly:
+GÉNÈRE IMMÉDIATEMENT le document complet. PAS de questions, PAS de clarifications.
+Document HTML imprimable avec CSS print-friendly:
 
 DEVIS/FACTURE:
 \`\`\`html
