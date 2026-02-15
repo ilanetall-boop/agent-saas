@@ -95,13 +95,28 @@ window.handleSignup = async function(event) {
 // ===== OAUTH HANDLERS =====
 window.loginWithGoogle = async function() {
     try {
+        console.log('🔵 Google OAuth: Starting...');
         const response = await fetch('/api/oauth/google/auth');
         const data = await response.json();
+        
+        console.log('📡 Google OAuth response:', data);
+        
+        if (data.code === 'OAUTH_NOT_CONFIGURED') {
+            console.error('❌ Google OAuth not configured');
+            alert('🔧 Google OAuth not yet configured.\n\nPlease use email/password login for now.\n\nAdmin: Configure GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET in environment variables.');
+            return;
+        }
+        
         if (data.url) {
+            console.log('✅ Redirecting to Google...');
             window.location.href = data.url;
+        } else {
+            console.error('❌ No OAuth URL returned:', data);
+            alert('Erreur OAuth: ' + (data.error || 'Impossible de se connecter avec Google'));
         }
     } catch (error) {
-        alert('Erreur: ' + (error.message || 'Google login échoué'));
+        console.error('❌ Google OAuth error:', error);
+        alert('Erreur réseau: ' + error.message);
     }
 };
 
@@ -111,13 +126,28 @@ window.signupWithGoogle = function() {
 
 window.loginWithGitHub = async function() {
     try {
+        console.log('⚫ GitHub OAuth: Starting...');
         const response = await fetch('/api/oauth/github/auth');
         const data = await response.json();
+        
+        console.log('📡 GitHub OAuth response:', data);
+        
+        if (data.code === 'OAUTH_NOT_CONFIGURED') {
+            console.error('❌ GitHub OAuth not configured');
+            alert('🔧 GitHub OAuth not yet configured.\n\nPlease use email/password login for now.\n\nAdmin: Configure GITHUB_OAUTH_CLIENT_ID and GITHUB_OAUTH_CLIENT_SECRET in environment variables.');
+            return;
+        }
+        
         if (data.url) {
+            console.log('✅ Redirecting to GitHub...');
             window.location.href = data.url;
+        } else {
+            console.error('❌ No OAuth URL returned:', data);
+            alert('Erreur OAuth: ' + (data.error || 'Impossible de se connecter avec GitHub'));
         }
     } catch (error) {
-        alert('Erreur: ' + (error.message || 'GitHub login échoué'));
+        console.error('❌ GitHub OAuth error:', error);
+        alert('Erreur réseau: ' + error.message);
     }
 };
 

@@ -13,11 +13,26 @@ const router = express.Router();
  */
 router.get('/google/auth', (req, res) => {
     try {
+        const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+        const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+        const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
+        
+        // Check if OAuth is configured
+        if (!clientId || !clientSecret || !redirectUri) {
+            console.log('⚠️ [OAUTH] Google OAuth not configured');
+            return res.status(503).json({ 
+                error: 'Google OAuth not configured',
+                code: 'OAUTH_NOT_CONFIGURED',
+                message: 'Admin must configure GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, and GOOGLE_OAUTH_REDIRECT_URI',
+                hint: 'Use email/password login for now'
+            });
+        }
+        
         const authUrl = oauth.getGoogleAuthUrl();
         res.json({ success: true, url: authUrl });
     } catch (error) {
-        console.error('[OAUTH] Google auth error:', error);
-        res.status(500).json({ error: 'Failed to initiate Google OAuth' });
+        console.error('[OAUTH] Google auth error:', error.message);
+        res.status(500).json({ error: 'Failed to initiate Google OAuth', details: error.message });
     }
 });
 
@@ -138,11 +153,26 @@ router.post('/google/callback', async (req, res) => {
  */
 router.get('/github/auth', (req, res) => {
     try {
+        const clientId = process.env.GITHUB_OAUTH_CLIENT_ID;
+        const clientSecret = process.env.GITHUB_OAUTH_CLIENT_SECRET;
+        const redirectUri = process.env.GITHUB_OAUTH_REDIRECT_URI;
+        
+        // Check if OAuth is configured
+        if (!clientId || !clientSecret || !redirectUri) {
+            console.log('⚠️ [OAUTH] GitHub OAuth not configured');
+            return res.status(503).json({ 
+                error: 'GitHub OAuth not configured',
+                code: 'OAUTH_NOT_CONFIGURED',
+                message: 'Admin must configure GITHUB_OAUTH_CLIENT_ID, GITHUB_OAUTH_CLIENT_SECRET, and GITHUB_OAUTH_REDIRECT_URI',
+                hint: 'Use email/password login for now'
+            });
+        }
+        
         const authUrl = oauth.getGithubAuthUrl();
         res.json({ success: true, url: authUrl });
     } catch (error) {
-        console.error('[OAUTH] GitHub auth error:', error);
-        res.status(500).json({ error: 'Failed to initiate GitHub OAuth' });
+        console.error('[OAUTH] GitHub auth error:', error.message);
+        res.status(500).json({ error: 'Failed to initiate GitHub OAuth', details: error.message });
     }
 });
 
