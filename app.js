@@ -219,6 +219,41 @@ function logout() {
     window.location.href = '/index.html';
 }
 
+// Eva avatar SVG - Girl with long brown hair and red NY Yankees cap
+const EVA_AVATAR_SVG = `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+  <!-- Hair background (long brown hair) -->
+  <ellipse cx="18" cy="22" rx="14" ry="14" fill="#5D4037"/>
+  <path d="M4 22c0-2 1-8 5-12 0 3 1 6 3 8-1 2-2 6-2 10v8H4v-14z" fill="#5D4037"/>
+  <path d="M32 22c0-2-1-8-5-12 0 3-1 6-3 8 1 2 2 6 2 10v8h6v-14z" fill="#5D4037"/>
+  <!-- Face -->
+  <ellipse cx="18" cy="20" rx="10" ry="11" fill="#FFCC80"/>
+  <!-- Hair strands on face -->
+  <path d="M8 16c2-6 6-8 10-8s8 2 10 8c-3-3-6-4-10-4s-7 1-10 4z" fill="#5D4037"/>
+  <!-- Red NY Yankees cap -->
+  <ellipse cx="18" cy="10" rx="12" ry="5" fill="#C62828"/>
+  <rect x="6" y="8" width="24" height="4" rx="2" fill="#C62828"/>
+  <path d="M10 8c0-4 4-6 8-6s8 2 8 6H10z" fill="#C62828"/>
+  <!-- NY logo on cap -->
+  <text x="18" y="10" text-anchor="middle" fill="white" font-size="5" font-weight="bold" font-family="Arial">NY</text>
+  <!-- Cap brim -->
+  <ellipse cx="18" cy="12" rx="10" ry="2" fill="#8B0000"/>
+  <!-- Eyes -->
+  <ellipse cx="14" cy="19" rx="1.5" ry="2" fill="#3E2723"/>
+  <ellipse cx="22" cy="19" rx="1.5" ry="2" fill="#3E2723"/>
+  <circle cx="14.5" cy="18.5" r="0.5" fill="white"/>
+  <circle cx="22.5" cy="18.5" r="0.5" fill="white"/>
+  <!-- Eyebrows -->
+  <path d="M11 16c1-1 2-1 4 0" stroke="#5D4037" stroke-width="0.5" fill="none"/>
+  <path d="M21 16c1-1 3-1 4 0" stroke="#5D4037" stroke-width="0.5" fill="none"/>
+  <!-- Nose -->
+  <path d="M18 20v3" stroke="#E0A070" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- Smile -->
+  <path d="M14 25c2 2 6 2 8 0" stroke="#C62828" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+  <!-- Blush -->
+  <ellipse cx="12" cy="23" rx="2" ry="1" fill="#FFAB91" opacity="0.5"/>
+  <ellipse cx="24" cy="23" rx="2" ry="1" fill="#FFAB91" opacity="0.5"/>
+</svg>`;
+
 function addMessage(role, content, aiInfo = null) {
     const messagesEl = document.getElementById('chatMessages');
     const msgEl = document.createElement('div');
@@ -259,8 +294,11 @@ function addMessage(role, content, aiInfo = null) {
         modelIndicator = `<div class="model-indicator" style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${complexityEmoji} ${details}</div>`;
     }
 
+    // Avatar: user emoji or Eva SVG
+    const avatarContent = role === 'user' ? '👤' : EVA_AVATAR_SVG;
+
     msgEl.innerHTML = `
-        <div class="avatar">${role === 'user' ? '👤' : '⚡'}</div>
+        <div class="avatar" style="${role !== 'user' ? 'background:none;padding:0;' : ''}">${avatarContent}</div>
         <div class="bubble-wrapper">
             <div class="bubble">${formatted}</div>
             ${modelIndicator}
@@ -309,7 +347,7 @@ function addTypingIndicator() {
     typingEl.className = 'message';
     typingEl.id = 'typingIndicator';
     typingEl.innerHTML = `
-        <div class="avatar">⚡</div>
+        <div class="avatar" style="background:none;padding:0;">${EVA_AVATAR_SVG}</div>
         <div class="typing-indicator">
             <span></span><span></span><span></span>
         </div>
