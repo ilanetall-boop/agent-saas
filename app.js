@@ -83,7 +83,7 @@ function showChat() {
     
     // Welcome message if first time
     if (!agent.onboardingComplete) {
-        addMessage('assistant', "Hey! I'm your new AI agent. What's your name?");
+        addMessage('assistant', "Salut ! Moi c'est Eva, ton assistante IA. Et toi, tu t'appelles comment ?");
     }
 }
 

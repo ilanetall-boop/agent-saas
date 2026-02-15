@@ -7,6 +7,11 @@ const ErrorRecovery = require('../services/error-recovery');
 const { validateRequest, schemas, sanitizeMessage } = require('../middleware/validation');
 const { log: auditLog } = require('../services/audit-log');
 
+// New smart routing system
+const { route: smartRoute } = require('../services/smart-router');
+const { recordFeedback } = require('../services/knowledge-capitalizer');
+const { getStats: getCostStats } = require('../services/cost-tracker');
+
 const router = express.Router();
 
 // Get user's agent
@@ -25,7 +30,7 @@ router.get('/me', authMiddleware, async (req, res) => {
         res.json({
             agent: {
                 id: agent.id,
-                name: agent.name || 'Alex',
+                name: agent.name || 'Eva',
                 telegramConnected: !!agent.telegram_chat_id,
                 onboardingComplete: !!agent.onboarding_complete
             },
@@ -128,50 +133,62 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             }
         } else {
             // Normal chat - adapt system prompt to user's language
-            systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name, language);
+            systemPrompt = getDefaultSystemPrompt('Eva', memoryMap.name || req.user.name, language);
         }
         
         // Determine user tier for AI routing
         const userTier = req.user.tier || 'free';
-        
-        // Generate response with smart error recovery and AI routing
+
+        // ========== NEW: Smart Router with Cache + Cost Tracking ==========
         let response;
-        let errorRecovery = null;
-        let recoveryAttempt = 1;
-        
-        async function attemptGenerate() {
-            return generateResponse({
-                systemPrompt,
-                messages: [...history, { role: 'user', content: message }],
-                memory: memoryMap,
-                userTier, // Pass tier for smart model selection
-                useRouter: true // Enable AI router
-            });
-        }
-        
+
         try {
-            response = await attemptGenerate();
-        } catch (genError) {
-            errorRecovery = new ErrorRecovery(agent);
-            const recovery = await errorRecovery.recover(genError, {
+            // Use smart router: checks cache first, then routes to cheapest capable model
+            response = await smartRoute(
+                message,
+                history,
+                {
+                    userTier,
+                    userId: req.user.id,
+                    systemPrompt,
+                    language: language || 'en',
+                    skipCache: !agent.onboarding_complete // Don't cache onboarding
+                },
+                db // Pass db for cache operations
+            );
+
+            // Log routing decision
+            console.log(`[SmartRouter] ${response.fromCache ? 'CACHE HIT' : response.model} | Cost: $${(response.cost || 0).toFixed(6)}`);
+
+        } catch (routerError) {
+            console.error('[SmartRouter] Error:', routerError.message);
+
+            // Fallback to legacy system
+            const errorRecovery = new ErrorRecovery(agent);
+            const recovery = await errorRecovery.recover(routerError, {
                 task: 'Génération de réponse',
-                attempt: recoveryAttempt,
-                onRetry: attemptGenerate
+                attempt: 1,
+                onRetry: async () => generateResponse({
+                    systemPrompt,
+                    messages: [...history, { role: 'user', content: message }],
+                    memory: memoryMap,
+                    userTier,
+                    useRouter: false // Direct call, no routing
+                })
             });
-            
+
             if (recovery.recovered) {
                 response = recovery.result;
-                console.log(`[Recovery] Success with strategy: ${recovery.strategy}`);
+                console.log(`[Recovery] Success with legacy fallback`);
             } else {
-                // Recovery failed, return error to user
-                return res.status(500).json({ 
+                return res.status(500).json({
                     error: recovery.userNotification || 'Erreur lors du chat',
                     recoveryStatus: recovery.strategy
                 });
             }
         }
-        
-        if (!response.success) {
+
+        if (!response.success && !response.content) {
             return res.status(500).json({ error: 'Erreur lors de la génération de réponse' });
         }
         
@@ -224,14 +241,17 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
                 messagesUsed: updatedUser.messages_used,
                 messagesLimit: updatedUser.messages_limit,
                 remaining: Math.max(0, updatedUser.messages_limit - updatedUser.messages_used),
-                degraded: messagesUsedToday > config.softDegradationThreshold // Inform frontend
+                degraded: messagesUsedToday > config.softDegradationThreshold
             },
             // AI routing info (for transparency)
             ai: {
                 model: response.model || 'claude-3-5-haiku-20241022',
                 provider: response.provider || 'anthropic',
                 complexity: response.routing?.complexity || 'unknown',
-                tier: userTier
+                tier: userTier,
+                fromCache: response.fromCache || false,
+                cost: response.cost || 0,
+                latency: response.routing?.latency || 0
             }
         });
     } catch (error) {
@@ -270,6 +290,43 @@ router.post('/memory', authMiddleware, validateRequest(schemas.memory), async (r
     } catch (error) {
         console.error('Update memory error:', error);
         res.status(500).json({ error: 'Erreur lors de la mise à jour de la mémoire' });
+    }
+});
+
+// ========== Knowledge Feedback ==========
+// Allow users to rate answers for quality improvement
+router.post('/feedback', authMiddleware, async (req, res) => {
+    try {
+        const { entryId, feedback } = req.body;
+
+        if (!entryId || !['positive', 'negative', 'neutral'].includes(feedback)) {
+            return res.status(400).json({ error: 'Invalid feedback' });
+        }
+
+        await recordFeedback(entryId, feedback, req.user.id, db);
+
+        res.json({ success: true, message: 'Feedback recorded' });
+    } catch (error) {
+        console.error('Feedback error:', error);
+        res.status(500).json({ error: 'Failed to record feedback' });
+    }
+});
+
+// ========== Cost Statistics (Admin/Pro only) ==========
+router.get('/stats/costs', authMiddleware, async (req, res) => {
+    try {
+        // Only pro users or admin can see cost stats
+        if (req.user.tier !== 'pro' && req.user.tier !== 'admin') {
+            return res.status(403).json({ error: 'Pro subscription required' });
+        }
+
+        const days = parseInt(req.query.days) || 30;
+        const stats = await getCostStats(db, days);
+
+        res.json({ success: true, stats });
+    } catch (error) {
+        console.error('Cost stats error:', error);
+        res.status(500).json({ error: 'Failed to get cost stats' });
     }
 });
 
