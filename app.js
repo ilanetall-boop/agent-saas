@@ -316,13 +316,18 @@ async function sendMessage() {
     addTypingIndicator();
 
     try {
+        // Get current language from i18n instance if available
+        const language = (typeof i18nInstance !== 'undefined' && i18nInstance.currentLanguage) 
+            ? i18nInstance.currentLanguage 
+            : localStorage.getItem('language') || 'en';
+        
         const res = await fetch(`${API_URL}/agent/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ message })
+            body: JSON.stringify({ message, language })
         });
 
         removeTypingIndicator();
