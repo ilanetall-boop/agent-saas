@@ -1,0 +1,40 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f5f7fa"/>
+  
+  <!-- Header -->
+  <rect width="800" height="80" fill="#635bff"/>
+  <circle cx="50" cy="40" r="25" fill="#00d4ff"/>
+  <text x="90" y="50" font-family="Inter, sans-serif" font-size="24" fill="white" font-weight="600">Alice's Portfolio</text>
+  
+  <!-- Navigation -->
+  <line x1="300" y1="35" x2="700" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+  <text x="320" y="50" font-family="Inter, sans-serif" font-size="14" fill="white">Home</text>
+  <text x="420" y="50" font-family="Inter, sans-serif" font-size="14" fill="white">Projects</text>
+  <text x="540" y="50" font-family="Inter, sans-serif" font-size="14" fill="white">Contact</text>
+  
+  <!-- Main content area -->
+  <rect x="40" y="120" width="720" height="380" fill="white" rx="12"/>
+  
+  <!-- Project cards (3x2 grid) -->
+  <rect x="60" y="140" width="220" height="160" fill="#e8ecf1" rx="8"/>
+  <rect x="300" y="140" width="220" height="160" fill="#e8ecf1" rx="8"/>
+  <rect x="540" y="140" width="220" height="160" fill="#e8ecf1" rx="8"/>
+  
+  <rect x="60" y="320" width="220" height="160" fill="#e8ecf1" rx="8"/>
+  <rect x="300" y="320" width="220" height="160" fill="#e8ecf1" rx="8"/>
+  <rect x="540" y="320" width="220" height="160" fill="#e8ecf1" rx="8"/>
+  
+  <!-- Project titles -->
+  <text x="170" y="240" font-family="Inter, sans-serif" font-size="12" fill="#1a1a1a" font-weight="600" text-anchor="middle">Web Design</text>
+  <text x="410" y="240" font-family="Inter, sans-serif" font-size="12" fill="#1a1a1a" font-weight="600" text-anchor="middle">Branding</text>
+  <text x="650" y="240" font-family="Inter, sans-serif" font-size="12" fill="#1a1a1a" font-weight="600" text-anchor="middle">UX Design</text>
+  
+  <text x="170" y="420" font-family="Inter, sans-serif" font-size="12" fill="#1a1a1a" font-weight="600" text-anchor="middle">Mobile App</text>
+  <text x="410" y="420" font-family="Inter, sans-serif" font-size="12" fill="#1a1a1a" font-weight="600" text-anchor="middle">E-Commerce</text>
+  <text x="650" y="420" font-family="Inter, sans-serif" font-size="12" fill="#1a1a1a" font-weight="600" text-anchor="middle">Dashboard</text>
+  
+  <!-- Footer -->
+  <rect y="520" width="800" height="80" fill="#f8fafc"/>
+  <text x="40" y="555" font-family="Inter, sans-serif" font-size="12" fill="#475569">© 2024 Alice Martin. Built with My Best Agent.</text>
+</svg>
