@@ -158,13 +158,22 @@ window.switchLanguage = switchLanguage;
 window.updatePageTranslations = updatePageTranslations;
 window.i18nInstance = i18nInstance;
 
-// Language selector initialization - syncs selector with localStorage
+// Language selector initialization - syncs selector with localStorage and adds event listener
 function initLangSelector() {
     const selector = document.getElementById('langSelector');
     if (selector) {
+        // Sync with localStorage
         const savedLang = localStorage.getItem('language');
         if (savedLang && selector.querySelector(`option[value="${savedLang}"]`)) {
             selector.value = savedLang;
+        }
+
+        // Add change event listener (CSP-compliant - no inline handlers)
+        if (!selector.hasAttribute('data-listener-added')) {
+            selector.addEventListener('change', function() {
+                changeLanguage(this.value);
+            });
+            selector.setAttribute('data-listener-added', 'true');
         }
     }
 }
