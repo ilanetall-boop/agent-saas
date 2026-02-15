@@ -62,7 +62,7 @@ async function generateResponse({
         // Fallback: Direct Claude call (legacy behavior)
         const response = await anthropic.messages.create({
             model: model || config.defaultModel,
-            max_tokens: 500,
+            max_tokens: 4000,
             system: fullSystemPrompt,
             messages: messages.map(m => ({
                 role: m.role === 'user' ? 'user' : 'assistant',
@@ -86,7 +86,7 @@ async function generateResponse({
             try {
                 const fallbackResponse = await anthropic.messages.create({
                     model: config.defaultModel,
-                    max_tokens: 500,
+                    max_tokens: 4000,
                     system: fullSystemPrompt,
                     messages: messages.map(m => ({
                         role: m.role === 'user' ? 'user' : 'assistant',
