@@ -1,221 +1,418 @@
-# Deployment Guide - Agent-SaaS MVP
+# My Best Agent - Deployment Guide
 
-## Current Status
-- **Code**: Pushed to GitHub (commit 04593f7)
-- **Render**: Auto-redeploying (in progress)
-- **URL**: https://agent-saas.onrender.com
+Complete setup guide for **Onboarding**, **Telegram Bot**, and **Desktop App**.
 
-## 🚀 Deployment Steps
+---
 
-### 1. GitHub Push ✅
-```bash
-cd /home/ilanetall/.openclaw/workspace/agent-saas
-git push origin main
-```
-Status: ✅ Complete (commit 04593f7 pushed)
+## 📋 Prerequisites
 
-### 2. Render Auto-Deploy ⏳
-- Render watches the main branch
-- Automatically rebuilds when new commits arrive
-- Current status: **In Progress** (wait 1-3 minutes)
-- Check deployment status: https://dashboard.render.com
+- Node.js 18+ and npm
+- Telegram Bot Token (from @BotFather)
+- Backend API running (see `src/api/server.js`)
+- Environment variables configured
 
-### 3. Environment Variables (Required)
+---
 
-**Add to Render Dashboard** → Settings → Environment Variables:
+## 🔧 Environment Variables
 
-```
-# Server
+Create `.env` in root directory:
+
+```env
+# Backend
 NODE_ENV=production
-PORT=3000
+PORT=5000
+API_URL=https://api.mybestagent.io
+APP_URL=https://mybestagent.io
 
-# Auth
-JWT_SECRET=your-secret-here-min-32-chars
-REFRESH_SECRET=your-refresh-secret-min-32-chars
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/mybestagent_db
 
-# APIs
-ANTHROPIC_API_KEY=sk-ant-...
-MISTRAL_API_KEY=...
-GEMINI_API_KEY=...
-ELEVENLABS_API_KEY=...
-STABILITY_API_KEY=...
-OPENAI_API_KEY=sk-...
+# Telegram Bot
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_WEBHOOK_URL=https://mybestagent.io
 
-# Telegram (optional for Phase 2)
-TELEGRAM_BOT_TOKEN=...
+# OAuth (Google, GitHub, etc.)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 
-# Monitoring
-SENTRY_DSN=https://... (optional)
-```
+# Security
+JWT_SECRET=your_jwt_secret_key
+REFRESH_TOKEN_SECRET=your_refresh_token_secret
 
-### 4. Test Health Endpoint
+# Sentry (Error Tracking)
+SENTRY_DSN=https://your_sentry_dsn
 
-```bash
-curl https://agent-saas.onrender.com/api/health
-# Expected response:
-# {"status":"ok","time":"2026-02-11T07:48:00.000Z"}
-```
+# File Storage (S3 or equivalent)
+AWS_ACCESS_KEY_ID=your_aws_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret
+AWS_S3_BUCKET=mybestagent-files
 
-### 5. Test Dual-Token Flow
-
-**Register:**
-```bash
-curl -X POST https://agent-saas.onrender.com/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123","name":"Test User"}'
-
-# Expected response:
-# {
-#   "success": true,
-#   "accessToken": "eyJ...",
-#   "refreshToken": "eyJ...",
-#   "expiresIn": 1800,
-#   "user": { "id": "...", "email": "test@example.com", ... }
-# }
-```
-
-**Login:**
-```bash
-curl -X POST https://agent-saas.onrender.com/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
-
-# Returns accessToken + refreshToken
-```
-
-**Refresh Token:**
-```bash
-ACCESS_TOKEN="eyJ..."
-curl -X POST https://agent-saas.onrender.com/api/auth/refresh \
-  -H "Content-Type: application/json" \
-  -d '{"refreshToken":"eyJ..."}'
-
-# Expected: New accessToken (expires in 30 minutes)
-```
-
-**Chat with Error Recovery:**
-```bash
-curl -X POST https://agent-saas.onrender.com/api/agent/chat \
-  -H "Authorization: Bearer $ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Hello agent"}'
-
-# Will automatically retry on transient errors
-# Will smart-fix logic errors
-# Will ask user for blocked errors
+# Claude API
+ANTHROPIC_API_KEY=your_anthropic_key
 ```
 
 ---
 
-## 🔍 Monitoring
+## 1. 🎨 Onboarding Screen
 
-### Check Deployment Status
-1. Go to https://dashboard.render.com
-2. Select **agent-saas** service
-3. Check **Logs** for errors
-4. Status should show **"Active"**
+**File:** `onboarding.html`
 
-### View Live Logs
+### Features
+- 3 clickable cards: Desktop, Telegram, WhatsApp
+- Matches design system (mauve #635bff, Inter font)
+- 100% responsive (mobile first)
+- User preference tracking (localStorage)
+
+### Deploy
 ```bash
-# Check Render logs for errors
-https://dashboard.render.com/services/srv-d64ion1r0fns73c8ip00/logs
+# No build required - it's standalone HTML
+# Serves at: https://mybestagent.io/onboarding
 ```
 
-### Health Check
+### Route Handler
+```javascript
+// In server.js
+app.get('/onboarding', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../onboarding.html'));
+});
+```
+
+---
+
+## 2. 🤖 Telegram Bot
+
+**Files:** `src/api/routes/telegram.js`
+
+### Features
+- Webhook endpoint: `POST /api/telegram/webhook`
+- Commands: `/start`, `/help`, `/create`, `/image`, `/code`, `/video`
+- User authentication (link Telegram ID to account)
+- Inline buttons for actions
+- File uploads & downloads
+
+### Setup
+
+#### 1. Create Telegram Bot
 ```bash
-# Should return OK immediately
-curl -w "\n%{http_code}\n" https://agent-saas.onrender.com/api/health
+# Chat with @BotFather on Telegram
+/newbot
+# Name: My Best Agent
+# Username: @mybestagent_bot
+# Get: TELEGRAM_BOT_TOKEN
+```
+
+#### 2. Set Webhook
+```bash
+# In production, the webhook is auto-set on startup
+# Or manually:
+curl -X POST https://api.telegram.org/botYOUR_TOKEN/setWebhook \
+  -d "url=https://mybestagent.io/api/telegram/webhook"
+```
+
+#### 3. Authentication Flow
+1. User sends `/start` to bot
+2. Bot shows login button (OAuth)
+3. User logs in via web
+4. User clicks "Connect Telegram"
+5. Session stored: `telegram_id → account`
+
+### API Endpoints
+```
+POST /api/telegram/webhook     - Handle messages
+GET  /api/telegram/auth/:token - Authenticate user
+POST /api/telegram/send        - Send message from backend
+```
+
+### User Session Format
+```javascript
+{
+    telegram_id: 123456789,
+    account_id: "user_uuid",
+    token: "auth_token",
+    name: "John Doe",
+    created_at: "2024-02-15T..."
+}
+```
+
+### Testing
+```bash
+# Send test message
+curl -X POST https://mybestagent.io/api/telegram/webhook \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": {
+      "chat": { "id": 123456789 },
+      "from": { "id": 987654321, "first_name": "Test" },
+      "text": "Hello agent"
+    }
+  }'
+```
+
+---
+
+## 3. 💻 Electron Desktop App
+
+**Files:** `electron/main.js`, `preload.js`, `app.html`, `app.js`, `styles.css`, `package.json`
+
+### Features
+- Chat interface (like web app)
+- File read/write operations (any directory)
+- Execute commands on local machine
+- Clipboard access
+- Open URLs & files
+- System info retrieval
+- Auto-update checking
+- Dark mode support
+
+### Setup
+
+#### 1. Install Dependencies
+```bash
+cd electron
+npm install
+```
+
+#### 2. Run in Development
+```bash
+npm run dev
+# Opens electron with hot reload
+```
+
+#### 3. Build for Distribution
+
+**macOS:**
+```bash
+npm run build:mac
+# Creates: electron/dist/MyBestAgent-x.x.x.dmg
+```
+
+**Windows:**
+```bash
+npm run build:win
+# Creates: electron/dist/MyBestAgent Setup x.x.x.exe
+```
+
+**Linux:**
+```bash
+npm run build:linux
+# Creates: electron/dist/MyBestAgent-x.x.x.AppImage
+```
+
+#### 4. Auto-Update
+App checks for updates at startup:
+```
+GET /api/app/latest-version
+→ { version: "1.0.1", downloadUrl: "..." }
+```
+
+### API Bridge (window.api)
+
+```javascript
+// Files
+await window.api.files.read('/path/to/file')
+await window.api.files.write('/path/to/file', 'content')
+await window.api.files.list('/path/to/dir')
+await window.api.files.delete('/path/to/file')
+
+// Execution
+await window.api.exec.run('node script.js')
+await window.api.exec.open('/path/to/file')
+await window.api.exec.openUrl('https://example.com')
+
+// System
+await window.api.system.home()      // → /Users/john
+await window.api.system.desktop()   // → /Users/john/Desktop
+await window.api.system.getInfo()   // → { os, arch, version, ... }
+
+// Clipboard
+await window.api.clipboard.read()   // → clipboard content
+await window.api.clipboard.write('text')
+
+// Backend
+await window.api.api.call('POST', '/api/agent/chat', { message: '...' }, token)
+
+// Updates
+await window.api.app.checkUpdates() // → { hasUpdate, latestVersion, downloadUrl }
+```
+
+### Trusted Mode
+
+After first login, users grant permission once for:
+- ✅ File access (read/write)
+- ✅ Command execution
+- ✅ URL opening
+- ✅ Clipboard access
+
+No more dialogs after that!
+
+### Security Considerations
+
+1. **Context Isolation:** Enabled (`contextIsolation: true`)
+2. **Preload Bridge:** Only explicit APIs exposed via `contextBridge`
+3. **Sandbox:** Renderer process runs in sandbox
+4. **HTTPS Only:** Backend communication over HTTPS
+5. **Token-based Auth:** JWT tokens for API requests
+6. **Local Storage:** Auth tokens stored in Electron's secure storage
+
+---
+
+## 🚀 Deployment Checklist
+
+### 1. Backend Setup
+- [ ] Install dependencies: `npm install`
+- [ ] Configure `.env` file
+- [ ] Setup database (PostgreSQL)
+- [ ] Run migrations
+- [ ] Start server: `npm start`
+- [ ] Verify health: `GET /api/health`
+
+### 2. Telegram Bot
+- [ ] Create bot via @BotFather
+- [ ] Set `TELEGRAM_BOT_TOKEN` in `.env`
+- [ ] Register webhook: `POST /api/telegram/webhook`
+- [ ] Test: Send `/start` to bot
+- [ ] Verify user authentication flow
+
+### 3. Desktop App
+- [ ] Build for all platforms (macOS, Windows, Linux)
+- [ ] Test locally with `npm run dev`
+- [ ] Upload binaries to CDN or GitHub Releases
+- [ ] Update version in `package.json`
+- [ ] Test auto-update mechanism
+
+### 4. Onboarding
+- [ ] Verify onboarding.html loads at `/onboarding`
+- [ ] Test all 3 card links work
+- [ ] Test responsive design on mobile
+- [ ] Verify localStorage preference tracking
+
+### 5. Production Verification
+- [ ] HTTPS enabled
+- [ ] CORS configured correctly
+- [ ] Rate limiting in place
+- [ ] Error tracking (Sentry) enabled
+- [ ] Monitoring & logging setup
+- [ ] Backups scheduled
+
+---
+
+## 📦 Release Process
+
+### Desktop App Release
+```bash
+# 1. Update version
+npm version patch  # 1.0.0 → 1.0.1
+
+# 2. Build all platforms
+npm run build
+
+# 3. Upload to CDN
+# Files in electron/dist/
+# - MyBestAgent-1.0.1.dmg (macOS)
+# - MyBestAgent Setup 1.0.1.exe (Windows)
+# - MyBestAgent-1.0.1.AppImage (Linux)
+
+# 4. Create GitHub Release
+# Tag: v1.0.1
+# Attach binaries
+
+# 5. Update version endpoint
+# GET /api/app/latest-version
+# → { "version": "1.0.1", "downloadUrl": "https://..." }
+```
+
+### Telegram Bot Update
+```bash
+# 1. Update src/api/routes/telegram.js
+# 2. Restart server
+# 3. Test commands work
+# 4. No binary build needed
+```
+
+### Onboarding Update
+```bash
+# 1. Update onboarding.html
+# 2. Clear CDN cache
+# 3. Test at https://mybestagent.io/onboarding
 ```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Issue: Service won't start
-- Check env vars are set (especially API keys)
-- Review Render logs for missing dependencies
-- Verify package.json is correct
-
-### Issue: Health check fails (timeout)
-- Render free tier has 15-minute auto-shutdown
-- Service needs ~30s to start up
-- Try again after 1 minute
-
-### Issue: Token endpoints return errors
-- Verify JWT_SECRET is set (min 32 chars)
-- Check database file exists (auto-created)
-- Review Render logs
-
-### Issue: Chat returns 429 (message limit)
-- This is normal after 50 messages on free plan
-- Upgrade user plan to continue
-
----
-
-## 📊 Load Testing (After Deployment)
-
+### Telegram Bot Not Responding
 ```bash
-# Test 5 concurrent users × 3 messages each
-# Before running: Make sure user quota allows
+# 1. Check webhook registration
+curl https://api.telegram.org/botTOKEN/getWebhookInfo
 
-for i in {1..5}; do
-  (
-    EMAIL="user$i@test.com"
-    # Register
-    TOKENS=$(curl -s -X POST https://agent-saas.onrender.com/api/auth/register \
-      -H "Content-Type: application/json" \
-      -d "{\"email\":\"$EMAIL\",\"password\":\"pass123\",\"name\":\"User $i\"}")
-    ACCESS=$(echo $TOKENS | jq -r '.accessToken')
-    
-    # Chat 3x
-    for j in {1..3}; do
-      curl -s -X POST https://agent-saas.onrender.com/api/agent/chat \
-        -H "Authorization: Bearer $ACCESS" \
-        -H "Content-Type: application/json" \
-        -d "{\"message\":\"Test message $j\"}"
-      echo ""
-    done
-  ) &
-done
-wait
+# 2. Check logs
+# 3. Verify TELEGRAM_BOT_TOKEN in .env
+# 4. Re-register webhook if needed
+```
+
+### Desktop App Auth Failing
+```bash
+# 1. Check REACT_APP_API_URL in electron/.env
+# 2. Verify JWT_SECRET matches backend
+# 3. Check token in browser console
+# 4. Test backend auth endpoint separately
+```
+
+### Onboarding Links Not Working
+```bash
+# 1. Verify Telegram bot username
+# 2. Check WhatsApp number format
+# 3. Test desktop download URL: GET /api/download/desktop
+# 4. Check CORS on /api/download/desktop
+```
+
+### Update Check Failing
+```bash
+# 1. Verify GET /api/app/latest-version returns JSON
+# 2. Check response format: { version, downloadUrl }
+# 3. Ensure HTTPS on all URLs
 ```
 
 ---
 
-## 🎯 Next Steps
+## 📊 Monitoring
 
-1. ✅ Code pushed to GitHub
-2. ⏳ Wait for Render to finish deployment (~2-3 min)
-3. ⏳ Test /api/health endpoint
-4. ✅ Test dual-token flow (register → login → refresh)
-5. ✅ Test error recovery (intentional errors)
-6. ✅ Load test (5 concurrent users)
-7. ✅ Configure DNS: mybestagent.io → agent-saas.onrender.com (CNAME)
-8. ✅ Phase 3: SEO Hub setup
+### Key Metrics to Track
+- Telegram bot message volume
+- Desktop app active sessions
+- Auth success/failure rates
+- API response times
+- File operation errors
+- Update check frequency
 
----
-
-## Critical URLs
-
-| Resource | URL |
-|----------|-----|
-| **API** | https://agent-saas.onrender.com/api |
-| **Health** | https://agent-saas.onrender.com/api/health |
-| **Render Dashboard** | https://dashboard.render.com/services/srv-d64ion1r0fns73c8ip00 |
-| **GitHub Repo** | https://github.com/ilanetall-boop/agent-saas |
-| **Domain** | mybestagent.io (DNS pending) |
+### Alerts to Setup
+- Bot webhook failures
+- Desktop app crash reports
+- Auth token expiration spikes
+- High API error rates
+- Storage quota exceeded
 
 ---
 
-## 📝 Notes
+## 🔐 Security Checklist
 
-- **Database**: Using SQL.js (SQLite) for MVP
-- **Future**: Migrate to Render PostgreSQL Free tier (256MB)
-- **Auth**: Dual-token system (30min access + 90day refresh)
-- **Error Recovery**: 3-tier (auto-retry, smart-fix, ask-user)
-- **APIs**: All 7 models integrated (Claude, OpenAI, Mistral, Gemini, etc.)
-- **Monitoring**: Sentry optional (via env var)
+- [ ] HTTPS enabled on all endpoints
+- [ ] CORS properly restricted
+- [ ] Rate limiting configured
+- [ ] JWT tokens have short expiry (15-30 min)
+- [ ] Refresh tokens use httpOnly cookies
+- [ ] Passwords hashed (bcrypt)
+- [ ] Telegram webhook validated
+- [ ] Desktop app code signed (macOS/Windows)
+- [ ] Dependencies kept updated
+- [ ] Secrets not in version control
 
 ---
 
-**Status**: 🚀 Deployment in progress. Update this doc after testing.
+## 📞 Support
+
+For issues:
+1. Check logs: `/var/log/mybestagent/`
+2. Test endpoints directly
+3. Check GitHub Issues
+4. Contact: support@mybestagent.io

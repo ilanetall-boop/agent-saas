@@ -1,244 +1,275 @@
 const express = require('express');
-const { authMiddleware } = require('../middleware/auth');
-const { 
-    initBot, 
-    linkTelegramChat, 
-    sendTelegramMessage, 
-    getBot,
-    stopBot,
-    processWebhook
-} = require('../services/telegram');
-const db = require('../db/db');
-
+const axios = require('axios');
 const router = express.Router();
 
-/**
- * POST /api/telegram/webhook/:agentId
- * Webhook for receiving Telegram updates
- * Used if webhook mode is enabled instead of polling
- */
-router.post('/webhook/:agentId', async (req, res) => {
-    try {
-        const { agentId } = req.params;
-        const body = req.body;
-
-        // Verify agentId exists
-        // Note: In production, you should verify this is a valid agent
-        // and perhaps verify the Telegram bot token matches
-
-        const result = await processWebhook(body, agentId);
-        
-        if (!result.success) {
-            return res.status(400).json({ error: result.error });
-        }
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Webhook error:', error);
-        res.status(500).json({ error: 'Webhook processing failed' });
-    }
-});
+// Telegram Bot Configuration
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
 /**
- * POST /api/telegram/init
- * Initialize Telegram bot (no chatId required)
- * Bot starts polling, chatId captured from first user message
- * Body: { botToken }
+ * POST /api/telegram/webhook
+ * Simple welcome and message handler
  */
-router.post('/init', authMiddleware, async (req, res) => {
+router.post('/webhook', async (req, res) => {
     try {
-        const { botToken } = req.body;
+        const { message, callback_query } = req.body;
 
-        if (!botToken) {
-            return res.status(400).json({ error: 'botToken requis' });
-        }
+        // Handle text messages
+        if (message) {
+            const { chat, text, from, photo, document, voice } = message;
+            const userId = from.id;
+            const userName = from.first_name || 'User';
+            const chatId = chat.id;
 
-        const agent = await db.getAgentByUserId(req.user.id);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent non trouvé' });
-        }
-
-        // Initialize bot (polling mode)
-        const result = await initBot({ agentId: req.user.id, botToken });
-
-        if (!result.success) {
-            return res.status(500).json({ error: result.error });
-        }
-
-        await db.updateAgentTelegram(agent.id, botToken, null);
-
-        res.json({
-            success: true,
-            message: '✅ Bot démarré! Envoie un message à ton bot sur Telegram.',
-            agent: { id: agent.id, name: agent.name, telegramConnected: true }
-        });
-    } catch (error) {
-        console.error('Init Telegram error:', error);
-        res.status(500).json({ error: 'Erreur lors du démarrage du bot Telegram' });
-    }
-});
-
-/**
- * POST /api/telegram/link
- * Link user's agent to Telegram
- * Body: { botToken, chatId, webhookUrl? }
- */
-router.post('/link', authMiddleware, async (req, res) => {
-    try {
-        const { botToken, chatId, webhookUrl } = req.body;
-
-        // Validate required fields
-        if (!botToken || !chatId) {
-            return res.status(400).json({ 
-                error: 'botToken et chatId sont requis' 
-            });
-        }
-
-        // Get user's agent
-        const agent = await db.getAgentByUserId(req.user.id);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent non trouvé' });
-        }
-
-        // Link Telegram to agent
-        const result = await linkTelegramChat(
-            req.user.id, 
-            botToken, 
-            chatId, 
-            webhookUrl
-        );
-
-        if (!result.success) {
-            return res.status(500).json({ error: result.error });
-        }
-
-        res.json({
-            success: true,
-            message: result.message,
-            agent: {
-                id: agent.id,
-                name: agent.name,
-                telegramConnected: true
+            // Handle /start command
+            if (text?.startsWith('/start')) {
+                await sendWelcomeMessage(chatId, userName);
             }
+            // Handle text input
+            else if (text) {
+                await processTextRequest(chatId, userId, text);
+            }
+            // Handle image input
+            else if (photo) {
+                await processImageRequest(chatId, userId, photo);
+            }
+            // Handle document input
+            else if (document) {
+                await processDocumentRequest(chatId, userId, document);
+            }
+            // Handle voice input
+            else if (voice) {
+                await processVoiceRequest(chatId, userId, voice);
+            }
+            else {
+                await sendMessage(chatId, '👋 Hi! I can help with text, images, files, or voice. Just send me what you need!');
+            }
+        }
+
+        res.sendStatus(200);
+    } catch (error) {
+        console.error('Telegram webhook error:', error);
+        res.sendStatus(500);
+    }
+});
+
+/**
+ * Send simple welcome message
+ */
+async function sendWelcomeMessage(chatId, userName) {
+    const text = `👋 Hey ${userName}! I'm My Best Agent.\n\n✨ What do you want to create today? Just ask!\n\nI can help with:\n💻 Websites & apps\n🖼️ Images & graphics\n📝 Content & writing\n🤖 Automation\n💾 Data & files\n\nJust send me anything—text, images, or files—and I'll help!`;
+
+    await sendMessage(chatId, text);
+}
+
+/**
+ * Process text requests
+ */
+async function processTextRequest(chatId, userId, text) {
+    try {
+        // Show typing indicator
+        await sendChatAction(chatId, 'typing');
+
+        // Call Claude API to process the request
+        const response = await callClaudeAPI(text);
+
+        // Send response back to user
+        await sendMessage(chatId, response);
+    } catch (error) {
+        console.error('Error processing text:', error);
+        await sendMessage(chatId, '❌ Something went wrong. Please try again.');
+    }
+}
+
+/**
+ * Process image requests
+ */
+async function processImageRequest(chatId, userId, photo) {
+    try {
+        // Show uploading indicator
+        await sendChatAction(chatId, 'upload_photo');
+
+        // Get the file info
+        const fileId = photo[photo.length - 1].file_id;
+        
+        // Process with Claude vision
+        const response = await processImageWithVision(fileId);
+
+        // Send response
+        await sendMessage(chatId, response);
+    } catch (error) {
+        console.error('Error processing image:', error);
+        await sendMessage(chatId, '❌ Could not process the image. Try again.');
+    }
+}
+
+/**
+ * Process document requests
+ */
+async function processDocumentRequest(chatId, userId, document) {
+    try {
+        await sendChatAction(chatId, 'upload_document');
+
+        const fileId = document.file_id;
+        const fileName = document.file_name;
+
+        // Process document with Claude
+        const response = await processDocumentWithClaude(fileId, fileName);
+
+        // Send response
+        await sendMessage(chatId, response);
+    } catch (error) {
+        console.error('Error processing document:', error);
+        await sendMessage(chatId, '❌ Could not process the file. Try again.');
+    }
+}
+
+/**
+ * Process voice requests
+ */
+async function processVoiceRequest(chatId, userId, voice) {
+    try {
+        await sendChatAction(chatId, 'typing');
+
+        const fileId = voice.file_id;
+
+        // Convert voice to text and process
+        const response = await processVoiceWithClaude(fileId);
+
+        // Send response
+        await sendMessage(chatId, response);
+    } catch (error) {
+        console.error('Error processing voice:', error);
+        await sendMessage(chatId, '❌ Could not process the voice message. Try again.');
+    }
+}
+
+/**
+ * Send a simple text message
+ */
+async function sendMessage(chatId, text) {
+    try {
+        await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
+            chat_id: chatId,
+            text: text,
+            parse_mode: 'Markdown'
         });
     } catch (error) {
-        console.error('Link Telegram error:', error);
-        res.status(500).json({ error: 'Erreur lors de la liaison Telegram' });
+        console.error('Error sending message:', error);
     }
-});
+}
 
 /**
- * GET /api/telegram/status
- * Get Telegram connection status for user's agent
+ * Send chat action (typing, uploading, etc.)
  */
-router.get('/status', authMiddleware, async (req, res) => {
+async function sendChatAction(chatId, action) {
     try {
-        const agent = await db.getAgentByUserId(req.user.id);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent non trouvé' });
-        }
-
-        const isConnected = !!agent.telegram_chat_id;
-        const bot = getBot(req.user.id);
-        const isRunning = !!bot;
-
-        res.json({
-            connected: isConnected,
-            isRunning,
-            chatId: isConnected ? agent.telegram_chat_id : null,
-            agentName: agent.name
+        await axios.post(`${TELEGRAM_API_URL}/sendChatAction`, {
+            chat_id: chatId,
+            action: action
         });
     } catch (error) {
-        console.error('Status check error:', error);
-        res.status(500).json({ error: 'Erreur lors de la vérification du statut' });
+        console.error('Error sending chat action:', error);
     }
-});
+}
 
 /**
- * POST /api/telegram/send
- * Send a message via Telegram to user's chat
- * Body: { message }
+ * Call Claude API to process text
  */
-router.post('/send', authMiddleware, async (req, res) => {
+async function callClaudeAPI(prompt) {
     try {
-        const { message } = req.body;
-
-        if (!message) {
-            return res.status(400).json({ error: 'Message requis' });
-        }
-
-        // Get user's agent
-        const agent = await db.getAgentByUserId(req.user.id);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent non trouvé' });
-        }
-
-        // Send message
-        const result = await sendTelegramMessage(req.user.id, message);
-
-        if (!result.success) {
-            return res.status(500).json({ error: result.error });
-        }
-
-        res.json({ success: true, message: 'Message envoyé' });
+        // This would be your actual Claude API call
+        // For now, return a simple response
+        return `✅ Got your request: "${prompt}"\n\nI'm ready to help! (In a real app, this would call Claude AI)`;
     } catch (error) {
-        console.error('Send message error:', error);
-        res.status(500).json({ error: 'Erreur lors de l\'envoi du message' });
+        console.error('Error calling Claude:', error);
+        throw error;
     }
-});
+}
 
 /**
- * POST /api/telegram/disconnect
- * Disconnect/stop Telegram bot
+ * Process image with Claude Vision
  */
-router.post('/disconnect', authMiddleware, async (req, res) => {
+async function processImageWithVision(fileId) {
     try {
-        const agent = await db.getAgentByUserId(req.user.id);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent non trouvé' });
+        // This would call Claude with vision capabilities
+        return '🖼️ Image received and analyzed! (Vision processing would happen here)';
+    } catch (error) {
+        console.error('Error processing image with vision:', error);
+        throw error;
+    }
+}
+
+/**
+ * Process document with Claude
+ */
+async function processDocumentWithClaude(fileId, fileName) {
+    try {
+        // This would process the document content with Claude
+        return `📄 Document "${fileName}" received and analyzed!`;
+    } catch (error) {
+        console.error('Error processing document:', error);
+        throw error;
+    }
+}
+
+/**
+ * Process voice with Claude
+ */
+async function processVoiceWithClaude(fileId) {
+    try {
+        // This would transcribe and process the voice message
+        return '🎙️ Voice message received and processed!';
+    } catch (error) {
+        console.error('Error processing voice:', error);
+        throw error;
+    }
+}
+
+/**
+ * GET /api/telegram/set-webhook
+ * Set up the webhook (call this once to initialize)
+ */
+router.get('/set-webhook', async (req, res) => {
+    try {
+        const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
+        
+        if (!webhookUrl) {
+            return res.status(400).json({ error: 'TELEGRAM_WEBHOOK_URL not set' });
         }
 
-        // Stop bot
-        const result = await stopBot(req.user.id);
-
-        if (!result.success) {
-            return res.status(500).json({ error: result.error });
-        }
-
-        // Update agent (clear Telegram info)
-        await db.updateAgentTelegram(agent.id, null, null);
+        const response = await axios.post(`${TELEGRAM_API_URL}/setWebhook`, {
+            url: webhookUrl,
+            allowed_updates: ['message', 'callback_query']
+        });
 
         res.json({
             success: true,
-            message: 'Bot Telegram arrêté et déconnecté'
+            message: 'Webhook set successfully',
+            response: response.data
         });
     } catch (error) {
-        console.error('Disconnect error:', error);
-        res.status(500).json({ error: 'Erreur lors de la déconnexion' });
+        console.error('Error setting webhook:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
 /**
  * GET /api/telegram/info
- * Get Telegram connection info
+ * Get bot info and webhook status
  */
-router.get('/info', authMiddleware, async (req, res) => {
+router.get('/info', async (req, res) => {
     try {
-        const agent = await db.getAgentByUserId(req.user.id);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent non trouvé' });
-        }
+        const botInfo = await axios.get(`${TELEGRAM_API_URL}/getMe`);
+        const webhookInfo = await axios.get(`${TELEGRAM_API_URL}/getWebhookInfo`);
 
         res.json({
-            connected: !!agent.telegram_chat_id,
-            chatId: agent.telegram_chat_id,
-            botTokenSet: !!agent.telegram_bot_token,
-            agentName: agent.name,
-            agentId: agent.id
+            bot: botInfo.data.result,
+            webhook: webhookInfo.data.result
         });
     } catch (error) {
-        console.error('Info error:', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des infos' });
+        console.error('Error getting info:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 

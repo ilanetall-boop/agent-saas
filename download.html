@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download My Best Agent</title>
+    <meta name="description" content="Download My Best Agent for Windows, Mac, or Linux. AI-powered automation at your fingertips.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #635bff;
+            --primary-light: #7c75ff;
+            --primary-dark: #4f46e5;
+            --accent: #00d4ff;
+            --success: #10b981;
+            --bg: #ffffff;
+            --bg-subtle: #f8fafc;
+            --bg-muted: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+        }
+
+        /* Main Content */
+        .content {
+            padding-top: 120px;
+            padding-bottom: 60px;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .header-section h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .header-section p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .download-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .download-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .download-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .os-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .download-card h2 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .download-card .os-version {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .download-card .file-info {
+            background: white;
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .download-card .btn {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .system-requirements {
+            background: var(--bg-muted);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .system-requirements h3 {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .system-requirements ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .system-requirements li {
+            padding: 4px 0;
+            color: var(--text-secondary);
+        }
+
+        .system-requirements li:before {
+            content: "✓ ";
+            color: var(--success);
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-section a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: var(--text);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .header-section h1 {
+                font-size: 32px;
+            }
+
+            .content {
+                padding-top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <span>My Best Agent</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/success-stories.html">Success Stories</a></li>
+            </ul>
+            <div>
+                <a href="/login.html" class="btn btn-secondary">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container">
+            <!-- Header -->
+            <div class="header-section">
+                <h1>Download My Best Agent</h1>
+                <p>Get the power of AI automation on your desktop. Available for Windows, macOS, and Linux.</p>
+            </div>
+
+            <!-- Download Cards -->
+            <div class="download-section" id="downloadSection">
+                <!-- Windows -->
+                <div class="download-card" id="windowsCard">
+                    <div class="os-icon">🪟</div>
+                    <h2>Windows</h2>
+                    <p class="os-version">Windows 10/11 or later</p>
+                    <div class="file-info">
+                        <strong>my-best-agent-setup.exe</strong><br>
+                        <span id="windowsSize">142 MB</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="downloadFile('windows')">Download for Windows</button>
+                    <div class="system-requirements">
+                        <h3>Requirements</h3>
+                        <ul>
+                            <li>Windows 10 or newer</li>
+                            <li>4 GB RAM minimum</li>
+                            <li>500 MB disk space</li>
+                            <li>Internet connection</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Mac -->
+                <div class="download-card" id="macCard">
+                    <div class="os-icon">🍎</div>
+                    <h2>macOS</h2>
+                    <p class="os-version">macOS 11.0 or later</p>
+                    <div class="file-info">
+                        <strong>my-best-agent.dmg</strong><br>
+                        <span id="macSize">128 MB</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="downloadFile('mac')">Download for Mac</button>
+                    <div class="system-requirements">
+                        <h3>Requirements</h3>
+                        <ul>
+                            <li>macOS 11 (Big Sur) or newer</li>
+                            <li>4 GB RAM minimum</li>
+                            <li>500 MB disk space</li>
+                            <li>Apple Silicon or Intel compatible</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Linux -->
+                <div class="download-card" id="linuxCard">
+                    <div class="os-icon">🐧</div>
+                    <h2>Linux</h2>
+                    <p class="os-version">Ubuntu 20.04 or compatible</p>
+                    <div class="file-info">
+                        <strong>my-best-agent.AppImage</strong><br>
+                        <span id="linuxSize">135 MB</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="downloadFile('linux')">Download for Linux</button>
+                    <div class="system-requirements">
+                        <h3>Requirements</h3>
+                        <ul>
+                            <li>Ubuntu 20.04 or newer</li>
+                            <li>4 GB RAM minimum</li>
+                            <li>500 MB disk space</li>
+                            <li>libfuse2 library</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <a href="/">Home</a>
+                    <a href="/#features">Features</a>
+                    <a href="/success-stories.html">Success Stories</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Help</h3>
+                    <a href="/contact.html">Contact</a>
+                    <a href="/terms.html">Terms of Service</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2026 My Best Agent. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-detect OS
+        function detectOS() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            
+            if (userAgent.includes('win')) {
+                highlightCard('windowsCard');
+                return 'windows';
+            } else if (userAgent.includes('mac') || userAgent.includes('darwin')) {
+                highlightCard('macCard');
+                return 'mac';
+            } else if (userAgent.includes('linux') || userAgent.includes('x11')) {
+                highlightCard('linuxCard');
+                return 'linux';
+            }
+        }
+
+        function highlightCard(cardId) {
+            document.querySelectorAll('.download-card').forEach(card => {
+                card.style.opacity = '0.6';
+            });
+            document.getElementById(cardId).style.opacity = '1';
+        }
+
+        function downloadFile(os) {
+            const urls = {
+                'windows': 'https://releases.mybestagent.io/my-best-agent-setup.exe',
+                'mac': 'https://releases.mybestagent.io/my-best-agent.dmg',
+                'linux': 'https://releases.mybestagent.io/my-best-agent.AppImage'
+            };
+            
+            if (urls[os]) {
+                window.location.href = urls[os];
+            }
+        }
+
+        // Detect OS on page load
+        window.addEventListener('DOMContentLoaded', detectOS);
+    </script>
+</body>
+</html>

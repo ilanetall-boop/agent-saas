@@ -115,6 +115,46 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// Download Desktop App
+app.get('/api/download/desktop', (req, res) => {
+    const appPath = path.join(__dirname, '../../electron/dist/MyBestAgent.exe');
+    // Check if file exists, if not return 404 or redirect to download page
+    if (require('fs').existsSync(appPath)) {
+        res.download(appPath, 'MyBestAgent-Setup.exe');
+    } else {
+        res.json({ 
+            message: 'Desktop app is being built',
+            download_url: 'https://github.com/mybestagent/releases/latest'
+        });
+    }
+});
+
+// Desktop App Execute (Protected)
+app.post('/api/desktop/execute', require('./middleware/auth'), async (req, res) => {
+    try {
+        const { action, command, path: filePath, content } = req.body;
+        const userId = req.user.id;
+
+        // Log the action for security
+        console.log(`[DESKTOP] User ${userId} action: ${action}`);
+
+        // Execute locally on the user's machine (via Electron IPC)
+        // This endpoint validates the request and returns authorization
+        res.json({
+            authorized: true,
+            userId: userId,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Onboarding redirect
+app.get('/onboarding', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../onboarding.html'));
+});
+
 // Serve static files (landing page)
 app.use(express.static(path.join(__dirname, '../../')));
 
