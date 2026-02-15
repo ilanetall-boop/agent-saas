@@ -94,14 +94,16 @@ document.addEventListener('DOMContentLoaded', function() {
         messageInput.addEventListener('keydown', handleKeyDown);
     }
     
-    // Chat Buttons
-    document.querySelectorAll('.logout').forEach(btn => {
-        if (btn.textContent.includes('Telegram')) {
-            btn.addEventListener('click', openTelegramModal);
-        } else if (btn.textContent.includes('Sign Out')) {
-            btn.addEventListener('click', logout);
-        }
-    });
+    // Chat Buttons - Use IDs instead of text content (i18n changes text)
+    const telegramBtn = document.getElementById('telegramBtn');
+    if (telegramBtn) {
+        telegramBtn.addEventListener('click', openTelegramModal);
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
     
     // Telegram Modal
     const telegramResendBtn = document.querySelector('#verificationModal .btn-primary');
