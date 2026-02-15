@@ -192,6 +192,28 @@ document.addEventListener('DOMContentLoaded', initLangSelector);
 window.initLangSelector = initLangSelector;
 window.changeLanguage = changeLanguage;
 
+// Update case study links based on current language
+function updateCaseStudyLinks() {
+    const lang = localStorage.getItem('language') || 'en';
+    const links = document.querySelectorAll('.case-study-link');
+    links.forEach(link => {
+        const caseName = link.getAttribute('data-case');
+        if (caseName) {
+            if (lang === 'en') {
+                link.href = `/case-study-${caseName}.html`;
+            } else {
+                link.href = `/case-study-${caseName}-${lang}.html`;
+            }
+        }
+    });
+}
+
+// Initialize case study links on DOM ready
+document.addEventListener('DOMContentLoaded', updateCaseStudyLinks);
+
+// Make function globally accessible
+window.updateCaseStudyLinks = updateCaseStudyLinks;
+
 // Export for use in other scripts (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { i18nInstance, updatePageTranslations, switchLanguage, initLangSelector, changeLanguage };

@@ -10,12 +10,12 @@
     <meta property="og:description" content="Real users. Real projects. Real results.">
     <meta property="og:type" content="website">
     <title>Success Stories - My Best Agent</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+
     <style>
         *, *::before, *::after {
             margin: 0;
@@ -83,6 +83,7 @@
             align-items: center;
             justify-content: space-between;
             height: 64px;
+            flex-wrap: nowrap;
         }
 
         .logo {
@@ -110,8 +111,10 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 24px;
             list-style: none;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .nav-links a {
@@ -120,6 +123,7 @@
             color: var(--text-secondary);
             text-decoration: none;
             transition: color 0.2s;
+            white-space: nowrap;
         }
 
         .nav-links a:hover { color: var(--text); }
@@ -128,7 +132,9 @@
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .btn {
@@ -155,6 +161,17 @@
             background: var(--primary-dark);
             transform: translateY(-1px);
             box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+            border-color: var(--text-muted);
         }
 
         .btn-large {
@@ -582,10 +599,10 @@
             </a>
 
             <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/success-stories.html" class="active">Success Stories</a></li>
-                <li><a href="/#how">How it works</a></li>
-                <li><a href="/#features">Features</a></li>
+                <li><a href="/" data-i18n="nav_home">Home</a></li>
+                <li><a href="/success-stories.html" class="active" data-i18n="nav_success">Success Stories</a></li>
+                <li><a href="/#how" data-i18n="nav_how">How it works</a></li>
+                <li><a href="/#features" data-i18n="nav_features">Features</a></li>
             </ul>
 
             <div class="nav-actions">
@@ -603,8 +620,8 @@
                         <option value="ru">Русский</option>
                     </select>
                 </div>
-                <a href="/login.html" class="btn btn-secondary">Sign In</a>
-                <a href="#" class="btn btn-primary">Start free</a>
+                <a href="/login.html" class="btn btn-secondary" data-i18n="nav_signin">Sign In</a>
+                <a href="#" class="btn btn-primary" data-i18n="btn_start_free">Start free</a>
             </div>
         </div>
     </nav>
@@ -615,10 +632,10 @@
             <div class="header-content">
                 <div class="section-label">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                    <span>Real Results</span>
+                    <span data-i18n="ss_real_results">Real Results</span>
                 </div>
-                <h1>Success Stories</h1>
-                <p>Real users. Real projects. Real results. See how people from all backgrounds built amazing things with My Best Agent.</p>
+                <h1 data-i18n="ss_title">Success Stories</h1>
+                <p data-i18n="ss_subtitle">Real users. Real projects. Real results. See how people from all backgrounds built amazing things with My Best Agent.</p>
             </div>
         </div>
     </section>
@@ -629,19 +646,19 @@
             <div class="stats-grid">
                 <div class="stat-item">
                     <div class="stat-number">11+</div>
-                    <div class="stat-label">Users Featured</div>
+                    <div class="stat-label" data-i18n="ss_stat_users">Users Featured</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">11+</div>
-                    <div class="stat-label">Projects Built</div>
+                    <div class="stat-label" data-i18n="ss_stat_projects">Projects Built</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">0</div>
-                    <div class="stat-label">Coding Exp.</div>
+                    <div class="stat-label" data-i18n="ss_stat_coding">Coding Exp.</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">5min</div>
-                    <div class="stat-label">Avg Build Time</div>
+                    <div class="stat-label" data-i18n="ss_stat_time">Avg Build Time</div>
                 </div>
             </div>
         </div>
@@ -651,8 +668,8 @@
     <section class="section section-alt">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">From Zero to Hero</h2>
-                <p class="section-subtitle">These users had an idea. Now they have a working project. You can too.</p>
+                <h2 class="section-title" data-i18n="ss_section_title">From Zero to Hero</h2>
+                <p class="section-subtitle" data-i18n="ss_section_subtitle">These users had an idea. Now they have a working project. You can too.</p>
             </div>
 
             <div class="stories-grid">
@@ -664,31 +681,31 @@
                         </svg>
                     </div>
                     <h3>Alice Martin</h3>
-                    <div class="story-role">Freelance Graphic Designer</div>
+                    <div class="story-role" data-i18n="ss_alice_role">Freelance Graphic Designer</div>
                     <div class="story-problem">
-                        <div class="story-label">❌ Challenge</div>
-                        <p>Needed professional portfolio but has zero coding knowledge</p>
+                        <div class="story-label" data-i18n="ss_challenge">Challenge</div>
+                        <p data-i18n="ss_alice_challenge">Needed professional portfolio but has zero coding knowledge</p>
                     </div>
                     <div class="story-solution">
-                        <div class="story-label">✅ Solution</div>
-                        <p>Complete portfolio website with responsive design</p>
+                        <div class="story-label" data-i18n="ss_solution">Solution</div>
+                        <p data-i18n="ss_alice_solution">Complete portfolio website with responsive design</p>
                     </div>
                     <div class="story-results">
-                        <h4>📊 Results</h4>
+                        <h4 data-i18n="ss_results">Results</h4>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>5-minute build</span>
+                            <span data-i18n="ss_alice_result1">5-minute build</span>
                         </div>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>$0 cost</span>
+                            <span data-i18n="ss_alice_result2">€0 cost</span>
                         </div>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>Professional result</span>
+                            <span data-i18n="ss_alice_result3">Professional result</span>
                         </div>
                     </div>
-                    <a href="/case-study-alice.html" class="story-link">Read Case Study →</a>
+                    <a href="/case-study-alice.html" class="story-link case-study-link" data-case="alice" data-i18n="ss_read_case">Read Case Study →</a>
                 </div>
 
                 <!-- Jean -->
@@ -699,31 +716,31 @@
                         </svg>
                     </div>
                     <h3>Jean Dubois</h3>
-                    <div class="story-role">Restaurant Owner</div>
+                    <div class="story-role" data-i18n="ss_jean_role">Restaurant Owner</div>
                     <div class="story-problem">
-                        <div class="story-label">❌ Challenge</div>
-                        <p>Wanted online contact form but hiring dev cost €500+</p>
+                        <div class="story-label" data-i18n="ss_challenge">Challenge</div>
+                        <p data-i18n="ss_jean_challenge">Wanted online contact form but hiring dev cost €500+</p>
                     </div>
                     <div class="story-solution">
-                        <div class="story-label">✅ Solution</div>
-                        <p>Complete contact form with validation and emails</p>
+                        <div class="story-label" data-i18n="ss_solution">Solution</div>
+                        <p data-i18n="ss_jean_solution">Complete contact form with validation and emails</p>
                     </div>
                     <div class="story-results">
-                        <h4>📊 Results</h4>
+                        <h4 data-i18n="ss_results">Results</h4>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>10-minute setup</span>
+                            <span data-i18n="ss_jean_result1">10-minute setup</span>
                         </div>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>€0 vs €500</span>
+                            <span data-i18n="ss_jean_result2">€0 vs €500</span>
                         </div>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>24/7 inquiries</span>
+                            <span data-i18n="ss_jean_result3">24/7 inquiries</span>
                         </div>
                     </div>
-                    <a href="/case-study-jean.html" class="story-link">Read Case Study →</a>
+                    <a href="/case-study-jean.html" class="story-link case-study-link" data-case="jean" data-i18n="ss_read_case">Read Case Study →</a>
                 </div>
 
                 <!-- Maria -->
@@ -734,31 +751,31 @@
                         </svg>
                     </div>
                     <h3>Maria Garcia</h3>
-                    <div class="story-role">Student Learning Code</div>
+                    <div class="story-role" data-i18n="ss_maria_role">Student Learning Code</div>
                     <div class="story-problem">
-                        <div class="story-label">❌ Challenge</div>
-                        <p>Struggling to build real projects while learning</p>
+                        <div class="story-label" data-i18n="ss_challenge">Challenge</div>
+                        <p data-i18n="ss_maria_challenge">Struggling to build real projects while learning</p>
                     </div>
                     <div class="story-solution">
-                        <div class="story-label">✅ Solution</div>
-                        <p>Complete calculator app with JavaScript + tutorial</p>
+                        <div class="story-label" data-i18n="ss_solution">Solution</div>
+                        <p data-i18n="ss_maria_solution">Complete calculator app with JavaScript + tutorial</p>
                     </div>
                     <div class="story-results">
-                        <h4>📊 Results</h4>
+                        <h4 data-i18n="ss_results">Results</h4>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>Functional project</span>
+                            <span data-i18n="ss_maria_result1">Functional project</span>
                         </div>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>Learning aid</span>
+                            <span data-i18n="ss_maria_result2">Learning aid</span>
                         </div>
                         <div class="result-item">
                             <span class="result-check">✓</span>
-                            <span>Portfolio piece</span>
+                            <span data-i18n="ss_maria_result3">Portfolio piece</span>
                         </div>
                     </div>
-                    <a href="/case-study-maria.html" class="story-link">Read Case Study →</a>
+                    <a href="/case-study-maria.html" class="story-link case-study-link" data-case="maria" data-i18n="ss_read_case">Read Case Study →</a>
                 </div>
             </div>
         </div>
@@ -768,9 +785,9 @@
     <section class="cta">
         <div class="container">
             <div class="cta-content">
-                <h2>Ready to Build Your Project?</h2>
-                <p>Join users who've already built amazing things. No coding experience required. Start free today.</p>
-                <a href="#" class="btn btn-large btn-primary">Start Building Now</a>
+                <h2 data-i18n="ss_cta_title">Ready to Build Your Project?</h2>
+                <p data-i18n="ss_cta_subtitle">Join users who've already built amazing things. No coding experience required. Start free today.</p>
+                <a href="#" class="btn btn-large btn-primary" data-i18n="ss_cta_button">Start Building Now</a>
             </div>
         </div>
     </section>
@@ -789,47 +806,47 @@
                     </div>
                     <span>My Best Agent</span>
                 </a>
-                <p>Your personal AI agent. Code, automate, decide and execute. Available 24/7 across all your favorite platforms.</p>
+                <p data-i18n="footer_desc">Your personal AI agent. Code, automate, decide and execute. Available 24/7 across all your favorite platforms.</p>
             </div>
             <div class="footer-col">
-                <h4>Product</h4>
+                <h4 data-i18n="footer_product">Product</h4>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/success-stories.html">Success Stories</a></li>
-                    <li><a href="/#features">Features</a></li>
+                    <li><a href="/" data-i18n="nav_home">Home</a></li>
+                    <li><a href="/success-stories.html" data-i18n="nav_success">Success Stories</a></li>
+                    <li><a href="/#features" data-i18n="nav_features">Features</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4>Resources</h4>
+                <h4 data-i18n="footer_resources">Resources</h4>
                 <ul>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+                    <li><a href="#" data-i18n="footer_docs">Documentation</a></li>
                     <li><a href="#">API</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4>Company</h4>
+                <h4 data-i18n="footer_company">Company</h4>
                 <ul>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="#">Careers</a></li>
+                    <li><a href="#" data-i18n="footer_about">About</a></li>
+                    <li><a href="#" data-i18n="footer_contact">Contact</a></li>
+                    <li><a href="#" data-i18n="footer_careers">Careers</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4>Legal</h4>
+                <h4 data-i18n="footer_legal">Legal</h4>
                 <ul>
-                    <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Terms</a></li>
-                    <li><a href="#">Security</a></li>
+                    <li><a href="#" data-i18n="footer_privacy">Privacy</a></li>
+                    <li><a href="#" data-i18n="footer_terms">Terms</a></li>
+                    <li><a href="#" data-i18n="footer_security">Security</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 My Best Agent. Built with AI, powered by humans.</p>
+            <p data-i18n="footer_copyright">&copy; 2026 My Best Agent. Built with AI, powered by humans.</p>
         </div>
     </footer>
 
-    <!-- i18n Scripts (includes language selector functions) -->
+    <!-- i18n Scripts (includes language selector and case study link functions) -->
     <script src="/app-i18n.js"></script>
 </body>
 </html>
