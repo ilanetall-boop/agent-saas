@@ -349,7 +349,11 @@ async function sendMessage() {
         }
     } catch (e) {
         removeTypingIndicator();
-        addMessage('assistant', `${i18nInstance.t('errors.network_error')}: ${e.message}`);
+        console.error('❌ Chat error:', e);
+        const errorMsg = e.message.includes('Unexpected') || e.message.includes('JSON') 
+            ? i18nInstance.t('errors.chat_error') || 'Server error. Please try again.'
+            : e.message;
+        addMessage('assistant', `${i18nInstance.t('errors.network_error')}: ${errorMsg}`);
     }
 
     input.disabled = false;
