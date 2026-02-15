@@ -1744,8 +1744,12 @@
     <script>
         function initLangSelector() {
             const selector = document.getElementById('langSelector');
-            if (selector && window.i18nInstance) {
-                selector.value = window.i18nInstance.currentLanguage || 'en';
+            if (selector) {
+                // Use localStorage directly for immediate sync
+                const savedLang = localStorage.getItem('language');
+                if (savedLang && selector.querySelector(`option[value="${savedLang}"]`)) {
+                    selector.value = savedLang;
+                }
             }
         }
 
@@ -1754,6 +1758,8 @@
             window.location.reload();
         }
 
+        // Run immediately and on DOMContentLoaded for reliability
+        initLangSelector();
         document.addEventListener('DOMContentLoaded', initLangSelector);
     </script>
     
