@@ -8,6 +8,30 @@ const oauth = require('../services/oauth');
 const router = express.Router();
 
 /**
+ * GET /api/oauth/config (DEBUG)
+ * Check OAuth configuration status
+ */
+router.get('/config', (req, res) => {
+    const config = {
+        google: {
+            clientId: process.env.GOOGLE_OAUTH_CLIENT_ID ? '✅ Set' : '❌ Missing',
+            clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET ? '✅ Set' : '❌ Missing',
+            redirectUri: process.env.GOOGLE_OAUTH_REDIRECT_URI ? '✅ Set' : '❌ Missing',
+            value: process.env.GOOGLE_OAUTH_REDIRECT_URI || 'not set'
+        },
+        github: {
+            clientId: process.env.GITHUB_OAUTH_CLIENT_ID ? '✅ Set' : '❌ Missing',
+            clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET ? '✅ Set' : '❌ Missing',
+            redirectUri: process.env.GITHUB_OAUTH_REDIRECT_URI ? '✅ Set' : '❌ Missing',
+            value: process.env.GITHUB_OAUTH_REDIRECT_URI || 'not set'
+        }
+    };
+    
+    console.log('🔧 OAuth Configuration:', config);
+    res.json(config);
+});
+
+/**
  * GET /api/oauth/google/auth
  * Redirect to Google OAuth login
  */
