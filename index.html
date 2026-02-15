@@ -882,7 +882,7 @@
             </ul>
 
             <div class="nav-actions">
-                <select class="lang-select" id="langSelector">
+                <select class="lang-select" id="langSelector" onchange="changeLanguage(this.value)">
                     <option value="en">English</option>
                     <option value="fr">Français</option>
                     <option value="es">Español</option>
@@ -1739,6 +1739,24 @@
 
     <!-- i18n Script (external to comply with CSP) - MUST LOAD FIRST -->
     <script src="/app-i18n.js"></script>
+    
+    <!-- Language Selector Sync -->
+    <script>
+        function initLangSelector() {
+            const selector = document.getElementById('langSelector');
+            if (selector && window.i18nInstance) {
+                selector.value = window.i18nInstance.currentLanguage || 'en';
+            }
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('language', lang);
+            window.location.reload();
+        }
+
+        document.addEventListener('DOMContentLoaded', initLangSelector);
+    </script>
+    
     <!-- Auth Modal Functions (external to comply with CSP) -->
     <script src="/auth-modal.js"></script>
 </body>
