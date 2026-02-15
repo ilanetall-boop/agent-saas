@@ -104,29 +104,85 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         
         if (!agent.onboarding_complete && onboardingStep < 5) {
             // Extract info from user message based on CURRENT step
-            // Then use NEXT step's prompt for response
+            // Smart extraction that understands natural language
             if (onboardingStep === 0) {
-                // They gave their name
-                const name = message.trim().split(' ')[0].replace(/[^a-zA-ZÀ-ÿ]/g, '');
+                // Extract name from various patterns
+                let name = null;
+                const msg = message.toLowerCase();
+
+                // Pattern: "Je m'appelle [NAME]" or "je suis [NAME]" or "moi c'est [NAME]"
+                const patterns = [
+                    /je m'appelle\s+(\w+)/i,
+                    /je suis\s+(\w+)/i,
+                    /moi c'est\s+(\w+)/i,
+                    /c'est\s+(\w+)/i,
+                    /my name is\s+(\w+)/i,
+                    /i'm\s+(\w+)/i,
+                    /i am\s+(\w+)/i
+                ];
+
+                for (const pattern of patterns) {
+                    const match = message.match(pattern);
+                    if (match && match[1]) {
+                        name = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+                        break;
+                    }
+                }
+
+                // If no pattern matched, check if it's just a name (single word or two words)
+                if (!name) {
+                    const words = message.trim().split(/\s+/);
+                    // Filter out common words that are NOT names
+                    const notNames = ['je', 'suis', 'moi', 'c\'est', 'bonjour', 'salut', 'hello', 'hi', 'hey', 'oui', 'non'];
+                    const firstWord = words[0].toLowerCase().replace(/[^a-zA-ZÀ-ÿ]/g, '');
+
+                    if (!notNames.includes(firstWord) && firstWord.length >= 2) {
+                        name = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
+                    }
+                }
+
                 if (name) {
                     await db.setMemory(nanoid(), agent.id, 'name', name);
-                    memoryMap.name = name; // Update local copy
+                    memoryMap.name = name;
+                    console.log(`[Onboarding] Extracted name: ${name}`);
                 }
+
+                // Also check if user already mentioned their job
+                const jobKeywords = ['photographe', 'développeur', 'designer', 'coach', 'prof', 'étudiant',
+                    'artisan', 'freelance', 'entrepreneur', 'consultant', 'formateur', 'auteur',
+                    'musicien', 'vidéaste', 'restaurateur', 'plombier', 'agent'];
+                const hasJob = jobKeywords.some(kw => msg.includes(kw));
+                if (hasJob) {
+                    await db.setMemory(nanoid(), agent.id, 'job', message.substring(0, 200));
+                    memoryMap.job = message.substring(0, 200);
+                    console.log(`[Onboarding] Also extracted job from intro`);
+                }
+
             } else if (onboardingStep === 1) {
                 await db.setMemory(nanoid(), agent.id, 'job', message.substring(0, 200));
+                memoryMap.job = message.substring(0, 200);
             } else if (onboardingStep === 2) {
                 await db.setMemory(nanoid(), agent.id, 'challenge', message.substring(0, 200));
+                memoryMap.challenge = message.substring(0, 200);
             } else if (onboardingStep === 3) {
                 await db.setMemory(nanoid(), agent.id, 'first_need', message.substring(0, 200));
+                memoryMap.first_need = message.substring(0, 200);
             }
             
-            // Increment onboarding step BEFORE generating response
-            const nextStep = onboardingStep + 1;
+            // Smart step progression - skip steps if info already known
+            let nextStep = onboardingStep + 1;
+
+            // If user already gave job in step 0 intro, skip step 1 (job question)
+            if (onboardingStep === 0 && memoryMap.job) {
+                nextStep = 2; // Skip to challenge question
+                console.log(`[Onboarding] User already gave job, skipping to step 2`);
+            }
+
             await db.setMemory(nanoid(), agent.id, 'onboarding_step', String(nextStep));
-            
+
             // Use the NEXT step's prompt for the response
             systemPrompt = getOnboardingPrompt(nextStep, memoryMap);
-            
+
             // Mark complete after step 4
             if (nextStep >= 5) {
                 await db.updateAgentOnboarding(agent.id);
