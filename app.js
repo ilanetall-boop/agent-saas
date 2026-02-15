@@ -245,12 +245,18 @@ function addMessage(role, content, aiInfo = null) {
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
 
-    // Model indicator for assistant messages
+    // Model indicator for assistant messages (detailed for testing period)
     let modelIndicator = '';
-    if (role === 'assistant' && aiInfo && aiInfo.model) {
-        const modelName = formatModelName(aiInfo.model);
+    if (role === 'assistant' && aiInfo) {
+        const modelName = formatModelName(aiInfo.model || 'unknown');
         const complexityEmoji = getComplexityEmoji(aiInfo.complexity);
-        modelIndicator = `<div class="model-indicator">${complexityEmoji} ${modelName}</div>`;
+        const cost = aiInfo.cost ? `$${aiInfo.cost.toFixed(6)}` : '';
+        const latency = aiInfo.latency ? `${aiInfo.latency}ms` : '';
+        const cacheIcon = aiInfo.fromCache ? '⚡ CACHE' : '';
+        const provider = aiInfo.provider || '';
+
+        const details = [cacheIcon, modelName, provider, cost, latency].filter(Boolean).join(' · ');
+        modelIndicator = `<div class="model-indicator" style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${complexityEmoji} ${details}</div>`;
     }
 
     msgEl.innerHTML = `
@@ -268,14 +274,22 @@ function addMessage(role, content, aiInfo = null) {
 // Format model name for display
 function formatModelName(model) {
     const modelNames = {
-        'mistral-small-latest': 'Mistral',
+        'mistral-small-latest': 'Mistral Small',
+        'mistral-medium-latest': 'Mistral Medium',
+        'mistral-large-latest': 'Mistral Large',
         'claude-3-5-haiku-20241022': 'Haiku',
         'claude-3-5-sonnet-20241022': 'Sonnet',
         'claude-opus-4-5': 'Opus',
         'gpt-3.5-turbo': 'GPT-3.5',
-        'gpt-4-turbo-preview': 'GPT-4'
+        'gpt-4-turbo-preview': 'GPT-4',
+        'gpt-4o': 'GPT-4o',
+        'gpt-4o-mini': 'GPT-4o Mini',
+        'gemini-1.5-flash': 'Gemini Flash',
+        'gemini-1.5-pro': 'Gemini Pro',
+        'cache': '⚡ Cache',
+        'knowledge-cache': '⚡ Cache'
     };
-    return modelNames[model] || model.split('-').slice(0, 2).join(' ');
+    return modelNames[model] || model;
 }
 
 // Get emoji for complexity level
