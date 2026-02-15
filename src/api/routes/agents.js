@@ -127,8 +127,8 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
                 await db.updateAgentOnboarding(agent.id);
             }
         } else {
-            // Normal chat
-            systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name);
+            // Normal chat - adapt system prompt to user's language
+            systemPrompt = getDefaultSystemPrompt('Alex', memoryMap.name || req.user.name, language);
         }
         
         // Determine user tier for AI routing
