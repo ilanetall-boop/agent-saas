@@ -294,11 +294,25 @@ function addMessage(role, content, aiInfo = null) {
         modelIndicator = `<div class="model-indicator" style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${complexityEmoji} ${details}</div>`;
     }
 
-    // Avatar: user emoji or Eva SVG
-    const avatarContent = role === 'user' ? '👤' : EVA_AVATAR_SVG;
+    // Avatar: user profile pic (from Google/GitHub) or emoji, Eva SVG for assistant
+    let avatarContent;
+    let avatarStyle = '';
+
+    if (role === 'user') {
+        // Check if user has a profile picture
+        if (user && user.avatar_url) {
+            avatarContent = `<img src="${user.avatar_url}" alt="Profile" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+            avatarStyle = 'background:none;padding:0;overflow:hidden;';
+        } else {
+            avatarContent = '👤';
+        }
+    } else {
+        avatarContent = EVA_AVATAR_SVG;
+        avatarStyle = 'background:none;padding:0;';
+    }
 
     msgEl.innerHTML = `
-        <div class="avatar" style="${role !== 'user' ? 'background:none;padding:0;' : ''}">${avatarContent}</div>
+        <div class="avatar" style="${avatarStyle}">${avatarContent}</div>
         <div class="bubble-wrapper">
             <div class="bubble">${formatted}</div>
             ${modelIndicator}

@@ -164,7 +164,8 @@ router.post('/login', validateRequest(schemas.login), async (req, res) => {
                 name: user.name,
                 plan: user.plan,
                 messagesUsed: user.messages_used,
-                messagesLimit: user.messages_limit
+                messagesLimit: user.messages_limit,
+                avatar_url: user.avatar_url || null
             }
         });
     } catch (error) {
@@ -287,7 +288,8 @@ router.get('/me', authMiddleware, (req, res) => {
             name: req.user.name,
             plan: req.user.plan,
             messagesUsed: req.user.messages_used,
-            messagesLimit: req.user.messages_limit
+            messagesLimit: req.user.messages_limit,
+            avatar_url: req.user.avatar_url || null
         }
     });
 });
@@ -497,7 +499,8 @@ router.get('/verify-token', async (req, res) => {
                 email: user.email,
                 name: user.name,
                 emailVerified: user.email_verified,
-                plan: user.plan || 'free'
+                plan: user.plan || 'free',
+                avatar_url: user.avatar_url || null
             }
         });
     } catch (error) {
