@@ -110,14 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     console.log('🌍 i18n: Detected language =', i18nInstance.currentLanguage);
     console.log('🌍 i18n: localStorage.language =', localStorage.getItem('language'));
-    
-    // DEBUG: Force French if nothing is set
-    if (!localStorage.getItem('language')) {
-        console.log('🌍 i18n: No language in localStorage, setting to fr');
-        localStorage.setItem('language', 'fr');
-        i18nInstance.currentLanguage = 'fr';
-    }
-    
+
     // Load current language and update DOM
     try {
         const loaded = await i18nInstance.loadLanguage(i18nInstance.currentLanguage);
