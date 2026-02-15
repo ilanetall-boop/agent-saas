@@ -223,10 +223,25 @@ function addMessage(role, content, aiInfo = null) {
     const messagesEl = document.getElementById('chatMessages');
     const msgEl = document.createElement('div');
     msgEl.className = `message ${role}`;
-    
+
+    // Helper to escape HTML entities
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // Process code blocks FIRST - escape HTML inside them
     let formatted = content
-        .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-        .replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">$1</code>')
+        .replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+            return '<pre><code>' + escapeHtml(code) + '</code></pre>';
+        })
+        .replace(/`([^`]+)`/g, (match, code) => {
+            return '<code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">' + escapeHtml(code) + '</code>';
+        })
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
 

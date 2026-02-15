@@ -185,5 +185,13 @@
     "switch_to_login": "Se connecter",
     "continue_google": "Continuer avec Google",
     "continue_github": "Continuer avec GitHub"
+  },
+  "chat": {
+    "my_agent": "Eva",
+    "telegram": "📱 Telegram",
+    "logout": "Déconnexion",
+    "type_message": "Écris ton message...",
+    "unlimited": "✅ Illimité - Pas de limite de messages",
+    "degraded_warning": "⚠️ Réponses plus lentes après 100 messages/jour"
   }
 }
