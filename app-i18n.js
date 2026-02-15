@@ -130,8 +130,10 @@ function updatePageTranslations() {
         const key = element.getAttribute('data-i18n');
         const translation = i18nInstance.t(key);
         
-        // Handle input placeholders
+        // Handle input/textarea placeholders
         if (element.tagName === 'INPUT' && (element.type === 'text' || element.type === 'email' || element.type === 'password')) {
+            element.placeholder = translation;
+        } else if (element.tagName === 'TEXTAREA') {
             element.placeholder = translation;
         } else {
             // Set text for all other elements
