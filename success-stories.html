@@ -590,8 +590,8 @@
 
             <div class="nav-actions">
                 <div class="language-switcher">
-                    <select onchange="window.location.href = '/success-stories-' + this.value + '.html'">
-                        <option value="en" selected>English</option>
+                    <select id="langSelector" onchange="changeLanguage(this.value)">
+                        <option value="en">English</option>
                         <option value="fr">Français</option>
                         <option value="es">Español</option>
                         <option value="de">Deutsch</option>
@@ -828,5 +828,27 @@
             <p>&copy; 2026 My Best Agent. Built with AI, powered by humans.</p>
         </div>
     </footer>
+
+    <!-- i18n Scripts -->
+    <script src="/app-i18n.js"></script>
+    <script>
+        function initLangSelector() {
+            const selector = document.getElementById('langSelector');
+            if (selector) {
+                const savedLang = localStorage.getItem('language');
+                if (savedLang && selector.querySelector(`option[value="${savedLang}"]`)) {
+                    selector.value = savedLang;
+                }
+            }
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('language', lang);
+            window.location.reload();
+        }
+
+        initLangSelector();
+        document.addEventListener('DOMContentLoaded', initLangSelector);
+    </script>
 </body>
 </html>
