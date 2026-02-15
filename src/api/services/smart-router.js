@@ -48,8 +48,42 @@ const PROVIDERS = {
     }
 };
 
-// Complexity detection patterns - ORDER MATTERS (website before simple)
+// Complexity detection patterns - ORDER MATTERS (most specific first)
 const PATTERNS = {
+    // === HIGH PRIORITY: Specific content types ===
+    ecommerce: [
+        /\b(boutique|shop|e-?commerce|magasin|store)\b.*\b(en ligne|online)\b/i,
+        /\b(vendre|sell|produit|product).*(en ligne|online|web)/i,
+        /\b(panier|cart|checkout|paiement|payment)\b/i,
+        /\b(shopify|woocommerce|prestashop)\b/i,
+        /page.*produit|product.*page/i
+    ],
+    presentation: [
+        /\b(présentation|presentation|powerpoint|ppt|slides?|diaporama)\b/i,
+        /\b(slide deck|pitch deck|keynote)\b/i,
+        /\b(créer?|crée|fais|faire).*(présentation|slides?|ppt)/i,
+        /pour (ma |une )?(réunion|meeting|conf|pitch)/i
+    ],
+    socialMedia: [
+        /\b(post|publication|contenu).*(linkedin|instagram|twitter|tiktok|facebook|réseaux?|social)/i,
+        /\b(linkedin|instagram|twitter|tiktok|facebook)\b.*\b(post|publication|contenu)\b/i,
+        /\b(réseaux? sociaux|social media)\b/i,
+        /\b(caption|légende|hashtag)\b/i,
+        /\b(reel|story|stories|thread|tweet)\b/i
+    ],
+    videoScript: [
+        /\b(script|scénario).*(vidéo|video|youtube|tiktok)\b/i,
+        /\b(youtube|tiktok|reels?)\b.*\b(script|scénario|idée)\b/i,
+        /\b(intro|hook|outro|cta)\b.*vidéo/i,
+        /\b(chaîne|channel)\b.*\b(youtube|vidéo)\b/i
+    ],
+    document: [
+        /\b(devis|quote|facture|invoice)\b/i,
+        /\b(contrat|contract)\b.*\b(freelance|prestation|service|travail)\b/i,
+        /\b(lettre|letter).*(motivation|démission|recommandation)\b/i,
+        /\b(cv|curriculum|résumé)\b/i,
+        /\b(bon de commande|purchase order)\b/i
+    ],
     website: [
         /\b(portfolio|site|website|landing.?page|webpage|page web)\b/i,
         /\b(créer?|crée|fais|faire|génère|build|make|write).*(site|portfolio|page)/i,
@@ -93,14 +127,26 @@ const PATTERNS = {
 
 /**
  * Analyze message complexity
- * Priority: website > code > complex > analysis > translate > simple
+ * Priority: ecommerce > presentation > socialMedia > videoScript > document > website > code > complex > analysis > translate > simple
  */
 function analyzeComplexity(message) {
     const text = message.toLowerCase();
     const wordCount = text.split(/\s+/).length;
 
-    // Check patterns in explicit priority order
-    const priorityOrder = ['website', 'code', 'complex', 'analysis', 'translate', 'simple'];
+    // Check patterns in explicit priority order (most specific first)
+    const priorityOrder = [
+        'ecommerce',      // Boutiques en ligne
+        'presentation',   // PowerPoint/Slides
+        'socialMedia',    // Posts réseaux sociaux
+        'videoScript',    // Scripts YouTube/TikTok
+        'document',       // Devis, factures, contrats, CV
+        'website',        // Sites web généraux
+        'code',           // Code/programmation
+        'complex',        // Tâches complexes
+        'analysis',       // Analyse
+        'translate',      // Traduction
+        'simple'          // Conversations simples
+    ];
 
     for (const complexity of priorityOrder) {
         const patterns = PATTERNS[complexity];
@@ -129,7 +175,12 @@ function selectModel(complexity, userTier = 'free') {
     const capabilityMap = {
         simple: 'chat',
         translate: 'translate',
-        website: 'code',  // Website creation needs full code capability (Sonnet)
+        ecommerce: 'code',      // E-commerce needs full code
+        presentation: 'code',   // Presentations need structured output
+        socialMedia: 'chat',    // Social posts are text-based
+        videoScript: 'chat',    // Scripts are text-based
+        document: 'chat',       // Documents are text-based
+        website: 'code',        // Website creation needs full code capability
         code: 'code',
         'code-simple': 'code-simple',
         analysis: 'analysis',
@@ -269,6 +320,174 @@ Commence directement par \`\`\`html et génère un site de 200+ lignes avec:
 
 INSTRUCTION CODE:
 Génère le code IMMÉDIATEMENT. Pas d'explication avant. Code d'abord, explications courtes après si nécessaire.`;
+    }
+
+    if (complexity === 'ecommerce') {
+        enhancedPrompt += `
+
+INSTRUCTION E-COMMERCE:
+Génère une boutique en ligne COMPLÈTE en HTML/CSS/JS avec:
+- Header avec logo, recherche, panier
+- Grille de produits avec images, prix, boutons "Ajouter au panier"
+- Sidebar filtres (catégories, prix, tailles)
+- Page produit détaillée avec galerie, description, avis
+- Panier fonctionnel avec localStorage
+- Design moderne type Shopify
+- Images: https://picsum.photos/400/400?random=X
+Minimum 300 lignes de code.`;
+    }
+
+    if (complexity === 'presentation') {
+        enhancedPrompt += `
+
+INSTRUCTION PRÉSENTATION/SLIDES:
+Génère une présentation HTML complète avec reveal.js intégré:
+\`\`\`html
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.min.css">
+<style>
+.reveal h1 { color: #2563eb; }
+.reveal h2 { color: #1e40af; }
+.reveal ul { text-align: left; }
+.stat-big { font-size: 3em; color: #2563eb; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<!-- SLIDES ICI -->
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+<script>Reveal.initialize();</script>
+</body>
+</html>
+\`\`\`
+Structure: Titre > Agenda > 5-8 slides contenu > Conclusion > Questions
+Chaque slide: 1 titre + 3-5 bullet points MAX ou 1 image/stat`;
+    }
+
+    if (complexity === 'socialMedia') {
+        enhancedPrompt += `
+
+INSTRUCTION POST RÉSEAUX SOCIAUX:
+Génère le contenu adapté à la plateforme:
+
+LINKEDIN:
+- Hook accrocheur (1ère ligne cruciale)
+- 3-5 paragraphes courts
+- Émojis professionnels ✅📈💡
+- Call-to-action final
+- 3-5 hashtags pertinents
+
+INSTAGRAM:
+- Caption engageante
+- Émojis visuels 🔥✨💪
+- Story telling
+- Call-to-action
+- 20-30 hashtags (en commentaire)
+
+TWITTER/X:
+- 280 caractères MAX
+- Percutant et direct
+- 1-2 hashtags
+- Thread si nécessaire (numérote 1/, 2/, etc.)
+
+TIKTOK:
+- Script court et dynamique
+- Hook dans les 3 premières secondes
+- Tendances/sons suggérés
+- Hashtags viraux`;
+    }
+
+    if (complexity === 'videoScript') {
+        enhancedPrompt += `
+
+INSTRUCTION SCRIPT VIDÉO:
+Génère un script structuré:
+
+FORMAT:
+\`\`\`
+🎬 TITRE: [Titre accrocheur]
+⏱️ DURÉE: [X minutes]
+🎯 OBJECTIF: [But de la vidéo]
+
+---
+HOOK (0-5 sec):
+[Phrase choc pour capter l'attention]
+
+INTRO (5-15 sec):
+[Présentation du sujet]
+
+CONTENU PRINCIPAL:
+Point 1: [Titre]
+- [Détails]
+- [B-roll suggéré]
+
+Point 2: [Titre]
+- [Détails]
+- [B-roll suggéré]
+
+Point 3: [Titre]
+- [Détails]
+- [B-roll suggéré]
+
+CONCLUSION:
+[Résumé]
+
+CTA (Call-to-Action):
+[Like, abonne-toi, commente...]
+
+---
+📝 NOTES DE PRODUCTION:
+- Musique suggérée: [type]
+- Transitions: [style]
+- Miniature: [description]
+\`\`\``;
+    }
+
+    if (complexity === 'document') {
+        enhancedPrompt += `
+
+INSTRUCTION DOCUMENT PRO:
+Génère un document HTML imprimable avec CSS print-friendly:
+
+DEVIS/FACTURE:
+\`\`\`html
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@media print { body { margin: 0; } }
+body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px; }
+.header { display: flex; justify-content: space-between; border-bottom: 2px solid #2563eb; padding-bottom: 20px; }
+.logo { font-size: 24px; font-weight: bold; color: #2563eb; }
+table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+th { background: #f8f9fa; }
+.total { font-size: 1.5em; text-align: right; margin-top: 20px; }
+.footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 0.9em; color: #666; }
+</style>
+</head>
+<body>
+<!-- CONTENU -->
+</body>
+</html>
+\`\`\`
+
+CONTRAT:
+- En-tête avec parties
+- Articles numérotés
+- Clauses standard (objet, durée, prix, résiliation)
+- Zone signature
+
+CV:
+- Design moderne
+- Sections: Contact, Profil, Expérience, Formation, Compétences
+- 1 page A4 max`;
     }
 
     // 3. Build messages array
