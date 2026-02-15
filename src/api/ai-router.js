@@ -25,7 +25,7 @@ const MODELS = {
     model: 'claude-3-5-haiku-20241022',
     inputCost: 0.25,
     outputCost: 1.25,
-    maxTokens: 4096,
+    maxTokens: 8192, // Increased for website generation
     tier: 'cheap'
   },
   // Mid tier
@@ -64,31 +64,39 @@ const MODELS = {
   }
 };
 
-// Task complexity patterns
+// Task complexity patterns (EN + FR)
 const COMPLEXITY_PATTERNS = {
   simple: [
-    /^(hi|hello|hey|bonjour|salut)/i,
+    /^(hi|hello|hey|bonjour|salut|coucou)/i,
     /what('s| is) (the )?(time|date|weather)/i,
-    /thank(s| you)/i,
-    /^(yes|no|ok|okay|sure|got it)/i,
-    /how are you/i,
+    /thank(s| you)|merci/i,
+    /^(yes|no|ok|okay|sure|got it|oui|non|d'accord)/i,
+    /how are you|ça va|comment vas/i,
+    /^je m'appelle/i,
+    /^c'est quoi/i,
+  ],
+  website: [
+    /\b(site|website|portfolio|landing|page web)\b/i,
+    /\b(crée|créer|fais|faire|génère|générer).*(site|portfolio|page)/i,
+    /\b(create|build|make|generate).*(site|website|portfolio|page)\b/i,
+    /\b(restaurant|boutique|shop|business).*(site|web)/i,
   ],
   code: [
     /\b(code|function|script|program|debug|error|bug|fix)\b/i,
-    /\b(javascript|python|html|css|sql|api|json)\b/i,
-    /\b(create|build|make|write).*(app|site|website|page)\b/i,
+    /\b(javascript|python|html|css|sql|api|json|react|vue)\b/i,
+    /\b(écris|écrire|fonction|variable|algorithme)\b/i,
     /```/,
   ],
   analysis: [
-    /\b(analyze|analyse|explain|compare|evaluate)\b/i,
-    /\b(spreadsheet|data|report|chart|graph)\b/i,
-    /\b(summarize|summary|digest)\b/i,
+    /\b(analyze|analyse|explain|compare|evaluate|analyser|expliquer|comparer)\b/i,
+    /\b(spreadsheet|data|report|chart|graph|données|rapport)\b/i,
+    /\b(summarize|summary|digest|résumer|résumé)\b/i,
   ],
   complex: [
-    /\b(architect|design|strategy|plan|roadmap)\b/i,
-    /\b(research|investigate|deep dive)\b/i,
-    /step.by.step/i,
-    /\b(complex|difficult|challenging)\b/i,
+    /\b(architect|design|strategy|plan|roadmap|stratégie|architecture)\b/i,
+    /\b(research|investigate|deep dive|recherche|approfondir)\b/i,
+    /step.by.step|étape par étape/i,
+    /\b(complex|difficult|challenging|complexe|difficile)\b/i,
   ]
 };
 
@@ -98,33 +106,38 @@ const COMPLEXITY_PATTERNS = {
 function analyzeComplexity(message) {
   const text = message.toLowerCase();
   const wordCount = text.split(/\s+/).length;
-  
-  // Very short messages = simple
+
+  // Very short messages = simple (unless they contain keywords)
   if (wordCount < 5) {
     for (const pattern of COMPLEXITY_PATTERNS.simple) {
       if (pattern.test(text)) return 'simple';
     }
   }
-  
-  // Check for complex patterns first (highest priority)
+
+  // Check for website patterns FIRST (highest priority for Eva)
+  for (const pattern of COMPLEXITY_PATTERNS.website) {
+    if (pattern.test(text)) return 'website';
+  }
+
+  // Check for complex patterns
   for (const pattern of COMPLEXITY_PATTERNS.complex) {
     if (pattern.test(text)) return 'complex';
   }
-  
+
   // Check for code patterns
   for (const pattern of COMPLEXITY_PATTERNS.code) {
     if (pattern.test(text)) return 'code';
   }
-  
+
   // Check for analysis patterns
   for (const pattern of COMPLEXITY_PATTERNS.analysis) {
     if (pattern.test(text)) return 'analysis';
   }
-  
+
   // Long messages tend to be more complex
   if (wordCount > 100) return 'analysis';
   if (wordCount > 50) return 'code';
-  
+
   // Default to simple for short, unclassified messages
   return 'simple';
 }
@@ -134,33 +147,36 @@ function analyzeComplexity(message) {
  */
 function selectModel(message, userTier = 'free') {
   const complexity = analyzeComplexity(message);
-  
+
   // Free users: limited to cheap models
   if (userTier === 'free' || userTier === 'starter') {
     switch (complexity) {
       case 'simple':
-        return MODELS.mistral;
+        return MODELS.haiku; // Haiku for Eva personality consistency
+      case 'website':
+        return MODELS.haiku; // Haiku can generate websites well
       case 'code':
       case 'analysis':
         return MODELS.haiku;
       case 'complex':
-        // Free users get Haiku even for complex tasks
         return MODELS.haiku;
       default:
-        return MODELS.mistral;
+        return MODELS.haiku;
     }
   }
-  
+
   // Pro users: full access, smart routing
   switch (complexity) {
     case 'simple':
-      return MODELS.haiku; // Still use cheap for simple
+      return MODELS.haiku;
+    case 'website':
+      return MODELS.sonnet; // Sonnet for better websites
     case 'code':
-      return MODELS.sonnet; // Good at code
+      return MODELS.sonnet;
     case 'analysis':
       return MODELS.sonnet;
     case 'complex':
-      return MODELS.opus; // Premium for complex
+      return MODELS.opus;
     default:
       return MODELS.haiku;
   }

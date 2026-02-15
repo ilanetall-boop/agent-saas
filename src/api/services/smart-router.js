@@ -48,56 +48,67 @@ const PROVIDERS = {
     }
 };
 
-// Complexity detection patterns
+// Complexity detection patterns - ORDER MATTERS (website before simple)
 const PATTERNS = {
-    simple: [
-        /^(hi|hello|hey|bonjour|salut|coucou)/i,
-        /^(yes|no|ok|okay|sure|oui|non|d'accord)/i,
-        /^thanks?|merci/i,
-        /how are you|ça va|comment vas/i
+    website: [
+        /\b(portfolio|site|website|landing.?page|webpage|page web)\b/i,
+        /\b(créer?|crée|fais|faire|génère|build|make|write).*(site|portfolio|page)/i,
+        /\b(html|css).*(complet|professionnel|moderne)/i,
+        /\b(restaurant|boutique|shop|business|entreprise).*(site|web)/i,
+        /besoin d'un site/i,
+        /site.*professionnel/i
+    ],
+    code: [
+        /\b(code|function|script|program|debug|error|bug|fix|fonction)\b/i,
+        /\b(javascript|typescript|python|java|sql|api|json|react|node)\b/i,
+        /```[\s\S]*```/,
+        /\b(implement|develop|program|écris|écrire)\b/i,
+        /\b(algorithme|variable|boucle|array|objet)\b/i
+    ],
+    analysis: [
+        /\b(analy[sz]e|explain|compare|evaluate|review|analyser|expliquer)\b/i,
+        /\b(summarize|summary|digest|résumé|résumer)\b/i,
+        /\b(data|report|chart|graph|spreadsheet|données)\b/i
+    ],
+    complex: [
+        /\b(architect|design|strategy|plan|roadmap|stratégie|architecture)\b/i,
+        /\b(research|investigate|deep.dive|recherche|approfondir)\b/i,
+        /step.by.step|étape par étape/i,
+        /\b(complex|difficult|challenging|optimize|complexe|difficile)\b/i,
+        /\b(refactor|rewrite|migrate|réécrire|migrer)\b/i
     ],
     translate: [
         /tradui[st]|translate/i,
         /en (français|anglais|espagnol|allemand)/i,
         /to (french|english|spanish|german)/i
     ],
-    website: [
-        /\b(portfolio|site|website|landing.?page|webpage)\b/i,
-        /\b(créer?|build|make|write).*(site|portfolio|page)\b/i,
-        /\b(html|css).*(complet|professionnel|moderne)/i
-    ],
-    code: [
-        /\b(code|function|script|program|debug|error|bug|fix)\b/i,
-        /\b(javascript|typescript|python|java|sql|api|json|react|node)\b/i,
-        /```[\s\S]*```/,
-        /\b(implement|develop|program)\b/i
-    ],
-    analysis: [
-        /\b(analy[sz]e|explain|compare|evaluate|review)\b/i,
-        /\b(summarize|summary|digest|résumé)\b/i,
-        /\b(data|report|chart|graph|spreadsheet)\b/i
-    ],
-    complex: [
-        /\b(architect|design|strategy|plan|roadmap)\b/i,
-        /\b(research|investigate|deep.dive)\b/i,
-        /step.by.step/i,
-        /\b(complex|difficult|challenging|optimize)\b/i,
-        /\b(refactor|rewrite|migrate)\b/i
+    simple: [
+        /^(hi|hello|hey|bonjour|salut|coucou)[\s!?]*$/i,
+        /^(yes|no|ok|okay|sure|oui|non|d'accord)[\s!?]*$/i,
+        /^(thanks?|merci)[\s!?]*$/i,
+        /^(how are you|ça va|comment vas)/i,
+        /^je m'appelle \w+$/i
     ]
 };
 
 /**
  * Analyze message complexity
+ * Priority: website > code > complex > analysis > translate > simple
  */
 function analyzeComplexity(message) {
     const text = message.toLowerCase();
     const wordCount = text.split(/\s+/).length;
 
-    // Check patterns in order of priority
-    for (const [complexity, patterns] of Object.entries(PATTERNS)) {
-        for (const pattern of patterns) {
-            if (pattern.test(text)) {
-                return complexity;
+    // Check patterns in explicit priority order
+    const priorityOrder = ['website', 'code', 'complex', 'analysis', 'translate', 'simple'];
+
+    for (const complexity of priorityOrder) {
+        const patterns = PATTERNS[complexity];
+        if (patterns) {
+            for (const pattern of patterns) {
+                if (pattern.test(text)) {
+                    return complexity;
+                }
             }
         }
     }
@@ -239,6 +250,27 @@ async function route(message, conversationHistory = [], options = {}, db = null)
 
     console.log(`[SmartRouter] Complexity: ${complexity} → Model: ${selected.provider}/${selected.model}`);
 
+    // 2.5. Enhance system prompt for specific tasks
+    let enhancedPrompt = systemPrompt || '';
+
+    if (complexity === 'website') {
+        enhancedPrompt += `
+
+INSTRUCTION CRITIQUE - SITE WEB:
+Tu dois IMMÉDIATEMENT générer le code HTML/CSS COMPLET. PAS de description, PAS de plan, PAS de question.
+Commence directement par \`\`\`html et génère un site de 200+ lignes avec:
+- Nav sticky + Hero gradient + Stats + Services cards + Testimonials + Contact form + Footer
+- CSS moderne: :root variables, flexbox/grid, transitions, responsive
+- Images: https://picsum.photos/600/400?random=X`;
+    }
+
+    if (complexity === 'code') {
+        enhancedPrompt += `
+
+INSTRUCTION CODE:
+Génère le code IMMÉDIATEMENT. Pas d'explication avant. Code d'abord, explications courtes après si nécessaire.`;
+    }
+
     // 3. Build messages array
     const messages = [
         ...conversationHistory,
@@ -258,7 +290,7 @@ async function route(message, conversationHistory = [], options = {}, db = null)
             result = await provider.call(
                 selected.model.includes(providerName) ? selected.model : getDefaultModel(providerName),
                 messages,
-                systemPrompt
+                enhancedPrompt
             );
             break; // Success, exit loop
         } catch (error) {
