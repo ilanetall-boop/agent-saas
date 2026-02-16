@@ -911,45 +911,70 @@
 
             .chat-header {
                 padding: 12px 16px;
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
             }
 
             .chat-header h1 {
                 font-size: 16px;
-            }
-
-            .chat-header h1 .status {
-                display: none;
+                justify-content: center;
             }
 
             .chat-header > div:last-child {
-                width: 100%;
-                display: flex;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
-                margin-top: 8px;
-                justify-content: space-between;
-                align-items: center;
+                width: 100%;
             }
 
             .tier-badge {
-                font-size: 11px;
-                padding: 3px 8px;
+                display: none;
             }
 
             .user-info {
-                font-size: 12px;
-                margin: 0;
-            }
-
-            .logout {
-                font-size: 13px;
-                padding: 6px 12px;
-                flex: 1;
-                min-width: 80px;
-            }
-
-            .logout:nth-child(3) {
                 display: none;
+            }
+
+            .chat-lang-select {
+                grid-column: 1;
+                padding: 10px 8px;
+                font-size: 12px;
+                min-width: unset;
+            }
+
+            .chat-header .logout {
+                font-size: 12px;
+                padding: 10px 8px;
+                min-width: unset;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* Hide full text, show only icons on mobile */
+            #connectionsBtn {
+                font-size: 0;
+            }
+            #connectionsBtn::before {
+                content: "🔗";
+                font-size: 16px;
+            }
+
+            #telegramBtn {
+                font-size: 0;
+            }
+            #telegramBtn::before {
+                content: "📱";
+                font-size: 16px;
+            }
+
+            #logoutBtn {
+                font-size: 0;
+            }
+            #logoutBtn::before {
+                content: "🚪";
+                font-size: 16px;
             }
 
             .chat-messages {
@@ -958,7 +983,7 @@
             }
 
             .message {
-                max-width: 100%;
+                max-width: 90%;
             }
 
             .message .bubble {
@@ -974,30 +999,34 @@
             }
 
             .chat-input-container {
-                padding: 12px 16px 16px;
+                padding: 12px 12px 16px;
+                /* Safe area for notched phones */
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
             }
 
             .chat-input {
-                padding: 10px 12px;
-                font-size: 16px;
-                min-height: 44px;
-                border-radius: 8px;
+                padding: 12px 14px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                min-height: 48px;
+                border-radius: 24px;
             }
 
             .send-btn {
-                width: 44px;
-                height: 44px;
-                border-radius: 8px;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                flex-shrink: 0;
             }
 
             .send-btn svg {
-                width: 18px;
-                height: 18px;
+                width: 20px;
+                height: 20px;
             }
 
             .usage-bar {
                 font-size: 11px;
                 margin-top: 8px;
+                text-align: center;
             }
 
             #languageSwitcher {
@@ -1008,13 +1037,22 @@
                 right: 12px;
             }
 
+            .auth-container {
+                padding: 16px;
+            }
+
             .auth-box {
-                padding: 24px;
-                border-radius: 12px;
+                padding: 24px 20px;
+                border-radius: 16px;
             }
 
             .auth-box h1 {
-                font-size: 20px;
+                font-size: 22px;
+                text-align: center;
+            }
+
+            .auth-box p {
+                text-align: center;
             }
 
             .form-group {
@@ -1022,18 +1060,27 @@
             }
 
             .form-group input {
-                padding: 12px 14px;
+                padding: 14px 16px;
                 font-size: 16px;
+                border-radius: 12px;
             }
 
             .btn {
-                padding: 12px;
-                font-size: 15px;
+                padding: 14px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+
+            .oauth-btn {
+                padding: 14px;
+                border-radius: 12px;
             }
 
             .modal-content {
                 width: 95%;
-                border-radius: 12px;
+                max-height: 90vh;
+                border-radius: 16px;
+                margin: 16px;
             }
 
             .modal-header {
@@ -1046,6 +1093,8 @@
 
             .modal-body {
                 padding: 16px;
+                max-height: 60vh;
+                overflow-y: auto;
             }
 
             .modal-footer {
@@ -1053,50 +1102,71 @@
                 gap: 8px;
             }
 
-            .tier-badge {
-                order: 1;
+            /* Upgrade banner mobile */
+            .upgrade-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+                margin: 12px;
             }
 
-            .user-info {
-                order: 2;
+            /* Site deployed card mobile */
+            .site-deployed-card {
+                margin: 12px 0;
+                padding: 16px;
             }
 
-            .logout {
-                order: 3;
+            .site-deployed-header {
+                font-size: 16px;
             }
 
-            .auth-container {
+            .site-deployed-link {
                 padding: 12px;
+            }
+
+            .site-url {
+                font-size: 12px;
             }
         }
 
         @media (max-width: 480px) {
             .chat-header {
                 padding: 10px 12px;
+                gap: 10px;
             }
 
             .chat-header h1 {
-                font-size: 14px;
+                font-size: 15px;
             }
 
             .chat-header > div:last-child {
-                flex-direction: column;
+                grid-template-columns: repeat(4, 1fr);
                 gap: 6px;
             }
 
-            .logout {
-                font-size: 12px;
-                padding: 5px 8px;
+            .chat-header .logout,
+            .chat-lang-select {
+                padding: 8px 6px;
+                font-size: 11px;
             }
 
             .message {
-                max-width: 95%;
+                max-width: 92%;
+                gap: 8px;
             }
 
             .message .bubble {
-                padding: 8px 10px;
-                font-size: 13px;
-                border-radius: 8px;
+                padding: 10px 12px;
+                font-size: 14px;
+                border-radius: 16px;
+            }
+
+            .message.user .bubble {
+                border-radius: 16px 16px 4px 16px;
+            }
+
+            .message:not(.user) .bubble {
+                border-radius: 16px 16px 16px 4px;
             }
 
             .message .avatar {
@@ -1106,7 +1176,8 @@
             }
 
             .chat-input-container {
-                padding: 10px 12px 12px;
+                padding: 10px 10px 14px;
+                padding-bottom: max(14px, env(safe-area-inset-bottom));
             }
 
             .chat-input-wrapper {
@@ -1114,21 +1185,19 @@
             }
 
             .chat-input {
-                padding: 8px 10px;
-                font-size: 15px;
-                min-height: 40px;
-                border-radius: 6px;
+                padding: 10px 14px;
+                font-size: 16px;
+                min-height: 44px;
             }
 
             .send-btn {
-                width: 40px;
-                height: 40px;
-                border-radius: 6px;
+                width: 44px;
+                height: 44px;
             }
 
             .send-btn svg {
-                width: 16px;
-                height: 16px;
+                width: 18px;
+                height: 18px;
             }
 
             .usage-bar {
@@ -1138,56 +1207,94 @@
             #languageSwitcher {
                 font-size: 11px;
                 padding: 5px 8px;
-                min-width: 90px;
+                min-width: 80px;
+            }
+
+            .auth-container {
+                padding: 12px;
             }
 
             .auth-box {
-                padding: 16px;
-                border-radius: 10px;
+                padding: 20px 16px;
+                border-radius: 12px;
             }
 
             .auth-box h1 {
-                font-size: 18px;
+                font-size: 20px;
                 margin-bottom: 6px;
             }
 
             .auth-box p {
                 margin-bottom: 20px;
-                font-size: 13px;
+                font-size: 14px;
             }
 
             .form-group {
-                margin-bottom: 12px;
+                margin-bottom: 14px;
             }
 
             .form-group label {
                 font-size: 13px;
+                margin-bottom: 6px;
             }
 
             .form-group input {
-                padding: 10px 12px;
-                font-size: 15px;
+                padding: 12px 14px;
+                font-size: 16px;
             }
 
             .oauth-btn {
-                padding: 10px;
-                font-size: 13px;
-                gap: 6px;
+                padding: 12px;
+                font-size: 14px;
+                gap: 8px;
             }
 
             .btn {
-                padding: 10px;
-                font-size: 14px;
+                padding: 12px;
+                font-size: 15px;
             }
 
             .auth-switch {
                 margin-top: 16px;
-                font-size: 12px;
+                font-size: 13px;
             }
 
             .divider {
-                margin: 12px 0;
-                font-size: 12px;
+                margin: 14px 0;
+                font-size: 13px;
+            }
+
+            /* Modal smaller screens */
+            .modal-content {
+                width: 100%;
+                max-width: none;
+                border-radius: 16px 16px 0 0;
+                margin: 0;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                max-height: 85vh;
+            }
+
+            .modal-body {
+                max-height: 55vh;
+            }
+
+            /* Integrations grid mobile */
+            .category-integrations {
+                grid-template-columns: 1fr;
+            }
+
+            .integration-card {
+                padding: 12px;
+            }
+        }
+
+        /* iPhone notch / Dynamic Island support */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .chat-header {
+                padding-top: max(12px, env(safe-area-inset-top));
             }
         }
 
