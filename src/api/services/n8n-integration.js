@@ -20,9 +20,23 @@ const config = require('../config');
 
 // N8N Configuration
 const N8N_CONFIG = {
-    baseUrl: process.env.N8N_URL || 'http://localhost:5678',
+    baseUrl: process.env.N8N_URL || 'https://mybestagent-n8n.onrender.com',
     apiKey: process.env.N8N_API_KEY || '',
-    webhookUrl: process.env.N8N_WEBHOOK_URL || 'http://localhost:5678/webhook'
+    webhookUrl: process.env.N8N_WEBHOOK_URL || 'https://mybestagent-n8n.onrender.com/webhook'
+};
+
+// Webhook path mapping (service -> actual N8N webhook path)
+const WEBHOOK_PATHS = {
+    gmail: 'gmail123',
+    calendar: 'eva-calendar',
+    slack: 'eva-slack',
+    notion: 'eva-notion',
+    trello: 'eva-trello',
+    drive: 'eva-drive',
+    linkedin: 'eva-linkedin',
+    github: 'eva-github',
+    stripe: 'eva-stripe',
+    hubspot: 'eva-hubspot'
 };
 
 // ==========================================
@@ -1242,15 +1256,21 @@ async function saveUserConnection(userId, service, credentials, db) {
 /**
  * Execute N8N workflow
  */
-async function executeWorkflow(workflowName, data, userId) {
+async function executeWorkflow(service, action, data, userId) {
     try {
-        const response = await fetch(`${N8N_CONFIG.webhookUrl}/${workflowName}`, {
+        // Get the webhook path for this service
+        const webhookPath = WEBHOOK_PATHS[service] || `eva-${service}`;
+
+        const response = await fetch(`${N8N_CONFIG.webhookUrl}/${webhookPath}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-N8N-API-KEY': N8N_CONFIG.apiKey
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ userId, ...data })
+            body: JSON.stringify({
+                userId,
+                action,
+                ...data
+            })
         });
 
         if (!response.ok) {
@@ -1299,11 +1319,8 @@ async function handleAction(userId, service, action, params, db) {
         };
     }
 
-    // Build workflow name from service and action
-    const workflowName = `${service}-${action.replace(/_/g, '-')}`;
-
     try {
-        const result = await executeWorkflow(workflowName, params, userId);
+        const result = await executeWorkflow(service, action, params, userId);
 
         if (db) {
             await db.query(
@@ -1415,6 +1432,8 @@ function getActionVerb(service, action) {
 module.exports = {
     INTEGRATIONS,
     CATEGORIES,
+    WEBHOOK_PATHS,
+    N8N_CONFIG,
     detectAction,
     checkUserConnection,
     getUserConnections,
