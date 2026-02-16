@@ -1748,5 +1748,20 @@
 
     <!-- Auth Modal Functions (external to comply with CSP) -->
     <script src="/auth-modal.js"></script>
+
+    <!-- Auto-open auth modal if ?auth=login or ?auth=register parameter -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authParam = urlParams.get('auth');
+            if (authParam === 'login') {
+                window.history.replaceState({}, '', window.location.pathname);
+                if (typeof showLogin === 'function') showLogin();
+            } else if (authParam === 'register') {
+                window.history.replaceState({}, '', window.location.pathname);
+                if (typeof showRegister === 'function') showRegister();
+            }
+        });
+    </script>
 </body>
 </html>
