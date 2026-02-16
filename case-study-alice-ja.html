@@ -518,47 +518,6 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav>
-        <div class="container nav-inner">
-            <a href="/" class="logo">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                        <path d="M2 17l10 5 10-5"/>
-                        <path d="M2 12l10 5 10-5"/>
-                    </svg>
-                </div>
-                <span>My Best Agent</span>
-            </a>
-
-                        <ul class="nav-links">
-                <li><a href="/" data-i18n="nav_home">Home</a></li>
-                <li><a href="/success-stories.html" data-i18n="nav_success">Success Stories</a></li>
-                <li><a href="/#how" data-i18n="nav_how">How it works</a></li>
-                <li><a href="/#features" data-i18n="nav_features">Features</a></li>
-            </ul>
-
-                        <div class="nav-actions">
-                <div class="language-switcher">
-                    <select id="langSelector" onchange="changeLanguage(this.value)">
-                        <option value="en">English</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="de">Deutsch</option>
-                        <option value="it">Italiano</option>
-                        <option value="pt">Português</option>
-                        <option value="zh">中文</option>
-                        <option value="ar">العربية</option>
-                        <option value="ja">日本語</option>
-                        <option value="ru">Русский</option>
-                    </select>
-                </div>
-                <a href="/?auth=login" class="btn btn-secondary" data-i18n="nav_signin">Sign In</a>
-                <a href="/" class="btn btn-primary" data-i18n="btn_start_free">Start free</a>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
     <div class="main-container">
         <div class="breadcrumb">
@@ -737,5 +696,7 @@
 
     <!-- i18n Scripts (includes language selector functions) -->
     <script src="/app-i18n.js"></script>
+    <!-- Shared Header -->
+    <script src="/shared-header.js"></script>
 </body>
 </html>
