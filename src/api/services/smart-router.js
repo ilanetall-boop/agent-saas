@@ -794,12 +794,20 @@ function getFallbackOrder(primary) {
 function formatActionResult(actionResult) {
     const { service, action, result } = actionResult;
 
+    // Helper to format emails (handles both single object and array)
+    const formatEmails = (emails) => {
+        if (!emails) return 'Aucun email trouvé';
+        const emailList = Array.isArray(emails) ? emails : [emails];
+        return emailList.map(e => `• **${e.From || e.from || 'Inconnu'}**: ${e.Subject || e.subject || 'Sans sujet'}`).join('\n');
+    };
+
     const templates = {
         gmail: {
             sort: `📧 J'ai trié tes mails!\n\n${result?.summary || 'Mails organisés avec succès.'}`,
-            send: `📧 Mail envoyé avec succès à ${result?.recipient || 'destinataire'}!`,
-            search: `📧 J'ai trouvé ${result?.count || 0} mails:\n${result?.preview || ''}`,
-            read: `📧 Voici tes derniers mails:\n${result?.emails?.map(e => `• ${e.subject}`).join('\n') || 'Aucun nouveau mail'}`
+            send: `📧 Mail envoyé avec succès à ${result?.recipient || result?.to || 'destinataire'}!`,
+            search: `📧 Résultats de recherche:\n${formatEmails(result?.results || result?.emails)}`,
+            list: `📧 Voici tes derniers mails:\n\n${formatEmails(result?.emails)}`,
+            read: `📧 Voici tes derniers mails:\n\n${formatEmails(result?.emails)}`
         },
         calendar: {
             create: `📅 Événement créé: "${result?.title || 'Nouvel événement'}" le ${result?.date || ''}`,
