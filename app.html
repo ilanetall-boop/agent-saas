@@ -1308,6 +1308,15 @@
             }
         }
 
+        /* Hide any unwanted workflow/n8n widget icons */
+        [class*="n8n"],
+        [class*="workflow-widget"],
+        [id*="n8n"],
+        .n8n-widget,
+        .workflow-trigger {
+            display: none !important;
+        }
+
         /* Site Deployed Card */
         .site-deployed-card {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
