@@ -78,9 +78,25 @@ async function all(sql, params = []) {
 const dbOps = {
     // Users
     createUser: async (id, email, passwordHash, name) => {
+        // Explicitly set messages_limit to unlimited (Phase 1)
         return run(
-            'INSERT INTO users (id, email, password_hash, name) VALUES ($1, $2, $3, $4)',
+            'INSERT INTO users (id, email, password_hash, name, messages_limit) VALUES ($1, $2, $3, $4, 999999999)',
             [id, email, passwordHash, name]
+        );
+    },
+
+    // Fix for users with low message limits (Phase 1: everyone unlimited)
+    resetAllMessageLimits: async () => {
+        return run(
+            'UPDATE users SET messages_limit = 999999999 WHERE messages_limit < 999999999'
+        );
+    },
+
+    // Reset a specific user's message count and limit
+    resetUserMessages: async (userId) => {
+        return run(
+            'UPDATE users SET messages_used = 0, messages_limit = 999999999 WHERE id = $1',
+            [userId]
         );
     },
     

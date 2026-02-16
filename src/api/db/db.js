@@ -88,10 +88,28 @@ const dbOps = {
     // Users (with field encryption)
     createUser: async (id, email, passwordHash, name) => {
         // ✅ Encrypt sensitive fields before storing
+        // ✅ Phase 1: Explicitly set messages_limit to unlimited
         const encryptedName = name ? encryptUserFields({ name }).name : null;
         await run(
-            'INSERT INTO users (id, email, password_hash, name) VALUES ($1, $2, $3, $4)',
+            'INSERT INTO users (id, email, password_hash, name, messages_limit) VALUES ($1, $2, $3, $4, 999999999)',
             [id, email, passwordHash, encryptedName]
+        );
+    },
+
+    // Phase 1 Fix: Reset all message limits to unlimited
+    resetAllMessageLimits: async () => {
+        const result = await run(
+            'UPDATE users SET messages_limit = 999999999 WHERE messages_limit < 999999999'
+        );
+        console.log(`   → Updated ${result?.rowCount || 0} users to unlimited messages`);
+        return result;
+    },
+
+    // Reset a specific user's message count and limit
+    resetUserMessages: async (userId) => {
+        return run(
+            'UPDATE users SET messages_used = 0, messages_limit = 999999999 WHERE id = $1',
+            [userId]
         );
     },
     

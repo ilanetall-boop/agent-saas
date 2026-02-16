@@ -258,6 +258,16 @@ async function start() {
     try {
         const db = await initDb();
 
+        // Phase 1 Fix: Reset all message limits to unlimited
+        try {
+            if (db.resetAllMessageLimits) {
+                await db.resetAllMessageLimits();
+                console.log('✅ Message limits reset to unlimited (Phase 1)');
+            }
+        } catch (migrationError) {
+            console.warn('⚠️ Message limit reset failed (non-blocking):', migrationError.message);
+        }
+
         // Initialize knowledge cache for semantic search
         try {
             await initCache(db);
