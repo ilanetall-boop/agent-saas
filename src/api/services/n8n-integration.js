@@ -25,18 +25,23 @@ const N8N_CONFIG = {
     webhookUrl: process.env.N8N_WEBHOOK_URL || 'https://mybestagent-n8n.onrender.com/webhook'
 };
 
-// Webhook path mapping (service -> actual N8N webhook path)
+// Webhook path mapping (service-action -> actual N8N webhook path)
 const WEBHOOK_PATHS = {
-    gmail: 'gmail123',
-    calendar: 'eva-calendar',
-    slack: 'eva-slack',
-    notion: 'eva-notion',
-    trello: 'eva-trello',
-    drive: 'eva-drive',
-    linkedin: 'eva-linkedin',
-    github: 'eva-github',
-    stripe: 'eva-stripe',
-    hubspot: 'eva-hubspot'
+    // Gmail actions
+    'gmail-list': 'eva-gmail-list',
+    'gmail-send': 'eva-gmail-send',
+    'gmail-search': 'eva-gmail-search',
+    'gmail-read': 'eva-gmail-list',
+    // Other services (placeholders)
+    'calendar': 'eva-calendar',
+    'slack': 'eva-slack',
+    'notion': 'eva-notion',
+    'trello': 'eva-trello',
+    'drive': 'eva-drive',
+    'linkedin': 'eva-linkedin',
+    'github': 'eva-github',
+    'stripe': 'eva-stripe',
+    'hubspot': 'eva-hubspot'
 };
 
 // ==========================================
@@ -1258,8 +1263,11 @@ async function saveUserConnection(userId, service, credentials, db) {
  */
 async function executeWorkflow(service, action, data, userId) {
     try {
-        // Get the webhook path for this service
-        const webhookPath = WEBHOOK_PATHS[service] || `eva-${service}`;
+        // Get the webhook path for this service-action combination
+        const webhookKey = `${service}-${action}`;
+        const webhookPath = WEBHOOK_PATHS[webhookKey] || WEBHOOK_PATHS[service] || `eva-${service}`;
+
+        console.log(`[N8N] Calling webhook: ${webhookPath} for ${service}/${action}`);
 
         const response = await fetch(`${N8N_CONFIG.webhookUrl}/${webhookPath}`, {
             method: 'POST',
@@ -1268,7 +1276,6 @@ async function executeWorkflow(service, action, data, userId) {
             },
             body: JSON.stringify({
                 userId,
-                action,
                 ...data
             })
         });
