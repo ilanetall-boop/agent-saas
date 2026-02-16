@@ -1027,10 +1027,10 @@ const CATEGORIES = {
 const ACTION_PATTERNS = {
     // Email patterns
     gmail: {
-        sort: [/tri(e|er)?.*mail/i, /organis(e|er)?.*mail/i, /class(e|er)?.*mail/i, /range(r)?.*mail/i],
-        send: [/envoi(e|er)?.*mail/i, /écri(s|re)?.*mail/i, /send.*email/i, /mail.*à/i],
-        search: [/cherch(e|er)?.*mail/i, /trouv(e|er)?.*mail/i, /search.*email/i],
-        read: [/li(s|re)?.*mail/i, /montr(e|er)?.*mail/i, /mes.*mails?/i, /inbox/i]
+        sort: [/tri(e|er)?.*e?mails?/i, /organis(e|er)?.*e?mails?/i, /class(e|er)?.*e?mails?/i, /range(r)?.*e?mails?/i],
+        send: [/envoi(e|er)?.*e?mails?/i, /écri(s|re)?.*e?mails?/i, /send.*email/i, /mail.*à/i, /email.*à/i],
+        search: [/cherch(e|er)?.*e?mails?/i, /trouv(e|er)?.*e?mails?/i, /search.*email/i],
+        list: [/li(s|re)?.*e?mails?/i, /montr(e|er)?.*e?mails?/i, /mes.*e?mails?/i, /inbox/i, /derniers?.*e?mails?/i, /voir.*e?mails?/i, /affich(e|er)?.*e?mails?/i, /boîte.*reception/i, /boite.*reception/i]
     },
     outlook: {
         send: [/envoi(e|er)?.*outlook/i, /mail.*outlook/i],
