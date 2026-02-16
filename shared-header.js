@@ -194,14 +194,15 @@
         }
 
         .shared-nav .btn-primary {
-            background: linear-gradient(135deg, #635bff 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, #635bff 0%, #00d4ff 100%);
             color: white;
-            box-shadow: 0 2px 8px rgba(99, 91, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(99, 91, 255, 0.3);
         }
 
         .shared-nav .btn-primary:hover {
+            background: linear-gradient(135deg, #5349e0 0%, #00bde6 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 91, 255, 0.4);
+            box-shadow: 0 6px 20px rgba(99, 91, 255, 0.4);
         }
 
         /* Hamburger Menu Button (hidden on desktop) */
@@ -308,7 +309,7 @@
         }
 
         .mobile-menu .mobile-menu-actions .btn-primary {
-            background: linear-gradient(135deg, #635bff 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, #635bff 0%, #00d4ff 100%);
             color: white;
         }
 
