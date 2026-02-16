@@ -390,4 +390,7 @@ const dbOps = {
     }
 };
 
-module.exports = { initDb, run, get, all, ...dbOps };
+// Get pool for raw queries (admin use only)
+const getPool = () => pool;
+
+module.exports = { initDb, run, get, all, getPool, ...dbOps };

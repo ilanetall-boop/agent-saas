@@ -304,17 +304,32 @@ router.post('/admin/reset-limits', async (req, res) => {
     }
 
     try {
-        // Reset all users to unlimited
-        const result = await db.query(
-            'UPDATE users SET messages_limit = 999999999, messages_used = 0'
-        );
-
-        console.log('✅ Admin: Reset all message limits');
-        res.json({
-            success: true,
-            message: 'All users reset to unlimited messages',
-            affected: result.rowCount
-        });
+        // Reset all users to unlimited using db method
+        if (db.resetAllMessageLimits) {
+            const result = await db.resetAllMessageLimits();
+            console.log('✅ Admin: Reset all message limits via db method');
+            res.json({
+                success: true,
+                message: 'All users reset to unlimited messages',
+                affected: result?.rowCount || 'unknown'
+            });
+        } else {
+            // Fallback: use raw pool if available
+            const pool = db.getPool ? db.getPool() : null;
+            if (pool) {
+                const result = await pool.query(
+                    'UPDATE users SET messages_limit = 999999999, messages_used = 0'
+                );
+                console.log('✅ Admin: Reset all message limits via pool');
+                res.json({
+                    success: true,
+                    message: 'All users reset to unlimited messages',
+                    affected: result.rowCount
+                });
+            } else {
+                res.status(500).json({ error: 'No db method available' });
+            }
+        }
     } catch (error) {
         console.error('Reset limits error:', error);
         res.status(500).json({ error: error.message });
