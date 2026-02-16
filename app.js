@@ -109,21 +109,7 @@ function updateTierBadge() {
 }
 
 function updateUsage() {
-    const tier = user.tier || 'starter';
-    const usageText = document.getElementById('usageText');
-    
-    if (tier === 'pro') {
-        usageText.textContent = '✅ Pro - ' + (i18nInstance.t('chat.unlimited') || 'Unlimited messages');
-    } else {
-        const messagesUsed = user.messagesUsed || 0;
-        const limit = 30;
-        usageText.textContent = `📊 ${messagesUsed}/${limit} ` + (i18nInstance.t('chat.messages_today') || 'messages today');
-        
-        // Show warning if approaching limit
-        if (messagesUsed >= limit * 0.8) {
-            usageText.innerHTML += ` <span style="color:#ff9800;">⚠️</span>`;
-        }
-    }
+    // Usage bar removed - function kept for compatibility
 }
 
 async function login() {
@@ -428,10 +414,8 @@ async function sendMessage() {
                 document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
             }
 
-            // Show degradation warning if applicable
-            if (data.usage && data.usage.degraded) {
-                document.getElementById('degradationWarning').style.display = 'block';
-            }
+            // Show degradation warning if applicable (usage bar removed)
+            // if (data.usage && data.usage.degraded) { ... }
         } else {
             removeTypingIndicator();
             const data = await res.json();
