@@ -107,7 +107,14 @@ app.use((req, res, next) => {
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/agent', require('./routes/agents'));
-app.use('/api/oauth', require('./routes/oauth'));
+try {
+    const oauthRoutes = require('./routes/oauth');
+    app.use('/api/oauth', oauthRoutes);
+    console.log('✅ OAuth routes loaded successfully');
+} catch (err) {
+    console.error('❌ Failed to load OAuth routes:', err.message);
+    console.error(err.stack);
+}
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/telegram', require('./routes/telegram'));
 app.use('/api/admin', require('./routes/admin'));
