@@ -401,6 +401,7 @@ router.get('/services/google/authorize', authMiddleware, (req, res) => {
  * Handle service OAuth callback
  */
 router.get('/services/google/callback', async (req, res) => {
+    console.log('[OAUTH] Callback received:', req.query);
     try {
         const { code, state, error: oauthError } = req.query;
 
