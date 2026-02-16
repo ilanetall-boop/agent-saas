@@ -1311,7 +1311,11 @@ function getOAuthUrl(service, userId, redirectUrl) {
  * Handle action request from Eva
  */
 async function handleAction(userId, service, action, params, db) {
-    const isConnected = await checkUserConnection(userId, service, db);
+    // Services that are already configured in N8N (skip connection check)
+    const n8nConfiguredServices = ['gmail'];
+
+    const isN8NConfigured = n8nConfiguredServices.includes(service);
+    const isConnected = isN8NConfigured || await checkUserConnection(userId, service, db);
 
     if (!isConnected) {
         const integration = INTEGRATIONS[service];
