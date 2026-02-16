@@ -1,0 +1,56 @@
+{
+  "name": "Slack - Envoyer message",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "slack-send",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.body.channel }}",
+        "text": "={{ $json.body.message }}",
+        "otherOptions": {}
+      },
+      "id": "slack-1",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "{{SLACK_CREDENTIAL_ID}}",
+          "name": "Slack OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, message: 'Message envoyé sur Slack' } }}"
+      },
+      "id": "response-1",
+      "name": "Réponse",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Slack", "type": "main", "index": 0 }]]
+    },
+    "Slack": {
+      "main": [[{ "node": "Réponse", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": ["eva", "slack", "communication"]
+}
