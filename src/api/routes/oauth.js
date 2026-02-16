@@ -490,7 +490,7 @@ router.get('/services', authMiddleware, async (req, res) => {
                 service: i.service,
                 email: i.email,
                 connected_at: i.connected_at,
-                last_used_at: i.last_used_at
+                last_used: i.last_used
             }))
         });
     } catch (error) {

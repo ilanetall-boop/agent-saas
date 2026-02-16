@@ -417,7 +417,7 @@ const dbOps = {
         } else {
             // Get the most recently used integration for this service
             integration = await get(
-                'SELECT * FROM user_integrations WHERE user_id = $1 AND service = $2 ORDER BY last_used_at DESC NULLS LAST LIMIT 1',
+                'SELECT * FROM user_integrations WHERE user_id = $1 AND service = $2 ORDER BY last_used DESC NULLS LAST LIMIT 1',
                 [userId, service]
             );
         }
@@ -442,7 +442,7 @@ const dbOps = {
 
     getUserIntegrations: async (userId) => {
         const integrations = await all(
-            'SELECT id, service, email, connected_at, last_used_at FROM user_integrations WHERE user_id = $1 ORDER BY service, email',
+            'SELECT id, service, email, connected_at, last_used FROM user_integrations WHERE user_id = $1 ORDER BY service, email',
             [userId]
         );
         return integrations;
@@ -450,7 +450,7 @@ const dbOps = {
 
     updateIntegrationLastUsed: async (userId, service, email) => {
         await run(
-            'UPDATE user_integrations SET last_used_at = CURRENT_TIMESTAMP WHERE user_id = $1 AND service = $2 AND email = $3',
+            'UPDATE user_integrations SET last_used = CURRENT_TIMESTAMP WHERE user_id = $1 AND service = $2 AND email = $3',
             [userId, service, email]
         );
     },

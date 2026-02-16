@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS user_integrations (
     token_expires_at TIMESTAMP,
     scopes TEXT,
     connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_used_at TIMESTAMP,
+    last_used TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE(user_id, service, email)
 );
