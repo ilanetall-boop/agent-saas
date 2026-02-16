@@ -1333,11 +1333,21 @@ async function handleAction(userId, service, action, params, db) {
     try {
         const result = await executeWorkflow(service, action, params, userId);
 
-        if (db) {
-            await db.query(
-                `UPDATE user_integrations SET last_used = NOW() WHERE user_id = $1 AND service = $2`,
-                [userId, service]
-            );
+        // Try to update last_used, but don't fail if db isn't available
+        try {
+            if (db && typeof db.query === 'function') {
+                await db.query(
+                    `UPDATE user_integrations SET last_used = NOW() WHERE user_id = $1 AND service = $2`,
+                    [userId, service]
+                );
+            } else if (db && typeof db.run === 'function') {
+                await db.run(
+                    `UPDATE user_integrations SET last_used = datetime('now') WHERE user_id = ? AND service = ?`,
+                    [userId, service]
+                );
+            }
+        } catch (dbError) {
+            console.log('[N8N] Could not update last_used:', dbError.message);
         }
 
         return { success: true, service, action, result };
