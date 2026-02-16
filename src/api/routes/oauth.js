@@ -354,6 +354,14 @@ router.post('/github/callback', async (req, res) => {
 // ==========================================
 
 /**
+ * GET /api/oauth/services/test - Simple test route
+ */
+router.get('/services/test', (req, res) => {
+    console.log('[OAUTH] Test route hit!');
+    res.json({ success: true, message: 'OAuth services routes are loaded!' });
+});
+
+/**
  * GET /api/oauth/services/google/authorize
  * Start service OAuth flow (Gmail, Calendar, Drive)
  * Query params: service (gmail|calendar|drive)
