@@ -499,11 +499,99 @@
 
         .hidden { display: none !important; }
 
-        /* Integrations Grid */
+        /* Integrations Grid (100+ services) */
         .integrations-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .integrations-search {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(26, 26, 26, 0.95);
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+
+        .integrations-search input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .integrations-search input:focus {
+            border-color: rgba(112,0,255,0.6);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .integrations-search input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .integrations-stats {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            padding: 4px 0 12px;
+        }
+
+        .integration-category {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .category-icon {
+            font-size: 18px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #fff;
+            flex: 1;
+        }
+
+        .category-count {
+            font-size: 11px;
+            background: rgba(112,0,255,0.3);
+            color: rgba(255,255,255,0.8);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .category-integrations {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
+            padding: 12px;
+        }
+
+        @media (max-width: 500px) {
+            .category-integrations {
+                grid-template-columns: 1fr;
+            }
         }
 
         .integration-card {
@@ -1361,19 +1449,19 @@
         </div>
     </div>
 
-    <!-- Integrations/Connections Modal -->
+    <!-- Integrations/Connections Modal (100+ services) -->
     <div class="modal" id="connectionsModal" style="display:none;">
-        <div class="modal-content" style="max-width:600px;">
+        <div class="modal-content" style="max-width:700px;max-height:85vh;">
             <div class="modal-header">
-                <h2 data-i18n="connections.title">🔗 My Connections</h2>
+                <h2 data-i18n="connections.title">🔗 Mes Connexions</h2>
                 <button class="modal-close" id="closeConnectionsModal">✕</button>
             </div>
-            <div class="modal-body">
-                <p style="color:rgba(255,255,255,0.7);margin-bottom:20px;" data-i18n="connections.subtitle">
-                    Connect your services so Eva can act for you
+            <div class="modal-body" style="overflow:hidden;">
+                <p style="color:rgba(255,255,255,0.7);margin-bottom:16px;" data-i18n="connections.subtitle">
+                    Connecte tes services pour qu'Eva puisse agir pour toi - 100+ intégrations disponibles !
                 </p>
                 <div id="integrationsGrid" class="integrations-grid">
-                    <!-- Integrations will be loaded here -->
+                    <!-- 100+ integrations will be loaded here by category -->
                 </div>
             </div>
         </div>

@@ -510,22 +510,15 @@ async function linkTelegramBot() {
 }
 
 // ==========================================
-// INTEGRATIONS / CONNEXIONS
+// INTEGRATIONS / CONNEXIONS (100+ services)
 // ==========================================
 
-// Available integrations (synced with n8n-integration.js)
-const INTEGRATIONS = {
-    gmail: { name: 'Gmail', icon: '📧', description: 'Lire, trier, envoyer des mails' },
-    calendar: { name: 'Google Calendar', icon: '📅', description: 'Gérer tes événements' },
-    drive: { name: 'Google Drive', icon: '📁', description: 'Accéder à tes fichiers' },
-    slack: { name: 'Slack', icon: '💬', description: 'Envoyer des messages' },
-    notion: { name: 'Notion', icon: '📝', description: 'Créer des pages et notes' },
-    trello: { name: 'Trello', icon: '📋', description: 'Gérer tes cartes et boards' },
-    sheets: { name: 'Google Sheets', icon: '📊', description: 'Lire et écrire des données' },
-    whatsapp: { name: 'WhatsApp', icon: '📱', description: 'Envoyer des messages' }
-};
-
+// Fetched from backend API
+let INTEGRATIONS = {};
+let CATEGORIES = {};
+let INTEGRATIONS_BY_CATEGORY = {};
 let userConnections = [];
+let searchQuery = '';
 
 function openConnectionsModal() {
     document.getElementById('connectionsModal').style.display = 'flex';
@@ -538,10 +531,10 @@ function closeConnectionsModal() {
 
 async function loadIntegrations() {
     const grid = document.getElementById('integrationsGrid');
-    grid.innerHTML = '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">Chargement...</div>';
+    grid.innerHTML = '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">Chargement des 100+ intégrations...</div>';
 
     try {
-        // Fetch user's current connections
+        // Fetch integrations and user's connections from backend
         const res = await fetch(`${API_URL}/integrations/status`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -549,9 +542,17 @@ async function loadIntegrations() {
         if (res.ok) {
             const data = await res.json();
             userConnections = data.connections || [];
+            CATEGORIES = data.categories || {};
+            INTEGRATIONS_BY_CATEGORY = data.byCategory || {};
+
+            // Build flat INTEGRATIONS map for lookup
+            INTEGRATIONS = {};
+            (data.available || []).forEach(int => {
+                INTEGRATIONS[int.id] = int;
+            });
         }
     } catch (e) {
-        console.error('Failed to load connections:', e);
+        console.error('Failed to load integrations:', e);
         userConnections = [];
     }
 
@@ -562,32 +563,94 @@ function renderIntegrations() {
     const grid = document.getElementById('integrationsGrid');
     const connectionMap = new Map(userConnections.map(c => [c.service, c]));
 
-    grid.innerHTML = Object.entries(INTEGRATIONS).map(([key, integration]) => {
-        const connection = connectionMap.get(key);
-        const isConnected = connection && connection.status === 'active';
+    // Check if we have data
+    if (Object.keys(INTEGRATIONS_BY_CATEGORY).length === 0) {
+        grid.innerHTML = '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">Aucune intégration disponible</div>';
+        return;
+    }
 
-        return `
-            <div class="integration-card ${isConnected ? 'connected' : ''}">
-                <div class="integration-header">
-                    <div class="integration-icon">${integration.icon}</div>
-                    <div class="integration-info">
-                        <h4>${integration.name}</h4>
-                        <span>${integration.description}</span>
+    // Build HTML for each category
+    let html = '';
+
+    // Add search bar
+    html += `
+        <div class="integrations-search">
+            <input type="text" id="integrationSearch" placeholder="🔍 Rechercher parmi 100+ services..."
+                   value="${searchQuery}" autocomplete="off">
+        </div>
+    `;
+
+    // Count total and connected
+    const totalCount = Object.keys(INTEGRATIONS).length;
+    const connectedCount = userConnections.filter(c => c.status === 'active').length;
+    html += `<div class="integrations-stats">${connectedCount} connecté(s) sur ${totalCount} disponibles</div>`;
+
+    // Render by category
+    for (const [categoryKey, categoryData] of Object.entries(INTEGRATIONS_BY_CATEGORY)) {
+        const integrations = categoryData.integrations || [];
+
+        // Filter by search query
+        const filtered = integrations.filter(int => {
+            if (!searchQuery) return true;
+            const q = searchQuery.toLowerCase();
+            return int.name.toLowerCase().includes(q) ||
+                   (int.description && int.description.toLowerCase().includes(q));
+        });
+
+        if (filtered.length === 0) continue;
+
+        html += `
+            <div class="integration-category">
+                <div class="category-header">
+                    <span class="category-icon">${categoryData.icon || '📦'}</span>
+                    <span class="category-name">${categoryData.name}</span>
+                    <span class="category-count">${filtered.length}</span>
+                </div>
+                <div class="category-integrations">
+        `;
+
+        for (const integration of filtered) {
+            const connection = connectionMap.get(integration.id);
+            const isConnected = connection && connection.status === 'active';
+
+            html += `
+                <div class="integration-card ${isConnected ? 'connected' : ''}">
+                    <div class="integration-header">
+                        <div class="integration-icon">${integration.icon}</div>
+                        <div class="integration-info">
+                            <h4>${integration.name}</h4>
+                            <span>${integration.description || ''}</span>
+                        </div>
                     </div>
+                    <button class="integration-btn ${isConnected ? 'disconnect' : 'connect'}"
+                            data-service="${integration.id}"
+                            data-connected="${isConnected}">
+                        ${isConnected ? '✓ Connecté' : 'Connecter'}
+                    </button>
                 </div>
-                <div class="integration-status ${isConnected ? 'connected' : 'disconnected'}">
-                    ${isConnected ? '✓ Connecté' : '○ Non connecté'}
+            `;
+        }
+
+        html += `
                 </div>
-                <button class="integration-btn ${isConnected ? 'disconnect' : 'connect'}"
-                        data-service="${key}"
-                        data-connected="${isConnected}">
-                    ${isConnected ? 'Déconnecter' : 'Connecter'}
-                </button>
             </div>
         `;
-    }).join('');
+    }
 
-    // Add click handlers
+    grid.innerHTML = html;
+
+    // Add search handler
+    const searchInput = document.getElementById('integrationSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderIntegrations();
+            // Re-focus search input after re-render
+            document.getElementById('integrationSearch')?.focus();
+        });
+    }
+
+    // Add click handlers for integration buttons
     grid.querySelectorAll('.integration-btn').forEach(btn => {
         btn.addEventListener('click', handleIntegrationClick);
     });
@@ -605,6 +668,9 @@ async function handleIntegrationClick(e) {
 }
 
 async function connectService(service) {
+    const integration = INTEGRATIONS[service];
+    const serviceName = integration?.name || service;
+
     try {
         // Get OAuth URL from backend
         const res = await fetch(`${API_URL}/integrations/connect/${service}`, {
@@ -619,7 +685,7 @@ async function connectService(service) {
                 window.open(data.oauthUrl, '_blank', 'width=600,height=700');
             } else {
                 // For demo: show instructions
-                alert(`🔗 Connexion ${INTEGRATIONS[service].name}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${INTEGRATIONS[service].name}?"`);
+                alert(`🔗 Connexion ${serviceName}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${serviceName}?"`);
             }
         } else {
             const data = await res.json();
@@ -627,12 +693,15 @@ async function connectService(service) {
         }
     } catch (e) {
         console.error('Connect error:', e);
-        alert(`🔗 Connexion ${INTEGRATIONS[service].name}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${INTEGRATIONS[service].name}?"`);
+        alert(`🔗 Connexion ${serviceName}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${serviceName}?"`);
     }
 }
 
 async function disconnectService(service) {
-    if (!confirm(`Déconnecter ${INTEGRATIONS[service].name}?`)) return;
+    const integration = INTEGRATIONS[service];
+    const serviceName = integration?.name || service;
+
+    if (!confirm(`Déconnecter ${serviceName}?`)) return;
 
     try {
         const res = await fetch(`${API_URL}/integrations/disconnect/${service}`, {

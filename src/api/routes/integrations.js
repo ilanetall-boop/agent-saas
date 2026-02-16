@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
-const { getAvailableIntegrations, getOAuthUrl, INTEGRATIONS } = require('../services/n8n-integration');
+const { getAvailableIntegrations, getOAuthUrl, INTEGRATIONS, CATEGORIES, getIntegrationsByCategory } = require('../services/n8n-integration');
 
 /**
  * GET /api/integrations/status
@@ -34,12 +34,19 @@ router.get('/status', authMiddleware, async (req, res) => {
             }
         }
 
+        // Get integrations grouped by category
+        const byCategory = getIntegrationsByCategory();
+
         res.json({
             connections,
+            categories: CATEGORIES,
+            byCategory,
             available: Object.entries(INTEGRATIONS).map(([key, int]) => ({
                 id: key,
                 name: int.name,
                 icon: int.icon,
+                category: int.category,
+                description: int.description,
                 actions: int.actions
             }))
         });
