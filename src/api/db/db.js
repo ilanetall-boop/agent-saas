@@ -387,6 +387,92 @@ const dbOps = {
 
     deleteSite: async (userId, slug) => {
         await run('DELETE FROM sites WHERE user_id = $1 AND slug = $2', [userId, slug]);
+    },
+
+    // User Integrations (per-user OAuth tokens for services)
+    saveUserIntegration: async (id, userId, service, email, accessToken, refreshToken, expiresAt, scopes) => {
+        // Encrypt tokens before storing
+        const encryptedAccessToken = accessToken ? encryptToken(accessToken) : null;
+        const encryptedRefreshToken = refreshToken ? encryptToken(refreshToken) : null;
+
+        await run(`
+            INSERT INTO user_integrations (id, user_id, service, email, access_token, refresh_token, token_expires_at, scopes)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT(user_id, service, email) DO UPDATE
+            SET access_token = EXCLUDED.access_token,
+                refresh_token = EXCLUDED.refresh_token,
+                token_expires_at = EXCLUDED.token_expires_at,
+                scopes = EXCLUDED.scopes,
+                connected_at = CURRENT_TIMESTAMP
+        `, [id, userId, service, email, encryptedAccessToken, encryptedRefreshToken, expiresAt, scopes]);
+    },
+
+    getUserIntegration: async (userId, service, email = null) => {
+        let integration;
+        if (email) {
+            integration = await get(
+                'SELECT * FROM user_integrations WHERE user_id = $1 AND service = $2 AND email = $3',
+                [userId, service, email]
+            );
+        } else {
+            // Get the most recently used integration for this service
+            integration = await get(
+                'SELECT * FROM user_integrations WHERE user_id = $1 AND service = $2 ORDER BY last_used_at DESC NULLS LAST LIMIT 1',
+                [userId, service]
+            );
+        }
+
+        if (integration) {
+            // Decrypt tokens
+            try {
+                if (integration.access_token) {
+                    integration.access_token = decryptToken(integration.access_token);
+                }
+                if (integration.refresh_token) {
+                    integration.refresh_token = decryptToken(integration.refresh_token);
+                }
+            } catch (error) {
+                console.error('[DB] Token decryption failed:', error.message);
+                return null;
+            }
+        }
+
+        return integration;
+    },
+
+    getUserIntegrations: async (userId) => {
+        const integrations = await all(
+            'SELECT id, service, email, connected_at, last_used_at FROM user_integrations WHERE user_id = $1 ORDER BY service, email',
+            [userId]
+        );
+        return integrations;
+    },
+
+    updateIntegrationLastUsed: async (userId, service, email) => {
+        await run(
+            'UPDATE user_integrations SET last_used_at = CURRENT_TIMESTAMP WHERE user_id = $1 AND service = $2 AND email = $3',
+            [userId, service, email]
+        );
+    },
+
+    updateIntegrationTokens: async (userId, service, email, accessToken, refreshToken, expiresAt) => {
+        const encryptedAccessToken = accessToken ? encryptToken(accessToken) : null;
+        const encryptedRefreshToken = refreshToken ? encryptToken(refreshToken) : null;
+
+        await run(`
+            UPDATE user_integrations
+            SET access_token = COALESCE($4, access_token),
+                refresh_token = COALESCE($5, refresh_token),
+                token_expires_at = COALESCE($6, token_expires_at)
+            WHERE user_id = $1 AND service = $2 AND email = $3
+        `, [userId, service, email, encryptedAccessToken, encryptedRefreshToken, expiresAt]);
+    },
+
+    deleteUserIntegration: async (userId, service, email) => {
+        await run(
+            'DELETE FROM user_integrations WHERE user_id = $1 AND service = $2 AND email = $3',
+            [userId, service, email]
+        );
     }
 };
 

@@ -288,12 +288,171 @@ async function getGithubUserEmails(accessToken) {
     }
 }
 
+// ==========================================
+// Google Service OAuth (Gmail, Calendar, Drive)
+// ==========================================
+
+// Service-specific scopes
+const SERVICE_SCOPES = {
+    gmail: [
+        'https://www.googleapis.com/auth/gmail.readonly',
+        'https://www.googleapis.com/auth/gmail.send',
+        'https://www.googleapis.com/auth/gmail.modify'
+    ],
+    calendar: [
+        'https://www.googleapis.com/auth/calendar.readonly',
+        'https://www.googleapis.com/auth/calendar.events'
+    ],
+    drive: [
+        'https://www.googleapis.com/auth/drive.readonly',
+        'https://www.googleapis.com/auth/drive.file'
+    ]
+};
+
+/**
+ * Get Google Service OAuth authorization URL
+ * @param {string} service - Service name (gmail, calendar, drive)
+ * @param {string} userId - User ID for state tracking
+ * @param {string} redirectUri - Custom redirect URI for service OAuth
+ * @returns {string}
+ */
+function getGoogleServiceAuthUrl(service, userId, redirectUri) {
+    const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+
+    if (!clientId) {
+        throw new Error('Google OAuth not configured');
+    }
+
+    const scopes = SERVICE_SCOPES[service];
+    if (!scopes) {
+        throw new Error(`Unknown service: ${service}`);
+    }
+
+    // Include email scope to get user's email
+    const allScopes = ['openid', 'email', 'profile', ...scopes];
+
+    // State encodes service and userId for callback
+    const state = Buffer.from(JSON.stringify({ service, userId })).toString('base64');
+
+    const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: 'code',
+        scope: allScopes.join(' '),
+        access_type: 'offline',
+        prompt: 'consent',
+        state
+    });
+
+    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+}
+
+/**
+ * Exchange Google auth code for tokens (service OAuth)
+ * @param {string} code - Authorization code
+ * @param {string} redirectUri - Same redirect URI used in authorization
+ * @returns {Promise<{accessToken: string, refreshToken: string, expiresIn: number, idToken: string}>}
+ */
+async function exchangeGoogleServiceCode(code, redirectUri) {
+    const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+        throw new Error('Google OAuth not configured');
+    }
+
+    const body = querystring.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        grant_type: 'authorization_code',
+        redirect_uri: redirectUri
+    });
+
+    const response = await makeRequest(
+        'POST',
+        'oauth2.googleapis.com',
+        '/token',
+        { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+    );
+
+    if (response.error) {
+        throw new Error(`Google OAuth error: ${response.error_description || response.error}`);
+    }
+
+    return {
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+        expiresIn: response.expires_in,
+        idToken: response.id_token
+    };
+}
+
+/**
+ * Refresh Google access token
+ * @param {string} refreshToken - Refresh token
+ * @returns {Promise<{accessToken: string, expiresIn: number}>}
+ */
+async function refreshGoogleToken(refreshToken) {
+    const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+        throw new Error('Google OAuth not configured');
+    }
+
+    const body = querystring.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token'
+    });
+
+    const response = await makeRequest(
+        'POST',
+        'oauth2.googleapis.com',
+        '/token',
+        { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+    );
+
+    if (response.error) {
+        throw new Error(`Google refresh error: ${response.error_description || response.error}`);
+    }
+
+    return {
+        accessToken: response.access_token,
+        expiresIn: response.expires_in
+    };
+}
+
+/**
+ * Get user email from ID token
+ * @param {string} idToken - ID token from Google
+ * @returns {Promise<{email: string, name: string}>}
+ */
+async function getGoogleUserFromIdToken(idToken) {
+    const payload = await verifyGoogleIdToken(idToken);
+    return {
+        email: payload.email,
+        name: payload.name
+    };
+}
+
 module.exports = {
-    // Google
+    // Google (Login OAuth)
     getGoogleAuthUrl,
     exchangeGoogleCode,
     verifyGoogleIdToken,
-    
+
+    // Google (Service OAuth - Gmail, Calendar, Drive)
+    getGoogleServiceAuthUrl,
+    exchangeGoogleServiceCode,
+    refreshGoogleToken,
+    getGoogleUserFromIdToken,
+    SERVICE_SCOPES,
+
     // GitHub
     getGithubAuthUrl,
     exchangeGithubCode,

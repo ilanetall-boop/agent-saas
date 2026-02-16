@@ -1205,15 +1205,48 @@ async function checkUserConnection(userId, service, db) {
     if (!db) return false;
 
     try {
+        // Use the db.getUserIntegration function if available (from db.js)
+        if (typeof db.getUserIntegration === 'function') {
+            const integration = await db.getUserIntegration(userId, service);
+            return integration !== null;
+        }
+
+        // Fallback to raw query
         const result = await db.query(
             `SELECT * FROM user_integrations
-             WHERE user_id = $1 AND service = $2 AND status = 'active'`,
+             WHERE user_id = $1 AND service = $2`,
             [userId, service]
         );
-        return result.rows.length > 0;
+        return result.rows && result.rows.length > 0;
     } catch (error) {
         console.error('Error checking user connection:', error);
         return false;
+    }
+}
+
+/**
+ * Get user's OAuth tokens for a service
+ */
+async function getUserTokens(userId, service, db) {
+    if (!db) return null;
+
+    try {
+        // Use the db.getUserIntegration function
+        if (typeof db.getUserIntegration === 'function') {
+            const integration = await db.getUserIntegration(userId, service);
+            if (integration) {
+                return {
+                    accessToken: integration.access_token,
+                    refreshToken: integration.refresh_token,
+                    email: integration.email,
+                    expiresAt: integration.token_expires_at
+                };
+            }
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting user tokens:', error);
+        return null;
     }
 }
 
@@ -1259,9 +1292,9 @@ async function saveUserConnection(userId, service, credentials, db) {
 }
 
 /**
- * Execute N8N workflow
+ * Execute N8N workflow with user tokens
  */
-async function executeWorkflow(service, action, data, userId) {
+async function executeWorkflow(service, action, data, userId, userTokens = null) {
     try {
         // Get the webhook path for this service-action combination
         const webhookKey = `${service}-${action}`;
@@ -1269,15 +1302,28 @@ async function executeWorkflow(service, action, data, userId) {
 
         console.log(`[N8N] Calling webhook: ${webhookPath} for ${service}/${action}`);
 
+        // Build the payload with user tokens if available
+        const payload = {
+            userId,
+            ...data
+        };
+
+        // Add user OAuth tokens if available (for per-user integration)
+        if (userTokens) {
+            payload.userAuth = {
+                accessToken: userTokens.accessToken,
+                refreshToken: userTokens.refreshToken,
+                email: userTokens.email
+            };
+            console.log(`[N8N] Using per-user tokens for ${userTokens.email}`);
+        }
+
         const response = await fetch(`${N8N_CONFIG.webhookUrl}/${webhookPath}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                userId,
-                ...data
-            })
+            body: JSON.stringify(payload)
         });
 
         if (!response.ok) {
@@ -1294,14 +1340,27 @@ async function executeWorkflow(service, action, data, userId) {
 /**
  * Generate OAuth connection URL for a service
  */
-function getOAuthUrl(service, userId, redirectUrl) {
+function getOAuthUrl(service, userId, baseUrl = '') {
     const integration = INTEGRATIONS[service];
     if (!integration) return null;
 
+    // Map integration OAuth provider to our service names
+    const serviceMap = {
+        'google': service === 'gmail' ? 'gmail' :
+                  service === 'calendar' ? 'calendar' :
+                  service === 'drive' ? 'drive' : 'gmail'
+    };
+
+    // For Google services (Gmail, Calendar, Drive), use our internal OAuth routes
+    if (integration.oauth === 'google') {
+        const oauthService = serviceMap['google'];
+        return `${baseUrl}/api/oauth/services/google/authorize?service=${oauthService}&redirect=true`;
+    }
+
+    // For other services, use N8N OAuth (future implementation)
     const params = new URLSearchParams({
         service,
-        userId,
-        redirect: redirectUrl
+        userId
     });
 
     return `${N8N_CONFIG.baseUrl}/oauth/${integration.oauth}/authorize?${params}`;
@@ -1310,14 +1369,16 @@ function getOAuthUrl(service, userId, redirectUrl) {
 /**
  * Handle action request from Eva
  */
-async function handleAction(userId, service, action, params, db) {
-    // Services that are already configured in N8N (skip connection check)
-    const n8nConfiguredServices = ['gmail'];
+async function handleAction(userId, service, action, params, db, baseUrl = '') {
+    // Check if user has connected this service
+    const userTokens = await getUserTokens(userId, service, db);
+    const isConnected = userTokens !== null;
 
-    const isN8NConfigured = n8nConfiguredServices.includes(service);
-    const isConnected = isN8NConfigured || await checkUserConnection(userId, service, db);
+    // For Google services, we need per-user OAuth
+    const googleServices = ['gmail', 'calendar', 'drive'];
+    const isGoogleService = googleServices.includes(service);
 
-    if (!isConnected) {
+    if (isGoogleService && !isConnected) {
         const integration = INTEGRATIONS[service];
         return {
             success: false,
@@ -1325,26 +1386,23 @@ async function handleAction(userId, service, action, params, db) {
             service,
             serviceName: integration?.name || service,
             icon: integration?.icon || '🔗',
-            message: `Pour ${action} sur ${integration?.name || service}, je dois me connecter à ton compte.`,
-            oauthUrl: getOAuthUrl(service, userId, '/app.html')
+            message: `${integration?.icon || '🔗'} Pour ${action === 'list' ? 'voir tes mails' : action} sur ${integration?.name || service}, j'ai besoin de me connecter à ton compte.\n\nClique sur le bouton ci-dessous pour m'autoriser.`,
+            oauthUrl: getOAuthUrl(service, userId, baseUrl),
+            button: {
+                text: `Connecter ${integration?.name || service}`,
+                url: getOAuthUrl(service, userId, baseUrl)
+            }
         };
     }
 
     try {
-        const result = await executeWorkflow(service, action, params, userId);
+        // Execute workflow with user tokens
+        const result = await executeWorkflow(service, action, params, userId, userTokens);
 
-        // Try to update last_used, but don't fail if db isn't available
+        // Update last_used timestamp
         try {
-            if (db && typeof db.query === 'function') {
-                await db.query(
-                    `UPDATE user_integrations SET last_used = NOW() WHERE user_id = $1 AND service = $2`,
-                    [userId, service]
-                );
-            } else if (db && typeof db.run === 'function') {
-                await db.run(
-                    `UPDATE user_integrations SET last_used = datetime('now') WHERE user_id = ? AND service = ?`,
-                    [userId, service]
-                );
+            if (db && typeof db.updateIntegrationLastUsed === 'function' && userTokens?.email) {
+                await db.updateIntegrationLastUsed(userId, service, userTokens.email);
             }
         } catch (dbError) {
             console.log('[N8N] Could not update last_used:', dbError.message);
@@ -1458,6 +1516,7 @@ module.exports = {
     detectAction,
     checkUserConnection,
     getUserConnections,
+    getUserTokens,
     saveUserConnection,
     executeWorkflow,
     getOAuthUrl,

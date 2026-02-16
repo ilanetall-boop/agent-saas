@@ -245,7 +245,8 @@ async function route(message, conversationHistory = [], options = {}, db = null)
         systemPrompt = null,
         language = 'en',
         forceModel = null,
-        skipCache = false
+        skipCache = false,
+        baseUrl = process.env.BASE_URL || ''
     } = options;
 
     const startTime = Date.now();
@@ -264,22 +265,23 @@ async function route(message, conversationHistory = [], options = {}, db = null)
             actionDetection.service,
             actionDetection.action,
             { message, language },
-            db
+            db,
+            baseUrl
         );
 
         if (actionResult.needsConnection) {
-            // User needs to connect the service first
-            const prompt = generateConnectionPrompt(actionDetection.service, actionDetection.action);
-
+            // User needs to connect the service first - include OAuth URL
             return {
                 success: true,
-                content: prompt.message,
+                content: actionResult.message,
                 isAction: true,
                 needsConnection: true,
                 connectionData: {
                     service: actionDetection.service,
                     serviceName: actionResult.serviceName,
-                    icon: actionResult.icon
+                    icon: actionResult.icon,
+                    oauthUrl: actionResult.oauthUrl,
+                    button: actionResult.button
                 },
                 model: 'action-router',
                 provider: 'n8n',

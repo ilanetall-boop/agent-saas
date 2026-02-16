@@ -349,6 +349,182 @@ router.post('/github/callback', async (req, res) => {
     }
 });
 
+// ==========================================
+// SERVICE OAUTH (Gmail, Calendar, Drive)
+// ==========================================
+
+/**
+ * GET /api/oauth/services/google/authorize
+ * Start service OAuth flow (Gmail, Calendar, Drive)
+ * Query params: service (gmail|calendar|drive)
+ */
+router.get('/services/google/authorize', authMiddleware, (req, res) => {
+    try {
+        const { service } = req.query;
+        const userId = req.user.id;
+
+        if (!service || !['gmail', 'calendar', 'drive'].includes(service)) {
+            return res.status(400).json({ error: 'Invalid service. Must be gmail, calendar, or drive' });
+        }
+
+        const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+        const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+
+        if (!clientId || !clientSecret) {
+            return res.status(503).json({
+                error: 'Google OAuth not configured',
+                code: 'OAUTH_NOT_CONFIGURED'
+            });
+        }
+
+        // Callback URI for service OAuth
+        const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+        const redirectUri = `${baseUrl}/api/oauth/services/google/callback`;
+
+        const authUrl = oauth.getGoogleServiceAuthUrl(service, userId, redirectUri);
+        console.log(`[OAUTH] Service auth URL for ${service}:`, authUrl);
+
+        // Redirect directly or return URL
+        if (req.query.redirect === 'true') {
+            res.redirect(authUrl);
+        } else {
+            res.json({ success: true, url: authUrl, service });
+        }
+    } catch (error) {
+        console.error('[OAUTH] Service auth error:', error.message);
+        res.status(500).json({ error: 'Failed to initiate service OAuth', details: error.message });
+    }
+});
+
+/**
+ * GET /api/oauth/services/google/callback
+ * Handle service OAuth callback
+ */
+router.get('/services/google/callback', async (req, res) => {
+    try {
+        const { code, state, error: oauthError } = req.query;
+
+        if (oauthError) {
+            console.error('[OAUTH] Service callback error:', oauthError);
+            return res.redirect('/dashboard.html?oauth_error=' + encodeURIComponent(oauthError));
+        }
+
+        if (!code || !state) {
+            return res.redirect('/dashboard.html?oauth_error=missing_params');
+        }
+
+        // Decode state
+        let stateData;
+        try {
+            stateData = JSON.parse(Buffer.from(state, 'base64').toString('utf8'));
+        } catch (e) {
+            return res.redirect('/dashboard.html?oauth_error=invalid_state');
+        }
+
+        const { service, userId } = stateData;
+
+        // Verify user exists
+        const user = await db.getUserById(userId);
+        if (!user) {
+            return res.redirect('/dashboard.html?oauth_error=user_not_found');
+        }
+
+        // Exchange code for tokens
+        const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+        const redirectUri = `${baseUrl}/api/oauth/services/google/callback`;
+
+        const tokens = await oauth.exchangeGoogleServiceCode(code, redirectUri);
+
+        // Get user's email from ID token
+        const googleUser = await oauth.getGoogleUserFromIdToken(tokens.idToken);
+        const email = googleUser.email;
+
+        // Calculate token expiration
+        const expiresAt = new Date(Date.now() + tokens.expiresIn * 1000);
+
+        // Store integration in database
+        const integrationId = nanoid();
+        const scopes = oauth.SERVICE_SCOPES[service].join(' ');
+
+        await db.saveUserIntegration(
+            integrationId,
+            userId,
+            service,
+            email,
+            tokens.accessToken,
+            tokens.refreshToken,
+            expiresAt,
+            scopes
+        );
+
+        console.log(`[OAUTH] Service ${service} connected for user ${userId} (${email})`);
+
+        auditLog({
+            type: 'service_oauth_connected',
+            userId,
+            service,
+            email,
+            ipAddress: req.ip
+        });
+
+        // Redirect back to dashboard with success
+        res.redirect(`/dashboard.html?oauth_success=${service}&email=${encodeURIComponent(email)}`);
+    } catch (error) {
+        console.error('[OAUTH] Service callback error:', error);
+        res.redirect('/dashboard.html?oauth_error=' + encodeURIComponent(error.message));
+    }
+});
+
+/**
+ * GET /api/oauth/services
+ * List user's connected services
+ */
+router.get('/services', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const integrations = await db.getUserIntegrations(userId);
+
+        res.json({
+            success: true,
+            integrations: integrations.map(i => ({
+                service: i.service,
+                email: i.email,
+                connected_at: i.connected_at,
+                last_used_at: i.last_used_at
+            }))
+        });
+    } catch (error) {
+        console.error('[OAUTH] List services error:', error);
+        res.status(500).json({ error: 'Failed to list services' });
+    }
+});
+
+/**
+ * DELETE /api/oauth/services/:service/:email
+ * Disconnect a service integration
+ */
+router.delete('/services/:service/:email', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { service, email } = req.params;
+
+        await db.deleteUserIntegration(userId, service, email);
+
+        auditLog({
+            type: 'service_oauth_disconnected',
+            userId,
+            service,
+            email,
+            ipAddress: req.ip
+        });
+
+        res.json({ success: true, message: `${service} disconnected for ${email}` });
+    } catch (error) {
+        console.error('[OAUTH] Disconnect service error:', error);
+        res.status(500).json({ error: 'Failed to disconnect service' });
+    }
+});
+
 /**
  * POST /api/oauth/unlink
  * Unlink OAuth account from user

@@ -121,3 +121,22 @@ CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_vaults_key_name ON vaults(key_name);
+
+-- User integrations table (per-user OAuth tokens for services like Gmail, Calendar, Drive)
+CREATE TABLE IF NOT EXISTS user_integrations (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    service TEXT NOT NULL,
+    email TEXT,
+    access_token TEXT,
+    refresh_token TEXT,
+    token_expires_at TIMESTAMP,
+    scopes TEXT,
+    connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_used_at TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(user_id, service, email)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_integrations_user ON user_integrations(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_integrations_service ON user_integrations(service);
