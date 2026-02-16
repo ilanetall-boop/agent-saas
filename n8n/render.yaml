@@ -1,8 +1,9 @@
 services:
-  # N8N Workflow Automation
+  # N8N Workflow Automation (Free Tier)
   - type: web
     name: mybestagent-n8n
-    env: docker
+    runtime: docker
+    plan: free
     dockerfilePath: ./n8n/Dockerfile
     envVars:
       - key: N8N_BASIC_AUTH_ACTIVE
@@ -43,10 +44,7 @@ services:
         fromDatabase:
           name: n8n-db
           property: password
-    disk:
-      name: n8n-data
-      mountPath: /home/node/.n8n
-      sizeGB: 1
+    # Note: No disk = workflows stored in PostgreSQL only (free tier)
 
 databases:
   - name: n8n-db
