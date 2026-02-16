@@ -3,8 +3,11 @@ services:
   - type: web
     name: mybestagent-n8n
     env: docker
-    plan: starter  # $7/month - required for Docker
-    dockerfilePath: ./n8n/Dockerfile
+    plan: starter
+    # Use official N8N image directly
+    dockerCommand: ""
+    image:
+      url: docker.io/n8nio/n8n:latest
     envVars:
       - key: N8N_BASIC_AUTH_ACTIVE
         value: "true"
@@ -24,7 +27,6 @@ services:
         generateValue: true
       - key: DB_TYPE
         value: "postgresdb"
-      # Use existing database - fill these manually from your Render PostgreSQL
       - key: DB_POSTGRESDB_HOST
         sync: false
       - key: DB_POSTGRESDB_PORT
@@ -35,5 +37,3 @@ services:
         sync: false
       - key: DB_POSTGRESDB_PASSWORD
         sync: false
-
-# No database created - use existing one
