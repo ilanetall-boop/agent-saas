@@ -851,6 +851,9 @@
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
+            .nav-actions .btn { display: none; }
+            .nav-actions .lang-select { display: none; }
+            .hamburger { display: flex; }
             .hero { padding: 120px 0 80px; }
             .hero h1 { font-size: 36px; }
             .hero-buttons { flex-direction: column; }
@@ -862,6 +865,105 @@
             .pricing-grid.pricing-4 { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; text-align: center; }
             .footer-brand { max-width: 100%; }
+        }
+
+        /* Hamburger Menu Button */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            margin: 3px 0;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 999;
+            padding: 24px;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+
+        .mobile-menu a:hover {
+            background: var(--bg-muted);
+        }
+
+        .mobile-menu .mobile-menu-actions {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mobile-menu .mobile-menu-actions .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .mobile-menu .mobile-lang-select {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -904,8 +1006,41 @@
                 <a href="#" id="navSignInBtn" class="btn btn-secondary" data-i18n="nav_signin">Sign In</a>
                 <a href="#" id="topStartBtn" class="btn btn-primary" data-i18n="btn_start_free">Start free</a>
             </div>
+
+            <!-- Hamburger Menu Button (Mobile) -->
+            <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#how" data-i18n="nav_how">How it works</a>
+        <a href="#features" data-i18n="nav_features">Features</a>
+        <a href="/success-stories.html" data-i18n="nav_success">Success Stories</a>
+        <a href="#pricing" data-i18n="nav_pricing">Pricing</a>
+
+        <div class="mobile-menu-actions">
+            <select class="mobile-lang-select" id="mobileLangSelector" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="it">Italiano</option>
+                <option value="pt">Português</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="ru">Русский</option>
+                <option value="ar">العربية</option>
+                <option value="he">עברית</option>
+            </select>
+            <a href="#" id="mobileSignInBtn" class="btn btn-secondary" data-i18n="nav_signin">Sign In</a>
+            <a href="#" id="mobileStartBtn" class="btn btn-primary" data-i18n="btn_start_free">Start free</a>
+        </div>
+    </div>
 
     <!-- Hero -->
     <section class="hero">
@@ -1760,6 +1895,61 @@
             } else if (authParam === 'register') {
                 window.history.replaceState({}, '', window.location.pathname);
                 if (typeof showRegister === 'function') showRegister();
+            }
+
+            // Mobile Menu Toggle
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileSignInBtn = document.getElementById('mobileSignInBtn');
+            const mobileStartBtn = document.getElementById('mobileStartBtn');
+            const mobileLangSelector = document.getElementById('mobileLangSelector');
+            const langSelector = document.getElementById('langSelector');
+
+            if (hamburgerBtn && mobileMenu) {
+                hamburgerBtn.addEventListener('click', function() {
+                    hamburgerBtn.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                    document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+                });
+
+                // Close menu when clicking a link
+                mobileMenu.querySelectorAll('a').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        hamburgerBtn.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+
+                // Mobile Sign In button
+                if (mobileSignInBtn) {
+                    mobileSignInBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        hamburgerBtn.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                        document.body.style.overflow = '';
+                        if (typeof showLogin === 'function') showLogin();
+                    });
+                }
+
+                // Mobile Start button
+                if (mobileStartBtn) {
+                    mobileStartBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        hamburgerBtn.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                        document.body.style.overflow = '';
+                        if (typeof showRegister === 'function') showRegister();
+                    });
+                }
+
+                // Sync mobile language selector with main selector
+                if (mobileLangSelector && langSelector) {
+                    mobileLangSelector.value = langSelector.value;
+                    mobileLangSelector.addEventListener('change', function() {
+                        langSelector.value = this.value;
+                    });
+                }
             }
         });
     </script>
