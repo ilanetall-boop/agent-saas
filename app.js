@@ -655,29 +655,55 @@ async function connectService(service) {
     const integration = INTEGRATIONS[service];
     const serviceName = integration?.name || service;
 
-    try {
-        // Get OAuth URL from backend
-        const res = await fetch(`${API_URL}/integrations/connect/${service}`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+    // Map service to OAuth service name
+    const googleServices = ['gmail', 'calendar', 'drive'];
 
-        if (res.ok) {
-            const data = await res.json();
-            if (data.oauthUrl) {
-                // Open OAuth window
-                window.open(data.oauthUrl, '_blank', 'width=600,height=700');
+    if (googleServices.includes(service)) {
+        // Use our OAuth routes for Google services
+        try {
+            const res = await fetch(`${API_URL}/oauth/services/google/authorize?service=${service}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.url) {
+                    // Redirect to OAuth
+                    window.location.href = data.url;
+                } else {
+                    alert(`Erreur: URL OAuth non disponible`);
+                }
             } else {
-                // For demo: show instructions
-                alert(`🔗 Connexion ${serviceName}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${serviceName}?"`);
+                const data = await res.json();
+                alert(data.error || 'Erreur de connexion OAuth');
             }
-        } else {
-            const data = await res.json();
-            alert(data.error || 'Erreur de connexion');
+        } catch (e) {
+            console.error('OAuth connect error:', e);
+            alert(`Erreur de connexion à ${serviceName}: ${e.message}`);
         }
-    } catch (e) {
-        console.error('Connect error:', e);
-        alert(`🔗 Connexion ${serviceName}\n\nCette fonctionnalité nécessite une configuration N8N.\nDemande à Eva: "Comment connecter mon ${serviceName}?"`);
+    } else {
+        // For other services, use old integrations endpoint
+        try {
+            const res = await fetch(`${API_URL}/integrations/connect/${service}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.oauthUrl) {
+                    window.open(data.oauthUrl, '_blank', 'width=600,height=700');
+                } else {
+                    alert(`🔗 ${serviceName} n'est pas encore configuré.\nContactez l'administrateur.`);
+                }
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Erreur de connexion');
+            }
+        } catch (e) {
+            console.error('Connect error:', e);
+            alert(`Erreur de connexion à ${serviceName}`);
+        }
     }
 }
 
