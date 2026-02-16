@@ -24,29 +24,16 @@ services:
         generateValue: true
       - key: DB_TYPE
         value: "postgresdb"
+      # Use existing database - fill these manually from your Render PostgreSQL
       - key: DB_POSTGRESDB_HOST
-        fromDatabase:
-          name: n8n-db
-          property: host
+        sync: false
       - key: DB_POSTGRESDB_PORT
-        fromDatabase:
-          name: n8n-db
-          property: port
+        value: "5432"
       - key: DB_POSTGRESDB_DATABASE
-        fromDatabase:
-          name: n8n-db
-          property: database
+        sync: false
       - key: DB_POSTGRESDB_USER
-        fromDatabase:
-          name: n8n-db
-          property: user
+        sync: false
       - key: DB_POSTGRESDB_PASSWORD
-        fromDatabase:
-          name: n8n-db
-          property: password
+        sync: false
 
-databases:
-  - name: n8n-db
-    plan: free
-    databaseName: n8n
-    user: n8n
+# No database created - use existing one
