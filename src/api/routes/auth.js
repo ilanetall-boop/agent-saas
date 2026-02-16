@@ -294,6 +294,33 @@ router.get('/me', authMiddleware, (req, res) => {
     });
 });
 
+// Admin: Reset all message limits (Phase 1 fix)
+router.post('/admin/reset-limits', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+
+    // Simple admin key check (use env var in production)
+    if (adminKey !== (process.env.ADMIN_KEY || 'eva-admin-2024')) {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        // Reset all users to unlimited
+        const result = await db.query(
+            'UPDATE users SET messages_limit = 999999999, messages_used = 0'
+        );
+
+        console.log('✅ Admin: Reset all message limits');
+        res.json({
+            success: true,
+            message: 'All users reset to unlimited messages',
+            affected: result.rowCount
+        });
+    } catch (error) {
+        console.error('Reset limits error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Logout (revoke refresh token) (NEW)
 router.post('/logout', authMiddleware, async (req, res) => {
     try {
