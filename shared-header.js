@@ -393,11 +393,23 @@
         const sharedLangSelector = document.getElementById('sharedLangSelector');
         const sharedMobileLangSelector = document.getElementById('sharedMobileLangSelector');
 
-        // Get saved language or detect from browser
-        const savedLang = localStorage.getItem('preferredLanguage') ||
-                         navigator.language.split('-')[0] || 'en';
+        // Get saved language from localStorage, or from existing page selector, or detect from browser
+        let savedLang = localStorage.getItem('preferredLanguage');
 
-        // Set initial value
+        // If no saved language, check if page has its own language selector
+        if (!savedLang) {
+            const pageLangSelector = document.getElementById('langSelector');
+            if (pageLangSelector) {
+                savedLang = pageLangSelector.value;
+            }
+        }
+
+        // Fallback to browser language or English
+        if (!savedLang) {
+            savedLang = navigator.language.split('-')[0] || 'en';
+        }
+
+        // Set initial value and add event listeners
         if (sharedLangSelector) {
             sharedLangSelector.value = savedLang;
             sharedLangSelector.addEventListener('change', function() {

@@ -70,12 +70,16 @@
             color: rgba(255,255,255,0.8);
             padding: 80px 0 40px;
             margin-top: 80px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .shared-footer .container {
             max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
             padding: 0 24px;
+            box-sizing: border-box;
         }
 
         .shared-footer .footer-grid {
