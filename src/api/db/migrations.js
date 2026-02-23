@@ -134,6 +134,42 @@ async function runMigrations(pool) {
         await createIndexIfNotExists(pool, 'user_integrations', 'idx_user_integrations_service', 'service');
         await createIndexIfNotExists(pool, 'user_integrations', 'idx_user_integrations_status', 'status');
 
+        // Migration 24: Enable pgvector extension for vector similarity search
+        const pgvectorEnabled = await enablePgvector(pool);
+
+        // Migration 25: Create agent_memories table (tri-type memory system)
+        const embeddingColType = pgvectorEnabled ? 'vector(1536)' : 'TEXT';
+        await createTableIfNotExists(pool, 'agent_memories', `
+            id TEXT PRIMARY KEY,
+            agent_id TEXT NOT NULL,
+            type VARCHAR(20) NOT NULL CHECK (type IN ('semantic', 'episodic', 'procedural')),
+            content TEXT NOT NULL,
+            source TEXT DEFAULT 'conversation',
+            embedding ${embeddingColType},
+            importance REAL DEFAULT 0.5,
+            access_count INTEGER DEFAULT 0,
+            last_accessed_at TIMESTAMP,
+            event_date TIMESTAMP,
+            category VARCHAR(50),
+            conversation_id TEXT,
+            superseded_by TEXT,
+            is_active BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE
+        `);
+
+        // Migration 26: Create HNSW vector index (only if pgvector is available)
+        if (pgvectorEnabled) {
+            await createVectorIndexIfNotExists(pool);
+        }
+
+        // Migration 27: Create standard indexes for agent_memories
+        await createIndexIfNotExists(pool, 'agent_memories', 'idx_agent_memories_agent', 'agent_id');
+        await createIndexIfNotExists(pool, 'agent_memories', 'idx_agent_memories_type', 'agent_id, type');
+        await createIndexIfNotExists(pool, 'agent_memories', 'idx_agent_memories_active', 'agent_id, is_active');
+        await createIndexIfNotExists(pool, 'agent_memories', 'idx_agent_memories_importance', 'importance DESC');
+
         console.log('✅ Migrations completed successfully');
     } catch (error) {
         console.error('❌ Migration error:', error);
@@ -213,6 +249,43 @@ async function createIndexIfNotExists(pool, tableName, indexName, columnName) {
     } catch (error) {
         console.error(`Error creating index ${indexName}:`, error);
         throw error;
+    }
+}
+
+async function enablePgvector(pool) {
+    try {
+        await pool.query('CREATE EXTENSION IF NOT EXISTS vector');
+        console.log('  ✅ pgvector extension enabled');
+        return true;
+    } catch (error) {
+        console.warn('  ⚠️ pgvector not available, using TEXT fallback for embeddings:', error.message);
+        return false;
+    }
+}
+
+async function createVectorIndexIfNotExists(pool) {
+    const indexName = 'idx_agent_memories_embedding';
+    try {
+        const checkResult = await pool.query(`
+            SELECT EXISTS (
+                SELECT 1 FROM pg_indexes
+                WHERE indexname = $1
+            )
+        `, [indexName]);
+
+        if (!checkResult.rows[0].exists) {
+            console.log(`  ➕ Creating HNSW vector index ${indexName}...`);
+            await pool.query(`
+                CREATE INDEX ${indexName}
+                ON agent_memories USING hnsw (embedding vector_cosine_ops)
+                WITH (m = 16, ef_construction = 64)
+            `);
+            console.log(`  ✅ HNSW vector index created`);
+        } else {
+            console.log(`  ✓ Vector index ${indexName} already exists`);
+        }
+    } catch (error) {
+        console.warn('  ⚠️ Could not create HNSW index:', error.message);
     }
 }
 

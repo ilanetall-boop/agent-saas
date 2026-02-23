@@ -243,6 +243,7 @@ async function route(message, conversationHistory = [], options = {}, db = null)
         userTier = 'free',
         userId = null,
         systemPrompt = null,
+        memoryContext = null,
         language = 'en',
         forceModel = null,
         skipCache = false,
@@ -370,6 +371,11 @@ async function route(message, conversationHistory = [], options = {}, db = null)
 
     // 2.5. Enhance system prompt for specific tasks
     let enhancedPrompt = systemPrompt || '';
+
+    // Append tri-type memory context if available
+    if (memoryContext) {
+        enhancedPrompt += memoryContext;
+    }
 
     if (complexity === 'website') {
         enhancedPrompt += `

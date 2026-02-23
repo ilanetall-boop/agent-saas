@@ -283,6 +283,17 @@ async function start() {
             console.warn('⚠️ Knowledge cache init failed (non-blocking):', cacheError.message);
         }
 
+        // Schedule memory consolidation every 6 hours
+        if (process.env.USE_NEW_MEMORY === 'true') {
+            const { runConsolidationForAllAgents } = require('./services/memory-consolidator');
+            setInterval(() => {
+                runConsolidationForAllAgents(db).catch(err =>
+                    console.error('[Consolidation] Scheduled run failed:', err.message)
+                );
+            }, 6 * 60 * 60 * 1000);
+            console.log('✅ Memory consolidation scheduler active (every 6h)');
+        }
+
         app.listen(config.port, () => {
             console.log(`
 🚀 Agent SaaS server running

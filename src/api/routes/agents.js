@@ -12,6 +12,11 @@ const { route: smartRoute } = require('../services/smart-router');
 const { recordFeedback } = require('../services/knowledge-capitalizer');
 const { getStats: getCostStats } = require('../services/cost-tracker');
 
+// AgentVault-inspired memory system
+const memoryManager = require('../services/memory-manager');
+const { extractMemories } = require('../services/memory-extractor');
+const USE_NEW_MEMORY = process.env.USE_NEW_MEMORY === 'true';
+
 const router = express.Router();
 
 // Get user's agent
@@ -90,11 +95,22 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         const historyRaw = await db.getRecentMessages(conversation.id, 10);
         const history = historyRaw.reverse();
         
-        // Get memory
+        // Get legacy memory (still needed for onboarding keys)
         const memories = await db.getAllMemories(agent.id);
         const memoryMap = {};
         memories.forEach(m => { memoryMap[m.key] = m.value; });
-        
+
+        // New: Retrieve relevant memories via vector search (post-onboarding only)
+        let memoryContext = null;
+        if (USE_NEW_MEMORY && agent.onboarding_complete) {
+            try {
+                const relevantMemories = await memoryManager.retrieveRelevantMemories(agent.id, message, db);
+                memoryContext = memoryManager.formatMemoryContext(relevantMemories, language);
+            } catch (memErr) {
+                console.warn('[MemoryManager] Retrieval failed, using legacy:', memErr.message);
+            }
+        }
+
         // Add user message
         await db.addMessage(nanoid(), conversation.id, 'user', message);
         
@@ -186,6 +202,17 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
             // Mark complete after step 4
             if (nextStep >= 5) {
                 await db.updateAgentOnboarding(agent.id);
+
+                // Migrate onboarding memories to new tri-type system
+                if (USE_NEW_MEMORY) {
+                    setImmediate(async () => {
+                        try {
+                            await memoryManager.migrateOnboardingMemories(agent.id, memoryMap, db);
+                        } catch (err) {
+                            console.error('[Memory] Onboarding migration failed:', err.message);
+                        }
+                    });
+                }
             }
         } else {
             // Normal chat - adapt system prompt to user's language
@@ -207,6 +234,7 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
                     userTier,
                     userId: req.user.id,
                     systemPrompt,
+                    memoryContext, // New: structured tri-type memory context
                     language: language || 'en',
                     skipCache: !agent.onboarding_complete // Don't cache onboarding
                 },
@@ -374,6 +402,21 @@ router.post('/chat', authMiddleware, validateRequest(schemas.chat), async (req, 
         }
 
         res.json(responseData);
+
+        // Async memory extraction (non-blocking, after response sent)
+        if (USE_NEW_MEMORY && agent.onboarding_complete) {
+            setImmediate(async () => {
+                try {
+                    const existingMemories = await db.getAllActiveAgentMemories(agent.id);
+                    await extractMemories(
+                        message, response.content,
+                        existingMemories, agent.id, conversation.id, db
+                    );
+                } catch (err) {
+                    console.error('[MemoryExtractor] Async extraction failed:', err.message);
+                }
+            });
+        }
     } catch (error) {
         console.error(`\n❌ [CHAT ERROR] User: ${req.user?.email}, Error: ${error.message}`);
         console.error('Stack:', error.stack.substring(0, 200));

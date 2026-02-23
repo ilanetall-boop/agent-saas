@@ -17,24 +17,29 @@ const anthropic = new Anthropic({
  * @param {string} options.userTier - User tier: 'free', 'pro', 'business', 'vip' (default: 'free')
  * @param {boolean} options.useRouter - Use AI router for model selection (default: true)
  */
-async function generateResponse({ 
-    systemPrompt, 
-    messages, 
-    memory = {}, 
+async function generateResponse({
+    systemPrompt,
+    messages,
+    memory = {},
+    memoryContext: newMemoryContext = null,
     model = null,
     userTier = 'free',
-    useRouter = true 
+    useRouter = true
 }) {
     // Build context from memory
-    let memoryContext = '';
-    if (Object.keys(memory).length > 0) {
-        memoryContext = '\n\nCe que tu sais sur cette personne:\n';
+    // New tri-type memory context takes priority if available
+    let memoryContextStr = '';
+    if (newMemoryContext) {
+        memoryContextStr = newMemoryContext;
+    } else if (Object.keys(memory).length > 0) {
+        // Legacy fallback: flat key-value format
+        memoryContextStr = '\n\nCe que tu sais sur cette personne:\n';
         for (const [key, value] of Object.entries(memory)) {
-            memoryContext += `- ${key}: ${value}\n`;
+            memoryContextStr += `- ${key}: ${value}\n`;
         }
     }
 
-    const fullSystemPrompt = systemPrompt + memoryContext;
+    const fullSystemPrompt = systemPrompt + memoryContextStr;
     
     // Get the last user message for routing analysis
     const lastMessage = messages.length > 0 ? messages[messages.length - 1].content : '';

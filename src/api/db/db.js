@@ -202,7 +202,145 @@ const dbOps = {
     getAllMemories: async (agentId) => {
         return await all('SELECT key, value FROM memories WHERE agent_id = $1', [agentId]);
     },
-    
+
+    // === Agent Memories (tri-type memory system with vector search) ===
+
+    createAgentMemory: async (id, agentId, type, content, embedding, options = {}) => {
+        const {
+            source = 'conversation',
+            importance = 0.5,
+            eventDate = null,
+            category = null,
+            conversationId = null
+        } = options;
+        const embeddingValue = embedding ? `[${embedding.join(',')}]` : null;
+        await run(`
+            INSERT INTO agent_memories (
+                id, agent_id, type, content, embedding, source,
+                importance, event_date, category, conversation_id
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `, [id, agentId, type, content, embeddingValue, source,
+            importance, eventDate, category, conversationId]);
+    },
+
+    searchAgentMemories: async (agentId, queryEmbedding, options = {}) => {
+        const { limit = 10, types = null, minSimilarity = 0.3 } = options;
+        const embeddingStr = `[${queryEmbedding.join(',')}]`;
+
+        // Try pgvector operator first, fall back to loading all + JS cosine
+        try {
+            let query = `
+                SELECT id, type, content, source, importance,
+                    access_count, last_accessed_at, event_date, category,
+                    1 - (embedding <=> $2::vector) as similarity
+                FROM agent_memories
+                WHERE agent_id = $1 AND is_active = TRUE AND embedding IS NOT NULL
+            `;
+            const params = [agentId, embeddingStr];
+            let paramIdx = 2;
+
+            if (types && types.length > 0) {
+                paramIdx++;
+                query += ` AND type = ANY($${paramIdx})`;
+                params.push(types);
+            }
+
+            query += ` HAVING 1 - (embedding <=> $2::vector) >= ${minSimilarity}`;
+            query += ` ORDER BY similarity DESC LIMIT ${limit}`;
+
+            // Wrap in subquery to allow HAVING-like filter
+            const fullQuery = `
+                SELECT * FROM (
+                    SELECT id, type, content, source, importance,
+                        access_count, last_accessed_at, event_date, category,
+                        1 - (embedding <=> $2::vector) as similarity
+                    FROM agent_memories
+                    WHERE agent_id = $1 AND is_active = TRUE AND embedding IS NOT NULL
+                    ${types && types.length > 0 ? `AND type = ANY($3)` : ''}
+                ) sub
+                WHERE similarity >= ${minSimilarity}
+                ORDER BY similarity DESC
+                LIMIT ${limit}
+            `;
+            const finalParams = types && types.length > 0
+                ? [agentId, embeddingStr, types]
+                : [agentId, embeddingStr];
+
+            return await all(fullQuery, finalParams);
+        } catch (error) {
+            // Fallback: pgvector not available, use TEXT embeddings + JS cosine
+            if (error.message.includes('operator does not exist') || error.message.includes('type "vector"')) {
+                console.warn('[DB] pgvector not available, using fallback cosine similarity');
+                const rows = await all(`
+                    SELECT id, type, content, source, importance,
+                        access_count, last_accessed_at, event_date, category, embedding
+                    FROM agent_memories
+                    WHERE agent_id = $1 AND is_active = TRUE AND embedding IS NOT NULL
+                    ${types && types.length > 0 ? `AND type = ANY($2)` : ''}
+                `, types && types.length > 0 ? [agentId, types] : [agentId]);
+
+                // Cosine similarity in JS
+                const cosine = (a, b) => {
+                    let dot = 0, magA = 0, magB = 0;
+                    for (let i = 0; i < a.length; i++) {
+                        dot += a[i] * b[i];
+                        magA += a[i] * a[i];
+                        magB += b[i] * b[i];
+                    }
+                    return dot / (Math.sqrt(magA) * Math.sqrt(magB));
+                };
+
+                return rows
+                    .map(row => {
+                        const emb = JSON.parse(row.embedding);
+                        const similarity = cosine(queryEmbedding, emb);
+                        return { ...row, embedding: undefined, similarity };
+                    })
+                    .filter(r => r.similarity >= minSimilarity)
+                    .sort((a, b) => b.similarity - a.similarity)
+                    .slice(0, limit);
+            }
+            throw error;
+        }
+    },
+
+    updateMemoryAccess: async (memoryIds) => {
+        if (!memoryIds || memoryIds.length === 0) return;
+        await run(`
+            UPDATE agent_memories
+            SET access_count = access_count + 1,
+                last_accessed_at = CURRENT_TIMESTAMP
+            WHERE id = ANY($1)
+        `, [memoryIds]);
+    },
+
+    getAgentMemoriesByType: async (agentId, type) => {
+        return await all(`
+            SELECT id, content, importance, access_count, event_date, category, created_at
+            FROM agent_memories
+            WHERE agent_id = $1 AND type = $2 AND is_active = TRUE
+            ORDER BY importance DESC, created_at DESC
+        `, [agentId, type]);
+    },
+
+    deactivateMemory: async (memoryId, supersededBy = null) => {
+        await run(`
+            UPDATE agent_memories
+            SET is_active = FALSE, superseded_by = $2, updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+        `, [memoryId, supersededBy]);
+    },
+
+    getAllActiveAgentMemories: async (agentId) => {
+        return await all(`
+            SELECT id, type, content, importance, access_count,
+                   last_accessed_at, event_date, category, source, created_at, embedding
+            FROM agent_memories
+            WHERE agent_id = $1 AND is_active = TRUE
+            ORDER BY type, importance DESC
+        `, [agentId]);
+    },
+
     // Conversations
     createConversation: async (id, agentId, channel) => {
         await run(
