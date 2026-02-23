@@ -229,55 +229,42 @@ const dbOps = {
 
         // Try pgvector operator first, fall back to loading all + JS cosine
         try {
-            let query = `
-                SELECT id, type, content, source, importance,
-                    access_count, last_accessed_at, event_date, category,
-                    1 - (embedding <=> $2::vector) as similarity
-                FROM agent_memories
-                WHERE agent_id = $1 AND is_active = TRUE AND embedding IS NOT NULL
-            `;
-            const params = [agentId, embeddingStr];
-            let paramIdx = 2;
+            // All values passed as parameterized queries to prevent SQL injection
+            const hasTypes = types && types.length > 0;
+            const params = hasTypes
+                ? [agentId, embeddingStr, types, minSimilarity, limit]
+                : [agentId, embeddingStr, minSimilarity, limit];
 
-            if (types && types.length > 0) {
-                paramIdx++;
-                query += ` AND type = ANY($${paramIdx})`;
-                params.push(types);
-            }
+            const simParam = hasTypes ? '$4' : '$3';
+            const limParam = hasTypes ? '$5' : '$4';
 
-            query += ` HAVING 1 - (embedding <=> $2::vector) >= ${minSimilarity}`;
-            query += ` ORDER BY similarity DESC LIMIT ${limit}`;
-
-            // Wrap in subquery to allow HAVING-like filter
-            const fullQuery = `
+            const query = `
                 SELECT * FROM (
                     SELECT id, type, content, source, importance,
                         access_count, last_accessed_at, event_date, category,
                         1 - (embedding <=> $2::vector) as similarity
                     FROM agent_memories
                     WHERE agent_id = $1 AND is_active = TRUE AND embedding IS NOT NULL
-                    ${types && types.length > 0 ? `AND type = ANY($3)` : ''}
+                    ${hasTypes ? 'AND type = ANY($3)' : ''}
                 ) sub
-                WHERE similarity >= ${minSimilarity}
+                WHERE similarity >= ${simParam}
                 ORDER BY similarity DESC
-                LIMIT ${limit}
+                LIMIT ${limParam}
             `;
-            const finalParams = types && types.length > 0
-                ? [agentId, embeddingStr, types]
-                : [agentId, embeddingStr];
 
-            return await all(fullQuery, finalParams);
+            return await all(query, params);
         } catch (error) {
             // Fallback: pgvector not available, use TEXT embeddings + JS cosine
             if (error.message.includes('operator does not exist') || error.message.includes('type "vector"')) {
                 console.warn('[DB] pgvector not available, using fallback cosine similarity');
+                const hasTypes = types && types.length > 0;
                 const rows = await all(`
                     SELECT id, type, content, source, importance,
                         access_count, last_accessed_at, event_date, category, embedding
                     FROM agent_memories
                     WHERE agent_id = $1 AND is_active = TRUE AND embedding IS NOT NULL
-                    ${types && types.length > 0 ? `AND type = ANY($2)` : ''}
-                `, types && types.length > 0 ? [agentId, types] : [agentId]);
+                    ${hasTypes ? 'AND type = ANY($2)' : ''}
+                `, hasTypes ? [agentId, types] : [agentId]);
 
                 // Cosine similarity in JS
                 const cosine = (a, b) => {
