@@ -169,6 +169,19 @@ async function callExtractionModel(prompt) {
 }
 
 /**
+ * Sanitize memory content before DB insertion.
+ * Prevents stored prompt injection and XSS via LLM-extracted content.
+ */
+function sanitizeMemoryContent(content) {
+    return content
+        .replace(/<script[^>]*>.*?<\/script>/gi, '') // Strip script tags
+        .replace(/<[^>]+>/g, '')                      // Strip all HTML tags
+        .replace(/\{%.*?%\}/g, '')                    // Strip template injection
+        .replace(/\$\{.*?\}/g, '')                    // Strip template literals
+        .trim();
+}
+
+/**
  * Parse LLM JSON response, handling common formatting issues
  */
 function parseExtractionResult(text) {
@@ -182,16 +195,16 @@ function parseExtractionResult(text) {
         const parsed = JSON.parse(cleaned);
         if (!parsed.memories || !Array.isArray(parsed.memories)) return [];
 
-        // Validate each memory
+        // Validate and sanitize each memory
         return parsed.memories.filter(m =>
             m.type && ['semantic', 'episodic', 'procedural'].includes(m.type) &&
             m.content && typeof m.content === 'string' && m.content.length > 5
         ).map(m => ({
             type: m.type,
-            content: m.content.substring(0, 500),
+            content: sanitizeMemoryContent(m.content.substring(0, 500)),
             importance: Math.max(0.1, Math.min(1.0, m.importance || 0.5)),
-            category: m.category || null
-        }));
+            category: m.category ? m.category.replace(/[^a-zA-Z0-9_\- ]/g, '').substring(0, 50) : null
+        })).filter(m => m.content.length > 5); // Re-check after sanitization
     } catch (error) {
         console.warn('[MemoryExtractor] Failed to parse LLM response:', error.message);
         return [];

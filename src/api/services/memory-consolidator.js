@@ -1,14 +1,15 @@
 /**
  * Memory Consolidation Service
  * Runs periodically to maintain memory quality:
- * - Merges near-duplicate memories
- * - Decays importance of unused memories
+ * - Merges near-duplicate memories (capped to avoid O(n^2) explosion)
+ * - Decays importance of unused memories (skips stable semantic facts)
  * - Promotes frequently accessed memories
  */
 
-const { generateEmbedding, cosineSimilarity } = require('./embeddings');
+const { cosineSimilarity } = require('./embeddings');
 
 const DUPLICATE_THRESHOLD = 0.92;
+const MAX_MEMORIES_PER_TYPE_FOR_DEDUP = 200; // Cap to avoid O(n^2) with large sets
 
 /**
  * Run consolidation for a single agent
@@ -22,10 +23,19 @@ async function consolidateAgent(agentId, db) {
     const allMemories = await db.getAllActiveAgentMemories(agentId);
 
     for (const type of ['semantic', 'episodic', 'procedural']) {
-        const typed = allMemories.filter(m => m.type === type && m.embedding);
+        let typed = allMemories.filter(m => m.type === type && m.embedding);
+
+        // Cap: only dedup the most recent N memories per type to avoid O(n^2) explosion
+        // With 200 cap: max 20,000 comparisons per type (manageable)
+        if (typed.length > MAX_MEMORIES_PER_TYPE_FOR_DEDUP) {
+            console.log(`[Consolidation] Agent ${agentId}: ${type} has ${typed.length} memories, capping dedup to ${MAX_MEMORIES_PER_TYPE_FOR_DEDUP} most recent`);
+            typed = typed
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, MAX_MEMORIES_PER_TYPE_FOR_DEDUP);
+        }
 
         for (let i = 0; i < typed.length; i++) {
-            if (!typed[i].is_active) continue; // May have been deactivated in this pass
+            if (!typed[i].is_active) continue;
 
             for (let j = i + 1; j < typed.length; j++) {
                 if (!typed[j].is_active) continue;
@@ -40,7 +50,6 @@ async function consolidateAgent(agentId, db) {
 
                 const similarity = cosineSimilarity(embA, embB);
                 if (similarity >= DUPLICATE_THRESHOLD) {
-                    // Keep the one with higher importance, deactivate the other
                     const keeper = (typed[i].importance || 0) >= (typed[j].importance || 0) ? typed[i] : typed[j];
                     const loser = keeper === typed[i] ? typed[j] : typed[i];
 
@@ -53,6 +62,8 @@ async function consolidateAgent(agentId, db) {
     }
 
     // 2. Decay unused memories (not accessed in 30+ days)
+    // SKIP semantic memories with importance >= 0.8 (stable identity facts like name, job)
+    // These should not decay even if unused — they are foundational knowledge
     const decayResult = await db.run(`
         UPDATE agent_memories
         SET importance = GREATEST(0.1, importance * 0.95),
@@ -60,6 +71,7 @@ async function consolidateAgent(agentId, db) {
         WHERE agent_id = $1
           AND is_active = TRUE
           AND last_accessed_at < CURRENT_TIMESTAMP - INTERVAL '30 days'
+          AND NOT (type = 'semantic' AND importance >= 0.8)
     `, [agentId]);
     decayed = decayResult.rowCount || 0;
 
